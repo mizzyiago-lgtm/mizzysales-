@@ -1,0 +1,121 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Mizzy Social — brand skin layer.
+   Loaded LAST on every page. Only visual: colours, logo, surfaces, tab bar.
+   No layout logic, no scripts, no backend contracts touched.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --mz-cyan: #22d3ee;
+  --mz-cyan-2: #06b6d4;
+  --mz-cyan-soft: #7dd3fc;
+  --mz-glow: 0 0 0 1px rgba(34, 211, 238, .22), 0 10px 30px -12px rgba(34, 211, 238, .45);
+  --mz-ink: #05070c;
+}
+
+html[data-theme="dark"], html:not([data-theme="light"]):not([data-theme="off"]) {
+  --bg: #05070c;
+  --bg2: #090d15;
+  --bg3: #0d1220;
+  --bg4: #131a2b;
+  --card: #0b1018;
+  --card2: #111827;
+  --border: #1b2436;
+  --border2: #24304a;
+  --t1: #eaf6fb;
+  --t2: #8fa3b8;
+  --t3: #5b6b80;
+}
+
+/* ── Logo ─────────────────────────────────────────────────────────────── */
+.brand-icon,
+.dbfl-crown-svg {
+  background: #000 url("/img/mizzy-logo.jpg") center/cover no-repeat !important;
+  box-shadow: var(--mz-glow) !important;
+  border-radius: 50% !important;
+}
+.brand-icon > svg,
+.dbfl-crown-svg > svg { display: none !important; }
+
+.brand-ksl {
+  color: var(--mz-cyan) !important;
+  letter-spacing: .04em;
+  background: linear-gradient(92deg, #ffffff 0%, var(--mz-cyan) 60%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.brand-ksl .brand-verified { -webkit-text-fill-color: initial; }
+
+/* ── Accent surfaces ──────────────────────────────────────────────────── */
+.btn-primary,
+.btn-gold,
+.btn-nav-reg,
+.prod-select-btn {
+  background: linear-gradient(135deg, var(--mz-cyan), var(--mz-cyan-2)) !important;
+  color: var(--mz-ink) !important;
+  font-weight: 800;
+  box-shadow: 0 8px 24px -12px rgba(34, 211, 238, .8);
+}
+.btn-primary:hover,
+.btn-gold:hover,
+.btn-nav-reg:hover { filter: brightness(1.08); }
+
+html[data-theme="dark"] .navbar,
+html:not([data-theme="light"]):not([data-theme="off"]) .navbar {
+  background: rgba(5, 7, 12, .88);
+  border-bottom: 1px solid var(--border);
+}
+
+.card, .kls-card, .stat-card {
+  border-radius: 18px;
+}
+
+/* ── Bottom tab bar — floating pill, matches the reference layout ─────── */
+.bottom-tabbar {
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%);
+  width: min(560px, calc(100% - 20px)) !important;
+  bottom: 10px !important;
+  border-radius: 22px !important;
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+  background: color-mix(in srgb, var(--card) 92%, transparent) !important;
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--border2) !important;
+  box-shadow: 0 -2px 40px -14px rgba(34, 211, 238, .5), 0 12px 32px -18px #000 !important;
+}
+.bottom-tabbar .bt-item {
+  position: relative;
+  gap: 4px;
+  color: var(--t2);
+  font-weight: 600;
+}
+.bottom-tabbar .bt-item .bt-label { font-size: 10.5px; line-height: 1.15; }
+.bottom-tabbar .bt-item .bt-icon .icon { width: 21px; height: 21px; }
+.bottom-tabbar .bt-item.active { color: var(--mz-cyan); }
+.bottom-tabbar .bt-item.active::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 34px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--mz-cyan);
+  box-shadow: 0 0 12px var(--mz-cyan);
+}
+
+/* keep floating buttons clear of the pill */
+.community-fab { bottom: 96px !important; }
+.ai-chat-fab { bottom: 160px !important; }
+
+/* ── Hero headline: brand cyan sweep, no legacy gold ──────────────────── */
+.hero-gradient {
+  background: linear-gradient(135deg, var(--mz-cyan) 0%, var(--mz-cyan-soft) 45%, #ffffff 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+/* hero crown mark → brand logo */
+.hero-h1 > svg, .hero-crown { display: none !important; }

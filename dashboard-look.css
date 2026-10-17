@@ -1,0 +1,267 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Mizzy Sales — dashboard look, shared by every page  (dashboard-look.css)
+
+   Source of truth: the <style> block in dashboard.html.
+   Same cyan/blue palette, same radii, same cards, buttons, nav and dock.
+   Load this LAST in <head> (after mizzy-unified.css and any inline styles).
+   To change the site's look later, edit the tokens in the first block only.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Tokens (identical to the dashboard) ───────────────────────────────── */
+:root {
+  --ms-blue: #00b4f8;
+  --ms-blue-dark: #0084d6;
+  --ms-cyan-light: #e6f8ff;
+  --ms-glow: rgba(0, 180, 248, 0.28);
+  --card-bg: #131b2e;
+  --card-border: rgba(0, 180, 248, 0.16);
+  --text: #f0f6fc;
+  --text-muted: #8b9bb4;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xl: 20px;
+  --ms-dock-bg: rgba(19, 27, 46, 0.94);
+  --ms-hero-bg: linear-gradient(145deg, #0d1e38 0%, #002d57 100%);
+
+  /* Map the dashboard tokens onto the variables the other pages already use */
+  --gold: var(--ms-blue);
+  --gold2: var(--ms-blue-dark);
+  --accent: var(--ms-blue);
+  --bg: #0b0f19;
+  --card: var(--card-bg);
+  --border: var(--card-border);
+  --t1: var(--text);
+  --t2: var(--text-muted);
+  --r8: var(--radius-sm);
+  --r12: 12px;
+  --r16: var(--radius);
+  --r24: var(--radius-xl);
+  --kls-r-sm: var(--radius-sm);
+  --kls-r-md: 12px;
+  --kls-r-lg: var(--radius);
+  --app-radius: var(--radius);
+  --pro-radius: var(--radius);
+  --pro-radius-sm: var(--radius-sm);
+}
+
+html[data-theme="light"] {
+  --ms-cyan-light: #e0f4ff;
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 180, 248, 0.18);
+  --text: #0e1726;
+  --text-muted: #5e6d82;
+  --ms-dock-bg: rgba(255, 255, 255, 0.94);
+  --bg: #f4f8fc;
+  --gold: var(--ms-blue);
+  --gold2: var(--ms-blue-dark);
+  --accent: var(--ms-blue);
+}
+
+/* ── 2. Page + type ───────────────────────────────────────────────────────── */
+html body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+html body h1,
+html body h2,
+html body h3,
+html body h4,
+html body .brand-ksl,
+html body .brand-title {
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  color: var(--text);
+}
+html body p a, html body .terms-body a, html body .link-btn { color: var(--ms-blue); }
+
+/* ── 3. Top bar (dashboard header: page colour, soft blur, cyan accents) ──── */
+html body .navbar {
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  border-bottom: 1px solid var(--card-border);
+  backdrop-filter: blur(12px);
+  box-shadow: none;
+}
+html body .nav-link { color: var(--text-muted); border-radius: 999px; }
+html body .nav-link:hover,
+html body .nav-link.active { color: var(--ms-blue); background: color-mix(in srgb, var(--ms-blue) 12%, transparent); }
+html body .brand-icon,
+html body .dbfl-crown-svg { background: linear-gradient(135deg, #00d2ff, #0084d6); box-shadow: 0 4px 16px var(--ms-glow); color: #fff; }
+html body .nav-avatar,
+html body .an-avatar-fallback { background: linear-gradient(135deg, #00d2ff, #0084d6); color: #fff; }
+html body .nav-balance-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--ms-blue); border-radius: 999px; }
+html body .nav-balance-btn:hover { border-color: var(--ms-blue); box-shadow: 0 0 14px var(--ms-glow); background: var(--card-bg); }
+html body :is(.theme-btn, .notif-btn, .drawer-icon-btn, .drawer-close) {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 50%;
+  color: var(--text);
+}
+html body :is(.theme-btn, .notif-btn, .drawer-icon-btn, .drawer-close):hover { background: var(--ms-cyan-light); color: var(--ms-blue-dark); border-color: var(--card-border); transform: translateY(-1px); }
+html body :is(.nav-dropdown, .notif-menu, .theme-menu, .modal-box, .cat-dropdown-menu, .bank-dropdown) {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+}
+html body .modal-box { border-radius: var(--radius-xl); }
+
+/* ── 4. Cards, tiles and sections ─────────────────────────────────────────── */
+html body :is(.card, .prod-card, .product-card, .stat-card, .setting-card, .settings-card, .panel, .kls-card,
+              .purchase-card, .supp-card, .how-card, .why-card, .wo-card, .wc-card, .wc-item, .ws-item,
+              .tb-card, .game-card, .lb-section, .dep-step-card, .dep-menu-btn, .dep-result-card, .dep-method-card,
+              .txn-wrap, .chat-sidebar, .chat-main, .faq-item, .auth-card, .welcome-how, .mkt-toolbar, .account-card) {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  box-shadow: none;
+}
+html body :is(.stat-card, .ws-item, .wc-card, .wc-item, .tb-card, .game-card, .dep-menu-btn, .dep-method-card, .app-tiles a) {
+  border-radius: var(--radius);
+}
+html body .faq-item { border-radius: var(--radius); }
+html body :is(.prod-card, .product-card, .why-card, .wo-card, .wc-card, .wc-item, .tb-card, .game-card,
+              .dep-menu-btn, .dep-method-card, .app-tiles a, .purchase-card) {
+  transition: transform .15s, border-color .15s, box-shadow .15s;
+}
+html body :is(.prod-card, .product-card, .why-card, .wo-card, .wc-card, .wc-item, .tb-card, .game-card,
+              .dep-menu-btn, .dep-method-card, .app-tiles a):hover {
+  transform: translateY(-2px);
+  border-color: var(--ms-blue);
+  box-shadow: 0 4px 12px var(--ms-glow);
+}
+html body :is(.why-icon, .wc-icon, .dep-step-icon, .step-n, .tile-icon, .app-tile-ico) { color: var(--ms-blue); }
+html body :is(.dep-step-icon, .step-n) {
+  background: linear-gradient(135deg, rgba(0, 180, 248, 0.15), rgba(0, 132, 214, 0.25));
+  border: 0;
+  border-radius: 12px;
+}
+html body :is(.step-n) { border-radius: 50%; }
+html body :is(.txn-item, .lb-row, .dcb-row, .cat-opt, .bank-opt) { border-color: var(--card-border); }
+html body .page-hero { background: none; border-bottom: 1px solid var(--card-border); }
+html body .page-hero h1 { color: var(--text); }
+html body .page-hero p { color: var(--text-muted); }
+
+/* ── 5. Balance / hero card (same gradient as the dashboard hero) ─────────── */
+html body :is(.wallet-card, .app-bal, .virtual-account-card) {
+  background: var(--ms-hero-bg);
+  border: 1px solid rgba(0, 180, 248, 0.35);
+  border-radius: 22px;
+  color: #ffffff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25), 0 0 24px var(--ms-glow);
+}
+html[data-theme="light"] body :is(.wallet-card, .app-bal, .virtual-account-card) { background: var(--ms-hero-bg); box-shadow: 0 12px 30px rgba(0, 45, 87, 0.22), 0 0 24px var(--ms-glow); }
+html body .wc-amount { font-family: 'Sora', sans-serif; }
+
+/* ── 6. Buttons (dashboard "Deposit" button language) ─────────────────────── */
+html body :is(.btn-primary, .btn-gold, .kls-btn-primary, .prod-select-btn, .hero-cta, .btn-nav-reg, .acc-copy,
+              .oab-copy, .m-buy-btn, .cat-dropdown-btn, .chat-send-btn, .chat-voice-send, .dep-submit-btn) {
+  background: linear-gradient(90deg, #00b4f8, #0084d6);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0, 180, 248, 0.4);
+  transition: transform .15s, opacity .15s;
+}
+html body :is(.btn-primary, .btn-gold, .kls-btn-primary, .prod-select-btn, .hero-cta, .btn-nav-reg, .acc-copy,
+              .oab-copy, .m-buy-btn, .cat-dropdown-btn, .chat-send-btn, .chat-voice-send, .dep-submit-btn):hover {
+  background: linear-gradient(90deg, #00b4f8, #0084d6);
+  color: #fff;
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+html body :is(.btn-primary, .btn-gold, .prod-select-btn, .m-buy-btn, .dep-submit-btn):disabled { opacity: .5; box-shadow: none; transform: none; }
+html body :is(.btn-secondary, .btn-nav-login, .hero-wa, .sec-more, .mgid-copy, .tutorial-nav-btn) {
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+}
+html body :is(.btn-secondary, .btn-nav-login, .hero-wa, .sec-more, .mgid-copy):hover { border-color: var(--ms-blue); color: var(--ms-blue); box-shadow: 0 0 14px var(--ms-glow); }
+html body :is(.filt, .hlink, .dep-quick-amounts button, .lb-game-tab, .lang-tab, .dep-method-option) {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-muted);
+  border-radius: 999px;
+}
+html body :is(.filt.active, .lb-game-tab.active, .dep-method-option.active, .dep-quick-amounts button.active, .cat-opt.active, .txn-seg-thumb) {
+  background: var(--ms-blue);
+  border-color: var(--ms-blue);
+  color: #fff;
+}
+html body :is(.filt:hover, .hlink:hover, .dep-quick-amounts button:hover) { border-color: var(--ms-blue); color: var(--ms-blue); }
+html body :is(.filt.active, .txn-seg-opt.active) { color: #fff; }
+
+/* ── 7. Chips and badges (dashboard .mz-badge) ────────────────────────────── */
+html body :is(.hero-chip, .ph-chip, .prod-badge, .pc-type, .ai-badge, .dep-chip) {
+  background: rgba(0, 180, 248, 0.2);
+  border: 1px solid rgba(0, 180, 248, 0.4);
+  color: var(--ms-blue-dark);
+  border-radius: 999px;
+}
+html[data-theme="dark"] body :is(.hero-chip, .ph-chip, .prod-badge, .pc-type, .ai-badge, .dep-chip),
+html:not([data-theme]) body :is(.hero-chip, .ph-chip, .prod-badge, .pc-type, .ai-badge, .dep-chip) { color: #7ee2ff; }
+html body .prod-badge { color: #fff; background: var(--ms-blue); border: 0; }
+
+/* ── 8. Form fields ───────────────────────────────────────────────────────── */
+html body :is(input, textarea, select, .input-field) {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+}
+html[data-theme="light"] body :is(input, textarea, select, .input-field) { background: #f4f8fc; }
+html body :is(input, textarea, select, .input-field):focus {
+  border-color: var(--ms-blue);
+  box-shadow: 0 0 0 3px var(--ms-glow);
+  outline: 0;
+}
+html body :is(input, textarea)::placeholder { color: var(--text-muted); opacity: .8; }
+html body label { color: var(--text-muted); }
+html body input[type="checkbox"], html body input[type="radio"] { accent-color: var(--ms-blue); }
+
+/* ── 9. Prices, links and accents that were the old gold ──────────────────── */
+html body :is(.prod-price, .pc-price, .m-price, .m-price-badge, .oab-big, .acc-bank, .sec-label, .prod-cat,
+              .hstat-n, .ws-num, .lb-score, .tb-spent, .auth-brand, .faq-chev, .sa-row-price) { color: var(--ms-blue); }
+html body :is(.sec-label, .prod-cat) { letter-spacing: .04em; }
+html body .m-price-badge { background: rgba(0, 180, 248, 0.12); }
+html body .hero-gradient { background: linear-gradient(135deg, #00d2ff 0%, #00b4f8 50%, #0084d6 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+html body :is(.chat-msg.mine .chat-msg-bubble) { background: linear-gradient(135deg, #00b4f8, #0084d6); color: #fff; }
+html body :is(.chat-msg.theirs .chat-msg-bubble, .chat-send-btn) { border-radius: 14px; }
+html body .chat-send-btn { border-radius: 12px; }
+
+/* ── 10. Floating dock (dashboard bottom nav) on phones ───────────────────── */
+@media (max-width: 768px) {
+  html body .bottom-tabbar {
+    left: 50%;
+    right: auto;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 460px;
+    padding: 8px 18px;
+    background: var(--ms-dock-bg);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--card-border);
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+  html[data-theme="light"] body .bottom-tabbar { box-shadow: 0 8px 24px rgba(14, 23, 38, 0.14); }
+  html body .bt-item { color: var(--text-muted); font-weight: 600; }
+  html body .bt-item.active,
+  html body .bt-item:hover { color: var(--ms-blue); }
+  html body { padding-bottom: 90px; }
+  html body.logged-out { padding-bottom: 0; }
+}
+
+/* ── 11. Misc surfaces ────────────────────────────────────────────────────── */
+html body .site-footer, html body .footer-bottom { border-color: var(--card-border); }
+html body .toast { background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--card-border); }
+html body .spin { border-top-color: var(--ms-blue); }
+html body .auth-bg { background: radial-gradient(ellipse 60% 60% at 50% -10%, rgba(0, 180, 248, 0.10), transparent); }
+html body :is(.support-fab .sfab-toggle, .ai-chat-fab) { background: linear-gradient(135deg, #00b4f8, #0084d6); color: #fff; }
+html body .page-load-bar { background: linear-gradient(90deg, #00b4f8, #00d2ff); box-shadow: 0 0 8px var(--ms-glow); }
+
+@media (prefers-reduced-motion: reduce) {
+  html body * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}

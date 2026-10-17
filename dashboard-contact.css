@@ -1,0 +1,21 @@
+.ms-contact{max-width:1200px;margin:22px auto;padding:22px;border-radius:22px;background:linear-gradient(160deg,var(--card,#fff),color-mix(in srgb,var(--ms-blue,#0ea5e9) 6%,var(--card,#fff)));border:1px solid color-mix(in srgb,var(--ms-blue,#0ea5e9) 18%,transparent);box-shadow:0 10px 30px -18px color-mix(in srgb,var(--ms-blue,#0ea5e9) 55%,transparent)}
+.ms-contact__head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:6px}
+.ms-contact__eyebrow{margin:0 0 4px;color:var(--ms-blue,#0ea5e9);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+.ms-contact h2{margin:0;font-size:clamp(20px,2.6vw,26px);font-weight:800}
+.ms-contact__live{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:99px;font-size:12px;font-weight:700;color:#059669;background:color-mix(in srgb,#10b981 12%,transparent)}
+.ms-contact__live i{width:7px;height:7px;border-radius:50%;background:#10b981;animation:msPulse 1.6s infinite}
+.ms-contact__hours{margin:6px 0 0;font-size:13px;color:var(--t2,#64748b)}
+.ms-contact__grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:16px}
+@media(min-width:640px){.ms-contact__grid{grid-template-columns:1fr 1fr}}
+.ms-contact__card{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;text-decoration:none;color:inherit;background:var(--card,#fff);border:1px solid color-mix(in srgb,var(--ms-blue,#0ea5e9) 16%,transparent);transition:transform .18s,box-shadow .18s,border-color .18s}
+.ms-contact__card:hover,.ms-contact__card:active{transform:translateY(-2px);border-color:var(--ms-blue,#0ea5e9);box-shadow:0 8px 20px -12px color-mix(in srgb,var(--ms-blue,#0ea5e9) 70%,transparent)}
+.ms-contact__ic{flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:12px;font-size:20px;background:color-mix(in srgb,var(--ms-blue,#0ea5e9) 12%,transparent)}
+.ms-contact__card--wa .ms-contact__ic{background:color-mix(in srgb,#25d366 16%,transparent)}
+.ms-contact__card--tg .ms-contact__ic{background:color-mix(in srgb,#229ed9 16%,transparent)}
+.ms-contact__txt{flex:1;min-width:0;display:flex;flex-direction:column}
+.ms-contact__txt b{font-size:15px;font-weight:700}
+.ms-contact__txt small{font-size:12px;color:var(--t2,#64748b);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-contact__go{flex:none;color:var(--ms-blue,#0ea5e9);font-weight:800;font-size:18px}
+.ms-contact.is-updated .ms-contact__card{animation:msFlash .9s ease}
+@keyframes msPulse{50%{opacity:.35}}
+@keyframes msFlash{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ms-blue,#0ea5e9) 45%,transparent)}100%{box-shadow:0 0 0 10px transparent}}
