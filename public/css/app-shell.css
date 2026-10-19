@@ -1,5 +1,5 @@
 /* ────────────────────────────────────────────────────────────────────────────
-   Mizzy Sales App Shell — turns the site into an app-style experience.
+   Mizzysales App Shell — turns the site into an app-style experience.
 
    Loaded last on every page (after redesign.css / fix-pack.css) so it can
    override the older desktop-website chrome:
@@ -13,18 +13,18 @@
 :root {
   --app-max: 560px;
   --app-nav-h: 62px;
-  /* Brand rails — blue & white (matches --gold accent #2f7bf6) */
-  --app-blue: #2f7bf6;
-  --app-blue2: #1a5fd0;
+  /* Brand rails — blue & white (matches --gold accent #0788e8) */
+  --app-blue: #0788e8;
+  --app-blue2: #0a6fd0;
   --app-blue-soft: #eaf2ff;
   /* Legacy aliases kept so older rules keep working — now blue, never green */
   --app-green: var(--app-blue);
   --app-green2: var(--app-blue2);
 }
 html[data-theme="dark"] {
-  --app-blue: #4d92ff;
-  --app-blue2: #2f6fdc;
-  --app-blue-soft: rgba(77,146,255,.14);
+  --app-blue: #4ade80;
+  --app-blue2: #0788e8;
+  --app-blue-soft: rgba(74,222,128,.14);
 }
 
 /* ── 1. Kill the slide bar (drawer) everywhere ───────────────────────────── */

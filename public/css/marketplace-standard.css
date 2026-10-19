@@ -1,5 +1,5 @@
 /* Shared professional marketplace layout for dashboard, numbers, boosting and support. */
-:root{--market-accent:var(--gold);--market-positive:#16a36a;--market-radius:8px}
+:root{--market-accent:#0788e8;--market-positive:#16a36a;--market-radius:8px}
 body{letter-spacing:0;background:var(--bg,#f5f7fb)}
 .page-hero{max-width:1120px;margin:28px auto 18px;padding:30px 34px!important;border:1px solid var(--border);border-radius:var(--market-radius);background:var(--card);text-align:left!important}
 .page-hero h1{font-size:clamp(25px,3vw,38px)!important;letter-spacing:0!important;margin:7px 0!important}
@@ -14,7 +14,7 @@ body{letter-spacing:0;background:var(--bg,#f5f7fb)}
 .bst-form label[for="boostDesc"]{grid-row:1}.bst-form #boostDesc{grid-row:2 / span 4;min-height:145px}.bst-form label[for="boostAvgTime"]{grid-row:6}.bst-form #boostAvgTime{grid-row:7}.bst-form label[for="boostCharge"]{grid-row:8}.bst-form #boostCharge{grid-row:9}.bst-form #boostPreview{grid-row:10}
 .srv-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
 .srv-card{min-height:126px!important;border-radius:var(--market-radius)!important;text-align:left!important;transition:border-color .18s,transform .18s,box-shadow .18s!important}
-.srv-card:hover{transform:translateY(-2px);border-color:var(--market-accent)!important;box-shadow:0 10px 24px color-mix(in srgb,var(--gold) 12%,transparent)!important}
+.srv-card:hover{transform:translateY(-2px);border-color:var(--market-accent)!important;box-shadow:0 10px 24px rgba(7,136,232,.12)!important}
 .dsh{max-width:1120px!important}.dsh-cols{grid-template-columns:minmax(310px,.8fr) minmax(0,1.2fr)!important}.dsh-bal{background:linear-gradient(110deg,#10233d,#164a70)!important;color:#fff!important}.hm-quick{grid-template-columns:repeat(3,minmax(0,1fr))!important}.hm-quick a{min-height:86px;border-radius:var(--market-radius)!important}
 .live-support-log{height:340px;overflow:auto;display:flex;flex-direction:column;gap:9px;padding:14px;background:var(--card2);border:1px solid var(--border);border-radius:6px;margin:12px 0}
 .live-support-msg{max-width:82%;padding:9px 11px;border-radius:7px;font-size:13px;line-height:1.5;white-space:pre-wrap}

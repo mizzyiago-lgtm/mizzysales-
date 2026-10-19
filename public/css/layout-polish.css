@@ -80,7 +80,7 @@ main,
 .wrap .card:hover {
   border-color: var(--gold);
   transform: translateY(-1px);
-  box-shadow: 0 10px 26px rgba(47, 123, 246, .16);
+  box-shadow: 0 10px 26px rgba(7,136,232, .16);
 }
 
 .select-tile:focus-visible,
@@ -525,5 +525,5 @@ body:not(.logged-out) #navAvatarWrap { display: block !important; }
   font-size: 10.5px; font-weight: 800; letter-spacing: .04em;
   padding: 3px 7px; border-radius: 6px;
 }
-.ls-tag.buy { background: color-mix(in oklab, #2f7bf6 15%, transparent); color: #2f7bf6; }
+.ls-tag.buy { background: color-mix(in oklab, #0788e8 15%, transparent); color: #0788e8; }
 .ls-tag.dep { background: color-mix(in oklab, #0a9d54 15%, transparent); color: #0a9d54; }
