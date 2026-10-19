@@ -1,4 +1,19 @@
+try { require('./organize.js').run({ quiet: true }); } catch (e) { console.error('[organize] skipped:', e.message); } // arranges flat-uploaded files into folders (no-op when already arranged)
 require('dotenv').config();
+// ── Security guard: never run with a missing/weak token secret (sub-admin tokens use JWT_SECRET + '_subadmin') ──
+if (!process.env.JWT_SECRET) { console.error('[SECURITY] JWT_SECRET is not set. Add it in your Render environment variables. Refusing to start.'); process.exit(1); }
+if (process.env.JWT_SECRET.length < 24) console.warn('[SECURITY] JWT_SECRET is short. Use a random value of 32+ characters.');
+// Constant-time string compare; false when either side is empty (an unset ADMIN_PASSCODE can never match).
+const safeEq = (a, b) => {
+  try {
+    a = String(a == null ? '' : a); b = String(b == null ? '' : b);
+    if (!a || !b) return false;
+    const x = require('crypto').createHash('sha256').update(a).digest();
+    const y = require('crypto').createHash('sha256').update(b).digest();
+    return require('crypto').timingSafeEqual(x, y);
+  } catch (e) { return false; }
+};
+const passcodeOk = (p) => safeEq(p, process.env.ADMIN_PASSCODE);
 // ── Site branding / look-and-feel lives in ONE file: site.config.js ─────────
 // Clone the project, edit site.config.js (or the BRAND_* vars in .env), and the
 // whole site renames, recolours and re-titles itself. No need to dig in here.
@@ -13,29 +28,6 @@ const fs = require('fs');
 const cors = require('cors');
 const axios = require('axios');
 const crypto = require('crypto');
-// ── Security helpers ───────────────────────────────────────────────────────
-const OWNER_PHONE = String(process.env.ADMIN_WHATSAPP || '').replace(/\D/g, '');
-// Numbers that shipped inside the original source code. They are never kept as the site contact.
-const BUILDER_PHONES = ['2349065518402', '2349154834677', '2348124960204'];
-function safeEq(a, b) {
-  const ha = crypto.createHash('sha256').update(String(a)).digest();
-  const hb = crypto.createHash('sha256').update(String(b)).digest();
-  return crypto.timingSafeEqual(ha, hb);
-}
-function adminPasscodeOk(p) {
-  const real = process.env.ADMIN_PASSCODE;
-  return !!real && typeof p === 'string' && p.length > 0 && safeEq(p, real);
-}
-// One-receipt, one-action, 48-hour links for the WhatsApp quick approve/reject buttons.
-// The master admin passcode is NEVER placed in a link.
-function signQuickAction(receiptId, action, exp) {
-  return crypto.createHmac('sha256', String(process.env.JWT_SECRET || '') + '_quick_action').update(`${receiptId}:${action}:${exp}`).digest('hex');
-}
-function escHtml(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-function safeExt(name) {
-  const e = path.extname(String(name || '')).toLowerCase();
-  return /^\.(jpe?g|png|gif|webp|mp4|mov|webm|m4a|mp3|ogg|wav|pdf|txt|csv|zip|rar|7z|docx?|xlsx?)$/.test(e) ? e : '.bin';
-}
 const { OAuth2Client } = require('google-auth-library');
 const googleClient = process.env.GOOGLE_CLIENT_ID ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID) : null;
 if (!googleClient) console.warn(' GOOGLE_CLIENT_ID not set in .env — Google Sign-In will be disabled until configured.');
@@ -60,7 +52,7 @@ app.use((req, res, next) => {
 // ── sitemap.xml (Search Console needs a real XML file at the root) ──────────
 app.get('/sitemap.xml', (req, res) => {
   const base = 'https://' + (req.headers.host || BRAND.domain).replace(/^www\./, '');
-  const paths = ['/', '/marketplace', '/tools', '/logs', '/boost', '/buy-number', '/support', '/login', '/register'];
+  const paths = ['/', '/marketplace', '/tools', '/logs', '/boost', '/buy-number', '/tutorials', '/support', '/login', '/register'];
   const now = new Date().toISOString().slice(0, 10);
   const body = '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
@@ -110,13 +102,6 @@ const authLimiter = rateLimit({
 });
 ['/api/auth/login', '/api/auth/google', '/api/auth/forgot-password', '/api/auth/reset-password-with-code']
   .forEach(route => app.use(route, authLimiter));
-// Admin doors: only FAILED attempts count, so normal admin work is never throttled.
-const adminFailLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100, skipSuccessfulRequests: true, standardHeaders: true, legacyHeaders: false,
-  message: { error: 'Too many failed admin requests. Please wait and try again.' }, trustProxy: true });
-app.use('/api/admin', adminFailLimiter);
-const adminLoginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, skipSuccessfulRequests: true, standardHeaders: true, legacyHeaders: false,
-  message: { error: 'Too many failed attempts. Please wait 15 minutes.' }, trustProxy: true });
-['/api/admin/verify', '/api/admin/staff/login'].forEach(route => app.use(route, adminLoginLimiter));
 
 const apiLimiter = rateLimit({
  windowMs: 60 * 1000,
@@ -145,8 +130,8 @@ const apiV1Limiter = rateLimit({
  message: { error: 'API rate limit exceeded — please slow down your requests.' },
  trustProxy: true
 });
-app.use('/api/v1/', apiV1Limiter);
-app.use(express.json({ limit: '20mb' }));
+app.use('/api/v1', (req, res) => res.status(404).json({ error: 'Not found' })); // the public developer API has been removed
+app.use(express.json({ limit: '20mb', verify: (req, res, buf) => { if ((req.originalUrl || '').startsWith('/api/webhooks/')) req.rawBody = buf; } })); // rawBody lets us verify Paystack's HMAC signature
 // ── KLS request console log ──────────────────────────────────────────────────
 // Every API call is logged with method, path, status, duration and the caller,
 // so any "it works for me but not for him" report can be traced in the server
@@ -169,13 +154,13 @@ app.use((req, res, next) => { stripOperators(req.body); stripOperators(req.query
 // HTML pages are never cached: visitors were still being served an old copy of
 // the home page (and other pages) out of the browser/CDN cache after a deploy.
 // Versioned assets (?v=...) keep their normal cache.
-// Uploaded files are untrusted: the browser must never run them as pages or scripts.
-app.use(/^\/(uploads?|receipts|files)\//i, (req, res, next) => {
-  const p = String(req.originalUrl || '').split('?')[0];
-  if (/\.(html?|xhtml|svg|js|mjs|xml|php|exe|sh|bat)$/i.test(p)) return res.status(403).end();
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('Content-Security-Policy', "default-src 'none'; img-src 'self' data:; media-src 'self'; style-src 'unsafe-inline'; sandbox");
-  next();
+// Older cached pages still ask for /js/kls-ui.js; the file lives at public/kls-ui.js. Serve it from both addresses.
+app.get('/js/kls-ui.js', (req, res) => res.sendFile(path.join(__dirname, 'public', 'kls-ui.js')));
+// Browsers ask for /favicon.ico on their own (ignoring <link> tags in some cases) and cache it hard.
+// Serve the Mizzysales icon there so no stale/old favicon can ever be picked up.
+app.get('/favicon.ico', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=3600');
+  res.type('image/png').sendFile(path.join(__dirname, 'public', 'favicon.png'));
 });
 app.use(express.static('public', {
   index: false,
@@ -203,7 +188,11 @@ if (cloudinaryConfigured) {
 const uploadDir = path.join(__dirname, 'public', 'uploads');
 const receiptDir = path.join(__dirname, 'public', 'receipts');
 const fileDir = path.join(__dirname, 'public', 'files');
-[uploadDir, receiptDir, fileDir].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
+[uploadDir, receiptDir, fileDir].forEach(d => {
+  // If a stray FILE sits where the folder should be, replace it; otherwise uploads fail with ENOTDIR.
+  try { if (fs.existsSync(d) && !fs.statSync(d).isDirectory()) fs.unlinkSync(d); } catch (e) { console.error('Could not clear non-directory at', d, e.message); }
+  if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
+});
 function makeStorage(folder, resourceType) {
  if (cloudinaryConfigured) {
  return new CloudinaryStorage({
@@ -219,7 +208,7 @@ function makeStorage(folder, resourceType) {
  const dir = folder === 'receipts' ? receiptDir : folder === 'files' ? fileDir : uploadDir;
  return multer.diskStorage({
  destination: (req, file, cb) => cb(null, dir),
- filename: (req, file, cb) => cb(null, `${folder}_${Date.now()}_${Math.random().toString(36).slice(2)}${safeExt(file.originalname)}`)
+ filename: (req, file, cb) => cb(null, `${folder}_${Date.now()}_${Math.random().toString(36).slice(2)}${safeExt(file)}`)
  });
 }
 function fileUrl(file) {
@@ -227,11 +216,20 @@ function fileUrl(file) {
  if (cloudinaryConfigured) return file.path; // Cloudinary gives the full https:// URL in file.path
  return `/${file.destination.includes('receipts') ? 'receipts' : file.destination.includes('files') ? 'files' : 'uploads'}/${file.filename}`;
 }
+// Only these extensions are ever written to disk; the browser-supplied file name/extension is never trusted
+// (an uploaded .html/.svg/.js would otherwise be served from our own domain).
+const SAFE_EXT = /^\.(jpe?g|png|gif|webp|pdf|mp4|mov|webm)$/;
+const safeExt = (file) => {
+  const e = path.extname((file && file.originalname) || '').toLowerCase();
+  if (SAFE_EXT.test(e)) return e;
+  const m = String((file && file.mimetype) || '').toLowerCase();
+  return ({ 'image/jpeg': '.jpg', 'image/png': '.png', 'image/gif': '.gif', 'image/webp': '.webp', 'application/pdf': '.pdf', 'video/mp4': '.mp4', 'video/quicktime': '.mov', 'video/webm': '.webm' })[m] || '.bin';
+};
 const upload = multer({ storage: makeStorage('uploads', 'image'), limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, cb) => /jpeg|jpg|png|gif|webp/.test(file.mimetype) ? cb(null, true) : cb(new Error('Images only')) });
 const receiptUpload = multer({
  storage: multer.diskStorage({
  destination: (req, file, cb) => cb(null, receiptDir),
- filename: (req, file, cb) => cb(null, `receipt_${Date.now()}_${Math.random().toString(36).slice(2)}${safeExt(file.originalname)}`)
+ filename: (req, file, cb) => cb(null, `receipt_${Date.now()}_${Math.random().toString(36).slice(2)}${safeExt(file)}`)
  }),
  limits: { fileSize: 10 * 1024 * 1024 },
  fileFilter: (req, file, cb) => /jpeg|jpg|png|gif|webp|pdf/.test(file.mimetype) ? cb(null, true) : cb(new Error('Image or PDF only'))
@@ -260,7 +258,7 @@ const uploadLogFields = multer({
  const isReview = file.fieldname === 'adminReviewFile' || file.fieldname.startsWith('subReviewFile_');
  const isTutorial = file.fieldname === 'tutorialImages' || file.fieldname === 'tutorialVideo' || file.fieldname.startsWith('subTutorialFile_');
  const prefix = file.fieldname === 'deliverableFile' ? 'file' : isReview ? 'review' : isTutorial ? 'tutorial' : 'img';
- cb(null, `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2)}${safeExt(file.originalname)}`);
+ cb(null, `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2)}${safeExt(file)}`);
  }
  }),
  limits: { fileSize: 100 * 1024 * 1024 },
@@ -292,7 +290,7 @@ const reviewUpload = multer({
  })
  : multer.diskStorage({
  destination: (req, file, cb) => cb(null, uploadDir),
- filename: (req, file, cb) => cb(null, `review_${Date.now()}_${Math.random().toString(36).slice(2)}${safeExt(file.originalname)}`)
+ filename: (req, file, cb) => cb(null, `review_${Date.now()}_${Math.random().toString(36).slice(2)}${safeExt(file)}`)
  }),
  limits: { fileSize: 50 * 1024 * 1024 },
  fileFilter: (req, file, cb) => /jpeg|jpg|png|gif|webp|mp4|mov|webm|quicktime/.test(file.mimetype) ? cb(null, true) : cb(new Error('Image or video only'))
@@ -310,9 +308,10 @@ const chatUpload = multer({
  })
  : multer.diskStorage({
  destination: (req, file, cb) => cb(null, uploadDir),
- filename: (req, file, cb) => cb(null, `chat_${Date.now()}_${Math.random().toString(36).slice(2)}${safeExt(file.originalname)}`)
+ filename: (req, file, cb) => cb(null, `chat_${Date.now()}_${Math.random().toString(36).slice(2)}${safeExt(file)}`)
  }),
- limits: { fileSize: 50 * 1024 * 1024 }
+ limits: { fileSize: 50 * 1024 * 1024 },
+ fileFilter: (req, file, cb) => /jpeg|jpg|png|gif|webp/.test(file.mimetype) ? cb(null, true) : cb(new Error('Images only'))
 });
 const depositTutorialUpload = multer({
  storage: cloudinaryConfigured
@@ -327,7 +326,7 @@ const depositTutorialUpload = multer({
  })
  : multer.diskStorage({
  destination: (req, file, cb) => cb(null, uploadDir),
- filename: (req, file, cb) => cb(null, `deptut_${Date.now()}_${Math.random().toString(36).slice(2)}${safeExt(file.originalname)}`)
+ filename: (req, file, cb) => cb(null, `deptut_${Date.now()}_${Math.random().toString(36).slice(2)}${safeExt(file)}`)
  }),
  limits: { fileSize: 100 * 1024 * 1024 },
  fileFilter: (req, file, cb) => {
@@ -346,22 +345,24 @@ mongoose.connect(process.env.MONGODB_URI, {
    console.log('MongoDB connected');
    try {
      const _sl = await SiteLinks.findById('main');
-     // Contact numbers come ONLY from your own .env (ADMIN_WHATSAPP) or the admin panel.
-     // Any number that shipped inside the original source is replaced with yours.
-     let finalNumber = OWNER_PHONE;
+     // Self-healing migration: corrects known-outdated contact numbers in the live database
+     // automatically on server boot. Only matches specific OLD values — once the number is
+     // '2349065518402' (or an admin sets any other custom number later), this never touches it
+     // again, so it's safe to leave running indefinitely.
+     const outdatedNumbers = ['2349154834677', '2348124960204'];
+     let finalNumber = '2349065518402';
      if (!_sl) {
-       await SiteLinks.create({ _id: 'main', whatsappNumber: OWNER_PHONE, adminPhone: OWNER_PHONE });
+       await SiteLinks.create({ _id: 'main', whatsappNumber: '2349065518402', adminPhone: '2349065518402' });
+     } else if (!_sl.whatsappNumber || outdatedNumbers.includes(_sl.whatsappNumber)) {
+       await SiteLinks.findByIdAndUpdate('main', { $set: { whatsappNumber: '2349065518402', adminPhone: '2349065518402' } });
+       console.log('[startup] contact number corrected to 2349065518402');
      } else {
-       const fix = {};
-       if (!_sl.whatsappNumber || BUILDER_PHONES.includes(_sl.whatsappNumber)) fix.whatsappNumber = OWNER_PHONE;
-       if (!_sl.adminPhone || BUILDER_PHONES.includes(_sl.adminPhone)) fix.adminPhone = OWNER_PHONE;
-       if (Object.keys(fix).length) {
-         await SiteLinks.findByIdAndUpdate('main', { $set: fix });
-         console.log('[startup] contact number reset to the one in your environment');
-       }
-       finalNumber = (fix.adminPhone !== undefined ? fix.adminPhone : _sl.adminPhone) || (fix.whatsappNumber !== undefined ? fix.whatsappNumber : _sl.whatsappNumber) || OWNER_PHONE;
+       finalNumber = _sl.adminPhone || _sl.whatsappNumber; // an admin already set a different custom number — respect it
      }
-     if (finalNumber) process.env.ADMIN_WHATSAPP = finalNumber;
+     // Keep the WhatsApp-notification env var in sync with the database value, so a stale
+     // ADMIN_WHATSAPP set in the hosting platform's environment variables can never override
+     // what's actually configured in the admin panel.
+     process.env.ADMIN_WHATSAPP = finalNumber;
    } catch(e) { console.error('[startup] site-links init:', e.message); }
  })
  .catch(err => console.error('MongoDB connection error:', err));
@@ -411,6 +412,16 @@ const userSchema = new mongoose.Schema({
  flwRef: { type: String, default: '' }, // Flutterwave's own reference
  createdAt: { type: Date }
  },
+ paystackVirtualAccount: { // dedicated virtual account issued by Paystack (Nigeria)
+ enabled: { type: Boolean, default: false },
+ accountNumber: { type: String, default: '' },
+ bankName: { type: String, default: '' },
+ accountName: { type: String, default: '' },
+ customerCode: { type: String, default: '' }, // Paystack customer code (CUS_...) — how we match payments back to the user
+ customerId: { type: String, default: '' },
+ dedicatedAccountId: { type: String, default: '' },
+ createdAt: { type: Date }
+ },
  notificationsSeenAt: { type: Date, default: null },
  loginHistory: [{
  at: { type: Date, default: Date.now },
@@ -427,7 +438,7 @@ const userSchema = new mongoose.Schema({
  deliverableFile: String,
  deliverableFileName: String,
  pricePaid: Number,
- source: { type: String, default: 'market1' }, // 'market1' manual logs · 'market2' RakibSocials API
+ source: { type: String, default: 'market1' }, // 'market1' manual logs · 'market2' NovaSolution API · 'market3' RakibSocials API
  purchasedAt: { type: Date, default: Date.now }
  }],
  createdAt: { type: Date, default: Date.now }
@@ -584,10 +595,44 @@ const paymentMethodSettingSchema = new mongoose.Schema({
  updatedAt: { type: Date, default: Date.now }
 });
 const PaymentMethodSetting = mongoose.model('PaymentMethodSetting', paymentMethodSettingSchema);
+// ── PAYMENT GATEWAYS (Flutterwave / Paystack) — switchable from the admin panel ──────────────
+// One row per gateway. No row yet = the built-in default: Flutterwave ON (so existing sites keep
+// working exactly as before) and Paystack OFF until an admin turns it on.
+const gatewaySettingSchema = new mongoose.Schema({
+ gateway: { type: String, enum: ['flutterwave', 'paystack'], required: true, unique: true },
+ enabled: { type: Boolean, default: true },
+ disabledMessage: { type: String, default: '' },
+ updatedAt: { type: Date, default: Date.now }
+});
+const GatewaySetting = mongoose.model('GatewaySetting', gatewaySettingSchema);
+const GATEWAY_LIST = ['flutterwave', 'paystack'];
+const GATEWAY_LABELS = { flutterwave: 'Flutterwave', paystack: 'Paystack' };
+const GATEWAY_DEFAULT_ENABLED = { flutterwave: true, paystack: false };
+function gatewayConfigured(g) {
+ if (g === 'flutterwave') return !!process.env.FLW_V3_SECRET_KEY;
+ if (g === 'paystack') return !!process.env.PAYSTACK_SECRET_KEY;
+ return false;
+}
+// { flutterwave: { enabled, configured, available, disabledMessage }, paystack: {...} }
+// `available` = switched ON by the admin AND its API keys exist on the server.
+async function getGatewayStates() {
+ let docs = [];
+ try { docs = await GatewaySetting.find({}); }
+ catch (e) { console.error('[KLS] getGatewayStates failed, using defaults:', e.message); }
+ const out = {};
+ for (const g of GATEWAY_LIST) {
+  const d = docs.find(x => x.gateway === g);
+  const enabled = d ? d.enabled !== false : GATEWAY_DEFAULT_ENABLED[g];
+  const configured = gatewayConfigured(g);
+  out[g] = { enabled, configured, available: enabled && configured, disabledMessage: (d && d.disabledMessage) || '' };
+ }
+ return out;
+}
 const siteLinksSchema = new mongoose.Schema({
  _id: { type: String, default: 'main' },
- whatsappNumber: { type: String, default: OWNER_PHONE }, // digits only, no + or spaces — used as wa.me/{number}
- adminPhone: { type: String, default: OWNER_PHONE }, // admin contact number shown on support/contact pages
+ whatsappNumber: { type: String, default: '2349065518402' }, // digits only, no + or spaces — used as wa.me/{number}
+ adminPhone: { type: String, default: '2349065518402' }, // admin contact number shown on support/contact pages
+ termsNumber: { type: String, default: '' }, // number shown on the Terms & Conditions page (blank = use the main contact number)
  whatsappGroupLink: { type: String, default: 'https://chat.whatsapp.com/HBqJeik773M1pqEmIjfpXr' },
  whatsappChannelLink: { type: String, default: 'https://whatsapp.com/channel/0029Vb7ivq9HLHQcS4XgQu2Q' },
  // Telegram + support contact details are admin-editable (Admin → Site Links) and are
@@ -596,6 +641,8 @@ const siteLinksSchema = new mongoose.Schema({
  // username used to appear to work but every page kept the old @klslogs link.
  telegramUsername: { type: String, default: 'klslogs' },
  telegramLink: { type: String, default: 'https://t.me/klslogs' },
+  telegramChannelLink: { type: String, default: '' },
+  telegramCommunityLink: { type: String, default: '' },
  whatsappChatLink: { type: String, default: '' },
  supportHours: { type: String, default: '' },
  updatedAt: { type: Date, default: Date.now }
@@ -609,8 +656,6 @@ const numberPricingSchema = new mongoose.Schema({
  apiPrice: { type: Number, default: 0 }, // 0/unset = not offered via the public developer API
  enabled: { type: Boolean, default: true },
  mode: { type: String, default: 'live' }, // kept for backward-compat with old records; always 'live' now
- otpsuiteCountryCode: { type: String, default: '' }, // e.g. "US" — only used when mode === 'live'
- otpsuiteServiceId: { type: String, default: '' }, // e.g. "69c05c2e27c5759c68a8135e"
  updatedAt: { type: Date, default: Date.now }
 });
 numberPricingSchema.index({ provider: 1, country: 1 }, { unique: true });
@@ -638,15 +683,19 @@ const numberListingSchema = new mongoose.Schema({
  phoneNumber: { type: String, required: true, trim: true },
  cost: { type: Number, default: 0 },
  sellPrice: { type: Number, required: true },
- status: { type: String, enum: ['available', 'sold', 'delivered', 'expired', 'cancelled'], default: 'available', index: true },
+ status: { type: String, enum: ['available', 'sold', 'delivered', 'expired', 'cancelled', 'needs_review'], default: 'available', index: true },
  soldTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
  createdAt: { type: Date, default: Date.now },
  soldAt: { type: Date },
  expiresAt: { type: Date },
  code: { type: String, default: '' },
  codeAddedAt: { type: Date },
- otpsuiteOrderId: { type: String, default: '' },
- // 'server1' = otpsuite (USA WhatsApp only) · 'server2' = GrizzlySMS (all services/countries)
+ novaSessionId: { type: String, default: '' },
+ novaOrderNumber: { type: String, default: '' },
+ novaServiceId: { type: Number, default: null },
+ novaServerId: { type: Number, default: null },
+ novaIdempotencyKey: { type: String, default: '' },
+ // 'server1' = NovaSolution · 'server2' = GrizzlySMS
  server: { type: String, default: 'server1' },
  grizzlyActivationId: { type: String, default: '' },
  costUsd: { type: Number, default: 0 },
@@ -658,24 +707,19 @@ const numberListingSchema = new mongoose.Schema({
  // Lifecycle timestamps powering the live order-status timeline.
  cancelledAt: { type: Date },
  expiredAt: { type: Date },
- // Whether the provider (Grizzly/otpsuite) confirmed the cancellation on their side.
+ // Whether the provider confirmed the cancellation on their side.
  providerCancelled: { type: Boolean, default: false },
  providerCancelDetail: { type: String, default: '' },
+ // How many times we retried the provider-side cancel after refunding the customer.
+ providerCancelAttempts: { type: Number, default: 0 },
 
 });
 const NumberListing = mongoose.model('NumberListing', numberListingSchema);
-const OTPSUITE_BASE_URL = process.env.OTPSUITE_BASE_URL || 'https://otpsuite.com/api/v1';
-const otpsuiteAxios = axios.create({
- baseURL: OTPSUITE_BASE_URL,
- timeout: 15000,
- headers: { 'X-API-KEY': process.env.OTPSUITE_API_KEY || '' }
-});
 
 // ── GrizzlySMS Integration (Server 2) ────────────────────────────────────────
 // GrizzlySMS is sms-activate compatible: one endpoint, an `action` query param and
 // an `api_key`. Docs: https://grizzlysms.com/docs  (handler_api.php)
-const GRIZZLY_API_KEY = process.env.GRIZZLY_API_KEY || '';
-if (!GRIZZLY_API_KEY) console.warn(' GRIZZLY_API_KEY is not set — Grizzly number purchases will be unavailable until you add it.');
+const GRIZZLY_API_KEY = process.env.GRIZZLY_API_KEY || '5ef2d6daed2387b1d8a7fb374162d56b';
 const GRIZZLY_BASE_URL = process.env.GRIZZLY_BASE_URL || 'https://api.grizzlysms.com/stubs/handler_api.php';
 const grizzlyAxios = axios.create({ timeout: 20000 });
 
@@ -727,8 +771,8 @@ async function grizzlyRequest(action, params = {}) {
 // Grizzly's dollar cost, and the flat-naira profit ladder used for markup.
 const numberServerConfigSchema = new mongoose.Schema({
   key: { type: String, default: 'main', unique: true },
-  server1Enabled: { type: Boolean, default: true },   // otpsuite — USA/Canada + all API countries, many services
-  // Server 1 profit ladder (₦ added on top of the live otpsuite cost). Replaces manual price entry.
+  server1Enabled: { type: Boolean, default: true },   // the provider live number catalog
+  // Server 1 profit ladder (₦ added on top of the live NovaSolution cost).
   server1MarkupTiers: {
     type: [{ upTo: Number, profit: Number }],
     default: [
@@ -1014,60 +1058,6 @@ function applyNumberMarkup(costNgn, cfg) {
   return Math.ceil(raw / step) * step;
 }
 
-// ── Server 1 (otpsuite) live pricing: API cost (₦) + profit ladder. Never sells below cost. ──
-const SERVER1_DEFAULT_TIERS = [{ upTo: 499, profit: 300 }, { upTo: 999, profit: 400 }, { upTo: 4999, profit: 700 }, { upTo: 10000, profit: 1200 }];
-function server1Profit(costNgn, cfg) {
-  const tiers = ((cfg && cfg.server1MarkupTiers && cfg.server1MarkupTiers.length) ? cfg.server1MarkupTiers : SERVER1_DEFAULT_TIERS)
-    .slice().sort((a, b) => a.upTo - b.upTo);
-  for (const t of tiers) if (costNgn <= t.upTo) return Number(t.profit) || 0;
-  return Math.max(1200, Math.round(costNgn * (Number(cfg?.highCostMarkupPercent) || 20) / 100));
-}
-function server1PriceNgn(costNgn, cfg, { api = false } = {}) {
-  const cost = Math.max(0, Math.ceil(Number(costNgn) || 0));
-  let profit = server1Profit(cost, cfg);
-  if (api) profit = Math.max(50, Math.round(profit * (Number(cfg?.apiProfitPercent ?? 75) / 100)));
-  return { costNgn: cost, profit, price: cost + profit };
-}
-function otpsuiteServiceCost(s) {
-  for (const k of ['your_price', 'base_price', 'price', 'cost', 'amount', 'rate', 'service_price', 'selling_price']) {
-    const v = Number(s && s[k]);
-    if (Number.isFinite(v) && v > 0) return v;
-  }
-  return 0;
-}
-const OTPSUITE_PINNED = ['US', 'CA'];
-const _s1ServicesCache = new Map();
-// Live services for one otpsuite country with our ₦ price already applied (cached 2 min).
-async function getServer1Services(countryCode, cfg, { api = false } = {}) {
-  const key = String(countryCode || '').trim(); // keep otpsuite's exact code — never change its case
-  let cached = _s1ServicesCache.get(key);
-  if (!cached || Date.now() - cached.at > 2 * 60 * 1000) {
-    const r = await otpsuiteRequest('get', '/services', { params: { country: key } });
-    // Accept every envelope shape otpsuite may send: {services:[]}, {data:{services:[]}} or a bare array.
-    const rows = Array.isArray(r) ? r : (Array.isArray(r?.services) ? r.services : (Array.isArray(r?.data?.services) ? r.data.services : (Array.isArray(r?.data) ? r.data : [])));
-    cached = { at: Date.now(), rows };
-    console.log(`[otpsuite] /services ${key}: ${rows.length} rows`);
-    if (rows.length) _s1ServicesCache.set(key, cached);
-  }
-  const out = [];
-  for (const s of cached.rows) {
-    const cost = otpsuiteServiceCost(s);
-    if (!cost) continue; // no live cost = cannot price safely, so it is never shown
-    const rawStock = s.count ?? s.stock ?? s.available ?? s.quantity;
-    const stock = (rawStock === undefined || rawStock === null || rawStock === '') ? NaN : Number(rawStock);
-    if (Number.isFinite(stock) && stock <= 0) continue;
-    const name = prettifyServiceName(s.service_name || s.name);
-    const priced = server1PriceNgn(cost, cfg, { api });
-    out.push({
-      serviceId: String(s.service_id || s.id || s._id), provider: name, name,
-      icon: serviceIconUrl(null, name), emoji: serviceEmoji(null, name),
-      price: priced.price, costNgn: priced.costNgn, stock: Number.isFinite(stock) ? stock : null
-    });
-  }
-  out.sort((a, b) => a.name.localeCompare(b.name));
-  return out;
-}
-
 function grizzlyPriceNgn(costUsd, cfg) {
   const costNgn = Number(costUsd || 0) * (Number(cfg.usdToNgn) || 0);
   return { costNgn: Math.round(costNgn), price: applyNumberMarkup(Math.round(costNgn), cfg) };
@@ -1188,35 +1178,6 @@ function prettifyServiceName(raw) {
  if (KNOWN_SERVICE_NAMES[key]) return KNOWN_SERVICE_NAMES[key];
  return String(raw || '').replace(/\b\w/g, c => c.toUpperCase());
 }
-async function otpsuiteRequest(method, path, { params, data } = {}) {
- console.log(`[otpsuite] ${method.toUpperCase()} ${path}`, JSON.stringify({ params, data }));
- try {
- const isPost = method.toLowerCase() === 'post';
- const requestConfig = { method, url: path, params };
- if (isPost && data) {
- requestConfig.data = new URLSearchParams(data).toString();
- requestConfig.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
- } else if (data) {
- requestConfig.data = data;
- }
- const res = await otpsuiteAxios.request(requestConfig);
- console.log(`[otpsuite] ${res.status}`, JSON.stringify(res.data));
- if (!res.data?.success) {
- const err = new Error(res.data?.error || 'otpsuite request failed');
- err.otpsuiteStatus = res.status;
- err.otpsuiteRaw = res.data;
- throw err;
- }
- return res.data.data;
- } catch (e) {
- if (e.otpsuiteStatus) throw e; // already normalized above
- console.log(`[otpsuite] ${e.response?.status || 'no response'}`, JSON.stringify(e.response?.data || e.message));
- const err = new Error(e.response?.data?.error || e.message || 'otpsuite request failed');
- err.otpsuiteStatus = e.response?.status || null;
- err.otpsuiteRaw = e.response?.data || null;
- throw err;
- }
-}
 const badgeSchema = new mongoose.Schema({
  name: { type: String, required: true, trim: true },
  icon: { type: String, default: '' }, // emoji shown next to the user's name
@@ -1270,7 +1231,7 @@ restockRequestSchema.index({ userId: 1, logId: 1 }, { unique: true });
 const RestockRequest = mongoose.model('RestockRequest', restockRequestSchema);
 async function getSiteLinks() {
  let doc = await SiteLinks.findById('main');
- if (!doc) doc = await SiteLinks.create({ _id: 'main', whatsappNumber: OWNER_PHONE, adminPhone: OWNER_PHONE });
+ if (!doc) doc = await SiteLinks.create({ _id: 'main', whatsappNumber: '2349065518402', adminPhone: '2349065518402' });
  return doc;
 }
 const SOLD_SUBACCOUNT_VISIBLE_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -1366,6 +1327,17 @@ const gameScoreSchema = new mongoose.Schema({
  createdAt: { type: Date, default: Date.now }
 });
 const Category = mongoose.model('Category', categorySchema);
+// Password-reset / engagement fields. These MUST be on the schema BEFORE the
+// model is compiled, otherwise Mongoose never saves or reads them and every
+// reset code shows as "invalid".
+userSchema.add({
+ resetCodeHash: { type: String, default: '' },
+ resetCodeExpires: { type: Date, default: null },
+ resetCodeAttempts: { type: Number, default: 0 },
+ resetCodeSentAt: { type: Date, default: null },
+ passwordChangedAt: { type: Date, default: null },
+ lastWinbackEmailAt: { type: Date, default: null }
+});
 const User = mongoose.model('User', userSchema);
 const Log = mongoose.model('Log', logSchema);
 const Transaction = mongoose.model('Transaction', transactionSchema);
@@ -1521,22 +1493,9 @@ const optionalAuth = async (req, res, next) => {
  } catch { /* an invalid/expired token just means "not logged in" here, not an error */ }
  next();
 };
-const apiKeyAuth = async (req, res, next) => {
- try {
- const key = req.headers['x-api-key'];
- const secret = req.headers['x-api-secret'];
- if (!key || !secret) return res.status(401).json({ error: 'Missing X-API-Key or X-API-Secret header' });
- const user = await User.findOne({ apiKey: key, apiEnabled: true }).select('-password');
- if (!user || user.apiSecret !== secret) return res.status(401).json({ error: 'Invalid API key or secret' });
- if (user.restricted) return res.status(403).json({ error: 'This account has been restricted', restricted: true });
- user.apiLastUsedAt = new Date();
- await user.save();
- req.apiUser = user;
- next();
- } catch (e) { res.status(500).json({ error: 'API auth error' }); }
-};
 const adminAuth = (req, res, next) => {
- if (!adminPasscodeOk(req.headers['x-admin-passcode'])) return res.status(403).json({ error: 'Access denied' });
+ const p = req.headers['x-admin-passcode'];
+ if (!passcodeOk(p)) return res.status(403).json({ error: 'Access denied' });
  req.adminRole = 'super';
  next();
 };
@@ -1554,11 +1513,20 @@ const subAdminAuth = async (req, res, next) => {
 };
 const anyAdminAuth = async (req, res, next) => {
  const p = req.headers['x-admin-passcode'];
- if (adminPasscodeOk(p)) { req.adminRole = 'super'; return next(); }
+ if (passcodeOk(p)) { req.adminRole = 'super'; return next(); }
  return subAdminAuth(req, res, next);
 };
-// Marketplace 2 (RakibSocials API) + marketplace on/off switches — see lib/market2.js
+// Marketplace 2 (NovaSolution API) + marketplace on/off switches — see lib/market2.js
 require('./lib/market2').register(app, { mongoose, User, Transaction, auth, anyAdminAuth, sendAdminEmail });
+// Marketplace 3 (RakibSocials API) - see lib/market3.js
+require('./lib/market3').register(app, { mongoose, User, Transaction, auth, anyAdminAuth, sendAdminEmail });
+// Welcome popup (WhatsApp channel promo) - settings editable in Admin -> Welcome Popup
+require('./lib/welcomepopup').register(app, { mongoose, adminAuth });
+// Games, giveaways, group chat and DMs are removed: their customer AND admin APIs are switched off.
+app.use(['/api/chat', '/api/dm', '/api/games', '/api/giveaways', '/api/admin/chat', '/api/admin/giveaways', '/api/admin/games'], (req, res) => res.status(404).json({ error: 'This feature has been removed.' }));
+// Tutorials (admin uploads video guides, customers watch them on /tutorials) - see lib/tutorials.js
+require('./lib/tutorials').register(app, { mongoose, adminAuth });
+require('./lib/boost2')({ app, mongoose, User, Transaction, auth, anyAdminAuth, novaGate });
 function sanitizeUser(u) {
  return {
  id: u._id, name: u.name, email: u.email, balance: u.balance || 0,
@@ -2173,29 +2141,6 @@ app.post('/api/user/profile-picture', auth, upload.single('picture'), async (req
  user.profilePicture = fileUrl(req.file);
  await user.save();
  res.json({ message: ' Profile picture updated', profilePicture: user.profilePicture });
- } catch (e) { res.status(500).json({ error: e.message }); }
-});
-app.get('/api/user/api-key', auth, async (req, res) => {
- const user = await User.findById(req.user._id).select('apiKey apiEnabled apiKeyCreatedAt apiLastUsedAt');
- res.json({ apiKey: user.apiKey || null, apiEnabled: user.apiEnabled, createdAt: user.apiKeyCreatedAt, lastUsedAt: user.apiLastUsedAt, hasSecret: !!user.apiKey });
-});
-app.post('/api/user/api-key/generate', auth, async (req, res) => {
- try {
- const user = await User.findById(req.user._id);
- user.apiKey = 'ksl_live_' + crypto.randomBytes(16).toString('hex');
- user.apiSecret = crypto.randomBytes(32).toString('hex');
- user.apiEnabled = true;
- user.apiKeyCreatedAt = new Date();
- await user.save();
- res.json({ apiKey: user.apiKey, apiSecret: user.apiSecret, message: ' API key generated. Save your secret now — it will not be shown again.' });
- } catch (e) { res.status(500).json({ error: e.message }); }
-});
-app.post('/api/user/api-key/revoke', auth, async (req, res) => {
- try {
- const user = await User.findById(req.user._id);
- user.apiKey = undefined; user.apiSecret = undefined; user.apiEnabled = false;
- await user.save();
- res.json({ message: ' API key revoked' });
  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 app.get('/api/user/me', auth, async (req, res) => res.json(await User.findById(req.user._id).select('-password -apiSecret')));
@@ -2993,12 +2938,13 @@ async function flwHeaders() {
 async function handleFlutterwaveWebhook(req, res) {
  const receivedHash = req.headers['verif-hash'];
  const expectedHash = process.env.FLW_SECRET_HASH || process.env.FLW_WEBHOOK_HASH || '';
+ // Unsigned or wrongly-signed webhooks are never processed (they could be forged to credit wallets).
  if (!expectedHash) {
- console.error(' KLS webhook REJECTED: FLW_SECRET_HASH is not set in the environment variables.');
- return res.status(503).json({ error: 'Webhook not configured' });
+ console.error('[SECURITY] Flutterwave webhook rejected: FLW_SECRET_HASH is not set. Set it in Render to your Flutterwave Webhook Secret Hash.');
+ return res.status(401).json({ error: 'Webhook not configured' });
  }
- if (!receivedHash || !safeEq(String(receivedHash), expectedHash)) {
- console.error(' KLS webhook REJECTED: signature mismatch.');
+ if (!safeEq(receivedHash, expectedHash)) {
+ console.error('Flutterwave webhook REJECTED: verif-hash mismatch.');
  if (klsPlatform) await klsPlatform.logWebhook({ channel: 'charge', status: 'signature_rejected', message: 'verif-hash mismatch', payload: req.body });
  return res.status(401).json({ error: 'Invalid webhook signature' });
  }
@@ -3371,7 +3317,8 @@ flwAxios.interceptors.request.use(config => {
 });
 const virtualAccountDepositSchema = new mongoose.Schema({
  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
- flwRef: { type: String, required: true, unique: true }, // Flutterwave tx reference
+ flwRef: { type: String, required: true, unique: true }, // Flutterwave tx reference (Paystack rows are prefixed PSK-)
+ gateway: { type: String, enum: ['flutterwave', 'paystack'], default: 'flutterwave' },
  flwTxId: { type: String, default: '' },
  amount: { type: Number, required: true },
  creditAmount: { type: Number, required: true },
@@ -3508,11 +3455,182 @@ async function createVirtualAccountForUser(user) {
  await user.save();
  return { message: ' Virtual account created', virtualAccount: user.virtualAccount };
 }
+// ═══ PAYSTACK DEDICATED VIRTUAL ACCOUNTS ════════════════════════════════════
+function isPaystackDvaTx(tx) {
+ return !!tx && [tx.channel, tx.authorization && tx.authorization.channel].some(c => String(c || '').toLowerCase() === 'dedicated_nuban');
+}
+// Who owns the account the money was sent to? Account number first, then Paystack customer code.
+async function findUserForPaystackVa(...sources) {
+ for (const t of sources) {
+  if (!t) continue;
+  const nums = [t.dedicated_account && t.dedicated_account.account_number, t.authorization && t.authorization.receiver_bank_account_number, t.metadata && t.metadata.receiver_account_number]
+   .filter(Boolean).map(String);
+  for (const n of nums) {
+   const u = await User.findOne({ 'paystackVirtualAccount.accountNumber': n });
+   if (u) return u;
+  }
+ }
+ for (const t of sources) {
+  const code = t && t.customer && t.customer.customer_code;
+  if (code) {
+   const u = await User.findOne({ 'paystackVirtualAccount.customerCode': code });
+   if (u) return u;
+  }
+ }
+ return null;
+}
+async function createPaystackVirtualAccountForUser(user) {
+ const vaCountry = String(user.country || 'NG').toUpperCase();
+ if (vaCountry !== 'NG') {
+  const err = new Error('Virtual accounts are available to customers in Nigeria only. Use the payment link — it is priced in US dollars for your country.');
+  err.status = 403;
+  throw err;
+ }
+ if (!process.env.PAYSTACK_SECRET_KEY) throw new Error('PAYSTACK_SECRET_KEY is not set');
+ if (user.paystackVirtualAccount?.accountNumber) {
+  user.paystackVirtualAccount.enabled = true;
+  await user.save();
+  return { message: 'Virtual account re-enabled', virtualAccount: user.paystackVirtualAccount };
+ }
+ const email = String(user.email || '').trim().toLowerCase();
+ const nameParts = String(user.name || '').trim().split(/\s+/);
+ const first_name = nameParts[0] || 'KLS';
+ const last_name = nameParts.slice(1).join(' ') || 'User';
+ const phone = user.contactPhone || undefined;
+ // 1. Paystack customer — reuse it if this e-mail already has one.
+ let customer = null;
+ try { customer = (await paystackAxios.get(`/customer/${encodeURIComponent(email)}`)).data?.data || null; }
+ catch (e) { if (e.response?.status !== 404) throw e; }
+ if (!customer) customer = (await paystackAxios.post('/customer', { email, first_name, last_name, phone })).data?.data || null;
+ if (!customer?.customer_code) throw new Error('Paystack did not return a customer');
+ // 2. Dedicated account — reuse it if this customer already has one.
+ let da = customer.dedicated_account && customer.dedicated_account.account_number ? customer.dedicated_account : null;
+ if (!da) {
+  const r = await paystackAxios.post('/dedicated_account', {
+   customer: customer.customer_code,
+   preferred_bank: process.env.PAYSTACK_DVA_BANK || 'wema-bank',
+   first_name, last_name, phone
+  }, { timeout: 25000 });
+  da = r.data?.data || null;
+ }
+ const accountNumber = (da && da.account_number) || '';
+ user.paystackVirtualAccount = {
+  enabled: !!accountNumber,
+  accountNumber,
+  bankName: (da && da.bank && da.bank.name) || '',
+  accountName: (da && da.account_name) || '',
+  customerCode: customer.customer_code,
+  customerId: String(customer.id || ''),
+  dedicatedAccountId: String((da && da.id) || ''),
+  createdAt: new Date()
+ };
+ await user.save();
+ if (!accountNumber) return { message: 'Your account is being set up — it will appear here in a moment.', pending: true, virtualAccount: user.paystackVirtualAccount };
+ return { message: ' Virtual account created', virtualAccount: user.paystackVirtualAccount };
+}
+// Paystack tells us (webhook) when an account that was still being assigned is ready.
+async function applyPaystackDvaAssigned(data) {
+ const code = data?.customer?.customer_code;
+ const da = data?.dedicated_account || {};
+ if (!code || !da.account_number) return false;
+ let user = await User.findOne({ 'paystackVirtualAccount.customerCode': code });
+ if (!user && data.customer.email) user = await User.findOne({ email: String(data.customer.email).trim().toLowerCase() });
+ if (!user) return false;
+ await User.updateOne({ _id: user._id }, { $set: {
+  'paystackVirtualAccount.enabled': true,
+  'paystackVirtualAccount.accountNumber': String(da.account_number),
+  'paystackVirtualAccount.bankName': (da.bank && da.bank.name) || '',
+  'paystackVirtualAccount.accountName': da.account_name || '',
+  'paystackVirtualAccount.customerCode': code,
+  'paystackVirtualAccount.dedicatedAccountId': String(da.id || ''),
+  'paystackVirtualAccount.createdAt': user.paystackVirtualAccount?.createdAt || new Date()
+ } });
+ return true;
+}
+// Credits one Paystack virtual-account transfer to the wallet. `tx` MUST come straight from Paystack's
+// API (verify or list) — callers never pass an unverified webhook body. Safe to call repeatedly:
+// the unique wallet-transaction reference means money can only ever move once.
+async function handlePaystackVaCredit(user, tx) {
+ if (!tx || !tx.reference) return { status: 'skipped' };
+ const key = 'PSK-' + String(tx.reference);
+ if (String(tx.status || '').toLowerCase() !== 'success' || String(tx.currency || '').toUpperCase() !== 'NGN') return { status: 'rejected' };
+ const receivedAmount = Number(tx.amount || 0) / 100; // kobo → naira
+ if (receivedAmount <= 0) return { status: 'skipped' };
+ const fee = calcDepositFee(receivedAmount);
+ const creditAmount = receivedAmount - fee;
+ if (creditAmount <= 0) return { status: 'skipped' };
+ const acct = user.paystackVirtualAccount?.accountNumber || '';
+ let claim;
+ try {
+  claim = await VirtualAccountDeposit.findOneAndUpdate(
+   { flwRef: key },
+   { $setOnInsert: { userId: user._id, flwRef: key, flwTxId: String(tx.id || ''), gateway: 'paystack', amount: receivedAmount, creditAmount, accountNumber: acct, status: 'pending', rawPayload: tx, createdAt: new Date() } },
+   { upsert: true, new: true }
+  );
+ } catch (e) {
+  if (e && e.code === 11000) claim = await VirtualAccountDeposit.findOne({ flwRef: key });
+  else throw e;
+ }
+ if (!claim) return { status: 'skipped' };
+ if (claim.status === 'success') return { status: 'duplicate' };
+ try {
+  await Transaction.create({
+   userId: user._id, type: 'deposit', amount: creditAmount, txRef: key,
+   description: `VA deposit — ₦${creditAmount.toLocaleString('en-NG')} credited (₦${receivedAmount.toLocaleString('en-NG')} received, ₦${fee} fee) via ${user.paystackVirtualAccount?.bankName || 'Paystack bank transfer'}`,
+   status: 'success'
+  });
+ } catch (e) {
+  if (e && e.code === 11000) {
+   await VirtualAccountDeposit.updateOne({ _id: claim._id }, { $set: { status: 'success' } }).catch(() => {});
+   return { status: 'duplicate' };
+  }
+  throw e;
+ }
+ const updated = await User.findByIdAndUpdate(user._id, { $inc: { balance: creditAmount } }, { new: true }).select('balance');
+ await VirtualAccountDeposit.updateOne({ _id: claim._id }, { $set: { status: 'success' } });
+ if (updated) {
+  pushBalanceToUser(user._id, updated.balance, creditAmount);
+  const msg = `event: va_deposit\ndata: ${JSON.stringify({ creditAmount, receivedAmount, fee, balance: updated.balance, bank: user.paystackVirtualAccount?.bankName || 'bank transfer', flwRef: key, ts: Date.now() })}\n\n`;
+  const clients = sseClients.get(String(user._id));
+  if (clients && clients.size) { for (const r of clients) { try { r.write(msg); } catch { clients.delete(r); } } }
+ }
+ console.log(` KLS Paystack VA credited: ₦${creditAmount} to ${user.email} (received ₦${receivedAmount}, fee ₦${fee}) | key:${key}`);
+ return { status: 'credited', creditAmount };
+}
+// Safety net for a missed webhook: look at the last 24h of successful Paystack charges.
+let _psVaReconcileRunning = false;
+async function reconcilePaystackVADeposits() {
+ if (_psVaReconcileRunning || !process.env.PAYSTACK_SECRET_KEY) return;
+ _psVaReconcileRunning = true;
+ try {
+  if (!(await User.exists({ 'paystackVirtualAccount.accountNumber': { $exists: true, $ne: '' } }))) return;
+  const from = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  for (let page = 1; page <= 3; page++) {
+   const r = await paystackAxios.get('/transaction', { params: { status: 'success', perPage: 100, page, from }, timeout: 15000 });
+   const list = r.data?.data || [];
+   if (!list.length) break;
+   for (const tx of list) {
+    if (!isPaystackDvaTx(tx) || !tx.reference) continue;
+    try {
+     if (await VirtualAccountDeposit.findOne({ flwRef: 'PSK-' + tx.reference, status: 'success' }).select('_id')) continue;
+     const user = await findUserForPaystackVa(tx);
+     if (user) await handlePaystackVaCredit(user, tx);
+    } catch (e) { console.warn('[PS-VA-reconcile] credit error:', e.message); }
+   }
+   if (list.length < 100) break;
+  }
+ } catch (e) {
+  console.warn('[PS-VA-reconcile] error:', e.response?.data?.message || e.message);
+ } finally { _psVaReconcileRunning = false; }
+}
 app.get('/api/user/virtual-account', auth, async (req, res) => {
  try {
- const user = await User.findById(req.user._id).select('virtualAccount name balance country contactPhone');
+ const user = await User.findById(req.user._id).select('virtualAccount paystackVirtualAccount name balance country contactPhone');
  const settings = await getVASettings();
- const va = user.virtualAccount || {};
+ const vaGw = req.query.gateway === 'paystack' ? 'paystack' : 'flutterwave';
+ const vaStates = await getGatewayStates();
+ const va = (vaGw === 'paystack' ? user.paystackVirtualAccount : user.virtualAccount) || {};
+ const gwOn = vaGw === 'paystack' ? vaStates.paystack.available : vaStates.flutterwave.enabled;
  // Nigeria-only rail. The country comes from the profile first and from the
  // caller's IP when the profile has none, so accounts created before the
  // country field existed are handled correctly too. Any non-Nigerian user —
@@ -3540,7 +3658,9 @@ app.get('/api/user/virtual-account', auth, async (req, res) => {
  userName: user.name || '',
  balance: user.balance || 0,
  createdAt: va.createdAt || null,
- globalEnabled: settings.globalEnabled
+ globalEnabled: settings.globalEnabled && gwOn,
+ gateway: vaGw,
+ pending: !!(va.customerCode && !va.accountNumber)
  });
  } catch (e) {
  // A failure here must never be mistaken for "maintenance". Report the error
@@ -3553,6 +3673,9 @@ app.post('/api/user/virtual-account/create', auth, async (req, res) => {
  try {
  const settings = await getVASettings();
  if (!settings.globalEnabled) return res.status(503).json({ error: 'Virtual accounts are temporarily disabled — please try again later or use another deposit method.' });
+ const vaGw = String(req.body?.gateway || 'flutterwave').toLowerCase() === 'paystack' ? 'paystack' : 'flutterwave';
+ const vaStates = await getGatewayStates();
+ if (vaGw === 'paystack' ? !vaStates.paystack.available : !vaStates.flutterwave.enabled) return res.status(503).json({ error: (vaStates[vaGw].disabledMessage) || 'Bank transfer is temporarily unavailable — please use the payment link instead.' });
  const user = await User.findById(req.user._id);
  if (!user) return res.status(404).json({ error: 'User not found' });
  if (!user.contactPhone) {
@@ -3566,7 +3689,7 @@ app.post('/api/user/virtual-account/create', auth, async (req, res) => {
  methods: ['paymentlink'],
  });
  }
- const result = await createVirtualAccountForUser(user);
+ const result = (String(req.body?.gateway || '').toLowerCase() === 'paystack') ? await createPaystackVirtualAccountForUser(user) : await createVirtualAccountForUser(user);
  res.json(result);
  } catch (e) {
  const msg = e.response?.data?.message || e.message;
@@ -3578,7 +3701,7 @@ app.post('/api/admin/virtual-accounts/create/:userId', adminAuth, async (req, re
  try {
  const user = await User.findById(req.params.userId);
  if (!user) return res.status(404).json({ error: 'User not found' });
- const result = await createVirtualAccountForUser(user);
+ const result = (String(req.body?.gateway || '').toLowerCase() === 'paystack') ? await createPaystackVirtualAccountForUser(user) : await createVirtualAccountForUser(user);
  res.json(result);
  } catch (e) {
  const msg = e.response?.data?.message || e.message;
@@ -3625,6 +3748,8 @@ const paymentLinkDepositSchema = new mongoose.Schema({
  fee: { type: Number, default: 0 },
  status: { type: String, enum: ['pending', 'success', 'failed'], default: 'pending' },
  flwTransactionId: { type: String, default: '' },
+ gateway: { type: String, enum: ['flutterwave', 'paystack'], default: 'flutterwave' }, // which provider took this payment (old rows = flutterwave)
+ gatewayTxId: { type: String, default: '' }, // Paystack's own transaction id
  rawPayload: { type: mongoose.Schema.Types.Mixed },
  creditedAt: { type: Date },
  // Reversal tracking — prevents double-deduction if a failed deposit webhook fires twice
@@ -3645,10 +3770,46 @@ function calcDepositFee(creditAmount) {
 function calcChargeAmount(creditAmount) {
  return creditAmount + calcDepositFee(creditAmount);
 }
-app.post('/api/deposit/paymentlink/create', auth, async (req, res) => {
+// ═══ PAYSTACK HELPERS ═══════════════════════════════════════════════════════
+const paystackAxios = axios.create({ baseURL: 'https://api.paystack.co', timeout: 15000 });
+paystackAxios.interceptors.request.use(config => {
+ config.headers = { ...config.headers, Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` };
+ return config;
+});
+// Paystack can only settle currencies that are switched on for the merchant account.
+// NGN always works. USD must be enabled in the Paystack dashboard AND PAYSTACK_ALLOW_USD=true set here.
+function paystackSupportsCurrency(cur) {
+ const c = String(cur || '').toUpperCase();
+ return c === 'NGN' || (c === 'USD' && String(process.env.PAYSTACK_ALLOW_USD || '').toLowerCase() === 'true');
+}
+// Returns Paystack's transaction object, or null when the reference does not exist (yet).
+async function paystackVerify(reference) {
  try {
- if (!process.env.FLW_V3_SECRET_KEY) {
- return res.status(503).json({ error: 'Payments are not configured yet — contact support.' });
+  const r = await paystackAxios.get(`/transaction/verify/${encodeURIComponent(reference)}`, { timeout: 15000 });
+  return r.data?.data || null;
+ } catch (e) {
+  const msg = String(e.response?.data?.message || '');
+  if (e.response?.status === 404 || /not found/i.test(msg)) return null;
+  throw e;
+ }
+}
+// Paystack amounts are in the currency's subunit (kobo / cents). Never credit less than was asked for.
+function paystackTxOk(tx, deposit) {
+ if (!tx) return false;
+ return String(tx.status || '').toLowerCase() === 'success'
+  && String(tx.currency || '').toUpperCase() === String(deposit.currency || 'NGN').toUpperCase()
+  && Number(tx.amount) >= Math.round(Number(deposit.amount) * 100)
+  && String(tx.reference || '') === String(deposit.txRef);
+}
+app.post('/api/deposit/paymentlink/create', auth, async (req, res) => {
+ let gateway = '';
+ try {
+ const gwStates = await getGatewayStates();
+ if (!gwStates.flutterwave.configured && !gwStates.paystack.configured) {
+  return res.status(503).json({ error: 'Payments are not configured yet — contact support.' });
+ }
+ if (!gwStates.flutterwave.available && !gwStates.paystack.available) {
+  return res.status(503).json({ error: gwStates.flutterwave.disabledMessage || gwStates.paystack.disabledMessage || 'Deposits are temporarily unavailable — please try again later.' });
  }
  const methodSetting = await PaymentMethodSetting.findOne({ method: 'paymentlink' });
  if (methodSetting && methodSetting.enabled === false) {
@@ -3689,39 +3850,71 @@ app.post('/api/deposit/paymentlink/create', auth, async (req, res) => {
  chargeAmount = parsedAmount + fee;
  chargeCurrency = 'NGN';
  }
- // Only the rails Flutterwave has actually approved for this market are
- // offered — a customer never sees a method that will fail at checkout.
- const paymentOptions = klsFlwMethods.paymentOptionsFor(plGeo.code, chargeCurrency);
- const txRef = `${BRAND.txPrefix}-PL-${user._id}-${Date.now()}`;
- const siteUrl = process.env.SITE_URL || '';
- const payload = {
- tx_ref: txRef,
- amount: chargeAmount,
- currency: chargeCurrency,
- redirect_url: `${siteUrl}/api/deposit/paymentlink/callback`,
- payment_options: paymentOptions,
- customer: {
- email: user.email, // auto-filled from the logged-in account — never typed by the user
- name: user.name || `KLS Customer`
- },
- customizations: { title: 'KLS Wallet Deposit', description: `Deposit for ${user.name}` }
+ // ── Which gateway takes this payment? ──────────────────────────────────────
+ // The customer's pick wins when it is available; otherwise Flutterwave, then Paystack.
+ const requested = String(req.body.gateway || '').trim().toLowerCase();
+ if (requested && !GATEWAY_LIST.includes(requested)) return res.status(400).json({ error: 'Unknown payment gateway' });
+ const gwOk = {
+  flutterwave: gwStates.flutterwave.available,
+  paystack: gwStates.paystack.available && paystackSupportsCurrency(chargeCurrency)
  };
- const flwRes = await flwAxios.post(`/payments`, payload, {
- headers: { 'Content-Type': 'application/json' },
- timeout: 15000
- });
- const link = flwRes.data?.data?.link;
- if (!link) throw new Error('Flutterwave did not return a payment link');
- await PaymentLinkDeposit.create({ userId: user._id, txRef, amount: chargeAmount, currency: chargeCurrency, creditAmount: creditNgn, fee, status: 'pending' });
- res.json({ link, txRef, currency: chargeCurrency, charged: chargeAmount, creditNgn, country: plGeo.code, paymentOptions });
+ gateway = requested || (gwOk.flutterwave ? 'flutterwave' : (gwOk.paystack ? 'paystack' : ''));
+ if (!gateway || !gwOk[gateway]) {
+  const which = gateway || 'flutterwave';
+  return res.status(503).json({ error: gwStates[which].disabledMessage || `${GATEWAY_LABELS[which]} is currently unavailable for your country or currency — please choose another payment option.` });
+ }
+ let txRef = `${BRAND.txPrefix}-PL-${user._id}-${Date.now()}`;
+ const siteUrl = process.env.SITE_URL || '';
+ let link, paymentOptions = null;
+ if (gateway === 'paystack') {
+  // Paystack references may only contain letters, numbers and - . =
+  txRef = txRef.replace(/[^A-Za-z0-9.=-]/g, '-');
+  const psRes = await paystackAxios.post('/transaction/initialize', {
+   email: user.email, // auto-filled from the logged-in account — never typed by the user
+   amount: Math.round(chargeAmount * 100), // kobo / cents
+   currency: chargeCurrency,
+   reference: txRef,
+   callback_url: `${siteUrl}/api/deposit/paystack/callback`,
+   metadata: {
+    userId: String(user._id), purpose: 'wallet_deposit', creditNgn,
+    cancel_action: `${siteUrl}/deposit?deposit=cancelled`
+   }
+  }, { headers: { 'Content-Type': 'application/json' }, timeout: 15000 });
+  link = psRes.data?.data?.authorization_url;
+  if (!psRes.data?.status || !link) throw new Error(psRes.data?.message || 'Paystack did not return a payment link');
+ } else {
+  // Only the rails Flutterwave has actually approved for this market are
+  // offered — a customer never sees a method that will fail at checkout.
+  paymentOptions = klsFlwMethods.paymentOptionsFor(plGeo.code, chargeCurrency);
+  const payload = {
+   tx_ref: txRef,
+   amount: chargeAmount,
+   currency: chargeCurrency,
+   redirect_url: `${siteUrl}/api/deposit/paymentlink/callback`,
+   payment_options: paymentOptions,
+   customer: {
+    email: user.email, // auto-filled from the logged-in account — never typed by the user
+    name: user.name || `KLS Customer`
+   },
+   customizations: { title: 'KLS Wallet Deposit', description: `Deposit for ${user.name}` }
+  };
+  const flwRes = await flwAxios.post(`/payments`, payload, {
+   headers: { 'Content-Type': 'application/json' },
+   timeout: 15000
+  });
+  link = flwRes.data?.data?.link;
+  if (!link) throw new Error('Flutterwave did not return a payment link');
+ }
+ await PaymentLinkDeposit.create({ userId: user._id, txRef, amount: chargeAmount, currency: chargeCurrency, creditAmount: creditNgn, fee, status: 'pending', gateway });
+ res.json({ link, txRef, gateway, currency: chargeCurrency, charged: chargeAmount, creditNgn, country: plGeo.code, paymentOptions });
  } catch (e) {
  console.error('Payment link create error:', JSON.stringify(e.response?.data || e.message, null, 2));
  try {
  await SystemError.create({
- source: 'flutterwave',
+ source: gateway || 'flutterwave',
  message: 'Failed to create payment link for deposit',
  detail: JSON.stringify(e.response?.data || e.message),
- context: { userId: req.user?._id, attemptedAmount: req.body?.amount }
+ context: { userId: req.user?._id, attemptedAmount: req.body?.amount, gateway }
  });
  } catch {}
  res.status(502).json({
@@ -3773,10 +3966,120 @@ app.get('/api/deposit/paymentlink/callback', async (req, res) => {
  res.redirect(failRedirect);
  }
 });
+// ── Paystack: browser comes back here after paying ───────────────────────────
+app.get('/api/deposit/paystack/callback', async (req, res) => {
+ const siteUrl = process.env.SITE_URL || '';
+ const failRedirect = `${siteUrl}/deposit?deposit=failed`;
+ const pendingRedirect = (ref) => `${siteUrl}/deposit?deposit=pending&txRef=${encodeURIComponent(ref)}`;
+ try {
+  const reference = String(req.query.reference || req.query.trxref || '');
+  if (!reference) return res.redirect(failRedirect);
+  const deposit = await PaymentLinkDeposit.findOne({ txRef: reference, gateway: 'paystack' });
+  if (!deposit) return res.redirect(failRedirect);
+  if (deposit.status === 'success') return res.redirect(`${siteUrl}/deposit?deposit=success`);
+  if (!process.env.PAYSTACK_SECRET_KEY) return res.redirect(failRedirect);
+  try {
+   const tx = await paystackVerify(reference);
+   if (paystackTxOk(tx, deposit)) {
+    await creditPaymentLinkDeposit(deposit, tx);
+    return res.redirect(`${siteUrl}/deposit?deposit=success`);
+   }
+   const st = String(tx?.status || '').toLowerCase();
+   if (st === 'failed' || st === 'reversed') {
+    await PaymentLinkDeposit.updateOne({ _id: deposit._id, status: 'pending' }, { $set: { status: 'failed', rawPayload: tx } });
+    return res.redirect(failRedirect);
+   }
+   if (st === 'abandoned') return res.redirect(`${siteUrl}/deposit?deposit=cancelled`);
+   return res.redirect(pendingRedirect(reference));
+  } catch (e) {
+   console.error('Paystack callback verify error:', e.response?.data || e.message);
+   return res.redirect(pendingRedirect(reference));
+  }
+ } catch (e) {
+  console.error('Paystack callback error:', e.message);
+  res.redirect(failRedirect);
+ }
+});
+// ── Paystack webhook (set https://YOUR-SITE/api/webhooks/paystack in the Paystack dashboard) ──
+// Always processed — even when the Paystack switch is OFF — because the customer has already paid.
+app.post('/api/webhooks/paystack', async (req, res) => {
+ const secret = process.env.PAYSTACK_SECRET_KEY || '';
+ const received = String(req.headers['x-paystack-signature'] || '');
+ const event = req.body || {};
+ const data = event.data || {};
+ const reference = String(data.reference || '');
+ const log = async (status, message) => {
+  try {
+   if (klsPlatform) await klsPlatform.logWebhook({
+    provider: 'paystack', channel: 'paymentlink', event: event.event || 'unknown', reference,
+    txId: data.id, amount: Number(data.amount || 0) / 100, currency: data.currency, status, message, payload: event
+   });
+  } catch { /* logging never breaks a credit */ }
+ };
+ if (!secret || !req.rawBody) {
+  await log('signature_rejected', !secret ? 'PAYSTACK_SECRET_KEY is not set' : 'raw body unavailable');
+  return res.status(401).json({ error: 'Webhook not configured' });
+ }
+ const expected = crypto.createHmac('sha512', secret).update(req.rawBody).digest('hex');
+ let valid = false;
+ try {
+  const a = Buffer.from(expected, 'utf8'), b = Buffer.from(received, 'utf8');
+  valid = a.length === b.length && crypto.timingSafeEqual(a, b);
+ } catch { valid = false; }
+ if (!valid) {
+  console.error('Paystack webhook REJECTED: bad x-paystack-signature');
+  await log('signature_rejected', 'x-paystack-signature mismatch');
+  return res.status(401).json({ error: 'Invalid webhook signature' });
+ }
+ try {
+  if (event.event === 'dedicatedaccount.assign.success') {
+   const ok = await applyPaystackDvaAssigned(data);
+   await log(ok ? 'processed' : 'ignored', ok ? 'virtual account assigned' : 'no matching customer for assigned account');
+   return res.json({ received: true });
+  }
+  if (event.event === 'dedicatedaccount.assign.failed') {
+   await log('failed', 'Paystack could not assign a dedicated account');
+   return res.json({ received: true });
+  }
+  if (event.event !== 'charge.success') {
+   await log('ignored', `event ${event.event || 'unknown'} is not handled`);
+   return res.json({ received: true });
+  }
+  const deposit = reference ? await PaymentLinkDeposit.findOne({ txRef: reference, gateway: 'paystack' }) : null;
+  if (!deposit && isPaystackDvaTx(data)) {
+   // A bank transfer into a customer's dedicated virtual account.
+   const vtx = await paystackVerify(reference);
+   if (!vtx || String(vtx.status || '').toLowerCase() !== 'success') {
+    await log('failed', `virtual account verification failed: status=${vtx?.status || 'not found'}`);
+    return res.json({ received: true });
+   }
+   const owner = await findUserForPaystackVa(vtx, data);
+   if (!owner) { await log('failed', 'virtual account transfer matches no user'); return res.json({ received: true }); }
+   const out = await handlePaystackVaCredit(owner, vtx);
+   await log(out.status === 'credited' ? 'processed' : 'ignored', `virtual account ${out.status}${out.creditAmount ? ' ₦' + out.creditAmount : ''}`);
+   return res.json({ received: true });
+  }
+  if (!deposit) { await log('ignored', 'no wallet deposit matches this reference'); return res.json({ received: true }); }
+  if (deposit.status === 'success') { await log('ignored', 'already credited'); return res.json({ received: true }); }
+  // Never trust the webhook body alone — confirm with Paystack's API before crediting.
+  const tx = await paystackVerify(reference);
+  if (!paystackTxOk(tx, deposit)) {
+   await log('failed', `verification failed: status=${tx?.status || 'not found'} amount=${tx?.amount} currency=${tx?.currency}`);
+   return res.json({ received: true });
+  }
+  await creditPaymentLinkDeposit(deposit, tx);
+  await log('processed', `credited ₦${deposit.creditAmount} for ${reference}`);
+  return res.json({ received: true });
+ } catch (e) {
+  console.error('Paystack webhook error:', e.response?.data || e.message);
+  await log('failed', e.message);
+  return res.status(500).json({ error: 'Processing error' }); // non-2xx → Paystack retries
+ }
+});
 async function creditPaymentLinkDeposit(deposit, tx) {
   const fresh = await PaymentLinkDeposit.findOneAndUpdate(
     { _id: deposit._id, status: 'pending' },
-    { status: 'success', flwTransactionId: String(tx.id || ''), creditedAt: new Date(), rawPayload: tx },
+    { status: 'success', ...(deposit.gateway === 'paystack' ? { gatewayTxId: String(tx.id || '') } : { flwTransactionId: String(tx.id || '') }), creditedAt: new Date(), rawPayload: tx },
     { new: true }
   );
   if (!fresh) return; // Already credited or failed — never double-credit
@@ -3791,7 +4094,7 @@ async function creditPaymentLinkDeposit(deposit, tx) {
   await Transaction.create({
     userId: updated._id, type: 'deposit', amount: creditAmount,
     txRef: deposit.txRef,
-    description: `Deposit via Flutterwave payment link (${tx.payment_type || 'unknown method'})`,
+    description: deposit.gateway === 'paystack' ? `Deposit via Paystack (${tx.channel || 'unknown method'})` : `Deposit via Flutterwave payment link (${tx.payment_type || 'unknown method'})`,
     status: 'success'
   });
   pushBalanceToUser(updated._id, updated.balance, creditAmount);
@@ -3859,6 +4162,25 @@ app.get('/api/deposit/paymentlink/status/:txRef', auth, async (req, res) => {
  const deposit = await PaymentLinkDeposit.findOne({ txRef: req.params.txRef, userId: req.user._id });
  if (!deposit) return res.status(404).json({ error: 'Deposit not found' });
  if (deposit.status !== 'pending') return res.json({ status: deposit.status, creditAmount: deposit.creditAmount });
+ if (deposit.gateway === 'paystack') {
+ if (process.env.PAYSTACK_SECRET_KEY) {
+ try {
+ const tx = await paystackVerify(deposit.txRef);
+ if (paystackTxOk(tx, deposit)) {
+ await creditPaymentLinkDeposit(deposit, tx);
+ return res.json({ status: 'success', creditAmount: deposit.creditAmount });
+ }
+ const st = String(tx?.status || '').toLowerCase();
+ if (st === 'failed' || st === 'reversed') {
+ await PaymentLinkDeposit.updateOne({ _id: deposit._id, status: 'pending' }, { $set: { status: 'failed', rawPayload: tx } });
+ return res.json({ status: 'failed' });
+ }
+ } catch (pollErr) {
+ console.error('Paystack status poll error:', pollErr.response?.data || pollErr.message);
+ }
+ }
+ return res.json({ status: 'pending' });
+ }
  if (process.env.FLW_V3_SECRET_KEY) {
  try {
  const verify = await flwAxios.get(`/transactions/verify_by_reference`, {
@@ -3925,6 +4247,7 @@ async function getOrCreateFlwCustomer(user) {
 }
 app.post('/api/deposit/banktransfer/create', auth, async (req, res) => {
  try {
+ if (!(await getGatewayStates()).flutterwave.enabled) return res.status(503).json({ error: 'Bank transfer is temporarily unavailable — please use the payment link instead.' });
  if (!process.env.FLW_CLIENT_ID || !process.env.FLW_CLIENT_SECRET) {
  return res.status(503).json({ error: 'Bank transfer deposits are not configured yet — contact support.' });
  }
@@ -4071,7 +4394,7 @@ app.get('/api/deposit/banktransfer/status/:reference', auth, async (req, res) =>
 });
 app.get('/api/user/virtual-account/latest-deposit', auth, async (req, res) => {
  try {
- const user = await User.findById(req.user._id).select('balance virtualAccount email');
+ const user = await User.findById(req.user._id).select('balance virtualAccount paystackVirtualAccount email');
  if (!user) return res.status(404).json({ error: 'User not found' });
  const latest = await VirtualAccountDeposit.findOne({ userId: user._id })
  .sort({ createdAt: -1 })
@@ -4115,13 +4438,30 @@ app.get('/api/user/virtual-account/latest-deposit', auth, async (req, res) => {
  }
  }
  }
+ if (!reconCredit && user.paystackVirtualAccount?.enabled && user.paystackVirtualAccount?.customerId && process.env.PAYSTACK_SECRET_KEY) {
+ const psKey = 'ps:' + String(user._id);
+ if (Date.now() - (_vaReconCache.get(psKey) || 0) > 30000) { // throttle: at most every 30s
+ _vaReconCache.set(psKey, Date.now());
+ try {
+ const psRes = await paystackAxios.get('/transaction', {
+ params: { customer: user.paystackVirtualAccount.customerId, status: 'success', perPage: 20, from: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString() },
+ timeout: 10000
+ });
+ for (const ptx of (psRes.data?.data || [])) {
+ if (!isPaystackDvaTx(ptx)) continue;
+ const out = await handlePaystackVaCredit(user, ptx).catch(err => { console.warn('[PS-VA-poll-reconcile] credit error:', err.message); return null; });
+ if (out?.status === 'credited') { reconCredit = { flwRef: 'PSK-' + ptx.reference, amount: Number(ptx.amount) / 100 }; break; }
+ }
+ } catch (psErr) { console.warn('[PS-VA-poll-reconcile] error:', psErr.response?.data?.message || psErr.message); }
+ }
+ }
  const latestFinal = reconCredit
  ? await VirtualAccountDeposit.findOne({ userId: user._id }).sort({ createdAt: -1 }).select('status amount creditAmount createdAt flwRef')
  : latest;
  const freshUser = reconCredit ? await User.findById(user._id).select('balance') : user;
  res.json({
  balance: freshUser.balance || 0,
- vaEnabled: vaEnabled || false,
+ vaEnabled: !!(vaEnabled || (user.paystackVirtualAccount?.enabled && user.paystackVirtualAccount?.accountNumber)),
  reconCredit, // non-null if we just credited something in this poll
  latestDeposit: latestFinal ? {
  status: latestFinal.status,
@@ -4153,7 +4493,8 @@ async function sendWhatsAppNotification(user, amount, bank, accountName, receipt
  const token = process.env.ULTRAMSG_TOKEN;
  const phone = process.env.ADMIN_WHATSAPP;
  const siteUrl = process.env.SITE_URL || 'https://your-site.onrender.com';
- const adminPath = process.env.ADMIN_SECRET_PATH || '';
+ const adminPath = process.env.ADMIN_SECRET_PATH || 'ksl-admin-secret';
+ const passcode = process.env.ADMIN_PASSCODE;
  if (!instance || !token || !phone) {
  const msg = 'UltraMsg not configured — WhatsApp notification skipped';
  console.log(msg);
@@ -4165,9 +4506,8 @@ async function sendWhatsAppNotification(user, amount, bank, accountName, receipt
  });
  return { sent: false, error: msg };
  }
- const qaExp = Date.now() + 48 * 60 * 60 * 1000;
- const approveLink = `${siteUrl}/api/admin/receipts/${receiptId}/quick-action?action=approved&exp=${qaExp}&sig=${signQuickAction(receiptId, 'approved', qaExp)}`;
- const rejectLink = `${siteUrl}/api/admin/receipts/${receiptId}/quick-action?action=rejected&exp=${qaExp}&sig=${signQuickAction(receiptId, 'rejected', qaExp)}`;
+ const approveLink = `${siteUrl}/api/admin/receipts/${receiptId}/quick-action?action=approved&passcode=${encodeURIComponent(passcode)}`;
+ const rejectLink = `${siteUrl}/api/admin/receipts/${receiptId}/quick-action?action=rejected&passcode=${encodeURIComponent(passcode)}`;
  const aiSummary = aiResult
  ? ` AI: ${aiResult.verdict.toUpperCase()} (${aiResult.confidence}%)\n Reason: ${aiResult.reason}${aiResult.flags?.length ? '\n Flags: ' + aiResult.flags.join(', ') : ''}\n\n`
  : '';
@@ -4209,25 +4549,19 @@ async function sendWhatsAppNotification(user, amount, bank, accountName, receipt
  }
 }
 app.get('/api/admin/receipts/:id/quick-action', async (req, res) => {
- res.set('Cache-Control', 'no-store');
  try {
- const { action, exp, sig } = req.query;
- const rid = String(req.params.id || '');
- const expNum = Number(exp);
- if (!['approved', 'rejected'].includes(action)) return res.status(400).send('<h2>Invalid action.</h2>');
- if (typeof sig !== 'string' || !Number.isFinite(expNum) || expNum < Date.now() || !safeEq(sig, signQuickAction(rid, action, expNum)))
- return res.status(403).send('<h2>This link is invalid or has expired. Please use the admin panel.</h2>');
- // Atomic: only a still-pending receipt can be actioned, so a link can never credit twice.
- const receipt = await Receipt.findOneAndUpdate(
- { _id: rid, status: 'pending' },
- { $set: { status: action, adminNote: `Quick-${action} via WhatsApp link` } },
- { new: true }
- );
- if (!receipt) {
- const existing = await Receipt.findById(rid);
- if (!existing) return res.status(404).send('<h2>Receipt not found.</h2>');
- return res.send(`<h2> Already ${escHtml(existing.status)}. No action needed.</h2>`);
- }
+ const { action, passcode } = req.query;
+ if (!passcodeOk(passcode))
+ return res.status(403).send(`<h2> Wrong passcode. Access denied.</h2>`);
+ if (!['approved', 'rejected'].includes(action))
+ return res.status(400).send(`<h2>Invalid action.</h2>`);
+ const receipt = await Receipt.findById(req.params.id);
+ if (!receipt) return res.status(404).send(`<h2>Receipt not found.</h2>`);
+ if (receipt.status !== 'pending')
+ return res.send(`<h2> Already ${receipt.status}. No action needed.</h2>`);
+ receipt.status = action;
+ receipt.adminNote = `Quick-${action} via WhatsApp link`;
+ await receipt.save();
  if (action === 'approved') {
  const user = await User.findById(receipt.userId);
  if (user) {
@@ -4244,21 +4578,21 @@ app.get('/api/admin/receipts/:id/quick-action', async (req, res) => {
  return res.send(`
  <html><body style="font-family:sans-serif;text-align:center;padding:40px;background:#0a0a0a;color:#ffd700;">
  <h1> APPROVED</h1>
- <p style="color:#fff;">₦${receipt.claimedAmount.toLocaleString('en-NG')} credited to <b>${escHtml(receipt.userName)}</b> (${escHtml(receipt.userEmail)})</p>
+ <p style="color:#fff;">₦${receipt.claimedAmount.toLocaleString('en-NG')} credited to <b>${receipt.userName}</b> (${receipt.userEmail})</p>
+ <p style="color:#aaa;">You can close this tab.</p>
+ </body></html>
+ `);
+ } else {
+ return res.send(`
+ <html><body style="font-family:sans-serif;text-align:center;padding:40px;background:#0a0a0a;color:#ff4444;">
+ <h1> REJECTED</h1>
+ <p style="color:#fff;">Deposit from <b>${receipt.userName}</b> has been rejected.</p>
  <p style="color:#aaa;">You can close this tab.</p>
  </body></html>
  `);
  }
- return res.send(`
- <html><body style="font-family:sans-serif;text-align:center;padding:40px;background:#0a0a0a;color:#ff4444;">
- <h1> REJECTED</h1>
- <p style="color:#fff;">Deposit from <b>${escHtml(receipt.userName)}</b> has been rejected.</p>
- <p style="color:#aaa;">You can close this tab.</p>
- </body></html>
- `);
  } catch (e) {
- console.error('[quick-action]', e.message);
- res.status(500).send('<h2>Something went wrong. Please use the admin panel.</h2>');
+ res.status(500).send(`<h2>Error: ${e.message}</h2>`);
  }
 });
 app.post('/api/visit', async (req, res) => {
@@ -4536,356 +4870,17 @@ app.get('/api/games/my-scores', auth, async (req, res) => {
  const scores = await GameScore.find({ userId: req.user._id }).sort({ createdAt: -1 }).limit(20);
  res.json(scores);
 });
-app.get('/api/v1/me', apiKeyAuth, async (req, res) => {
- res.json({ id: req.apiUser._id, name: req.apiUser.name, email: req.apiUser.email, balance: req.apiUser.balance, gameId: req.apiUser.gameId, restricted: req.apiUser.restricted });
-});
-app.get('/api/v1/balance', apiKeyAuth, async (req, res) => {
- res.json({ balance: req.apiUser.balance || 0 });
-});
-app.get('/api/v1/purchases', apiKeyAuth, async (req, res) => {
- const u = await User.findById(req.apiUser._id).select('purchaseDetails');
- res.json(u.purchaseDetails || []);
-});
-app.get('/api/v1/purchases/:purchaseId', apiKeyAuth, async (req, res) => {
- const u = await User.findById(req.apiUser._id).select('purchaseDetails');
- const purchase = (u.purchaseDetails || []).id(req.params.purchaseId);
- if (!purchase) return res.status(404).json({ error: 'Purchase not found on your account' });
- res.json(purchase);
-});
-app.get('/api/v1/listings', apiKeyAuth, async (req, res) => {
- const filter = { available: true };
- if (req.query.type && req.query.type !== 'all') filter.type = req.query.type;
- const logs = await Log.find(filter).select('-details -toolLink -deliverableFile').sort({ createdAt: -1 });
- const visible = logs.filter(l => l.type === 'tool' || l.maxPurchases <= 0 || l.soldCount < l.maxPurchases);
- res.json(visible);
-});
-app.get('/api/v1/listings/:id', apiKeyAuth, async (req, res) => {
- const log = await Log.findById(req.params.id).select('-details -toolLink -deliverableFile');
- if (!log) return res.status(404).json({ error: 'Not found' });
- res.json(log);
-});
-app.post('/api/v1/buy/:id', apiKeyAuth, async (req, res) => {
- try {
- const log = await Log.findById(req.params.id);
- if (!log || !log.available) return res.status(404).json({ error: 'Item not available' });
- const user = await User.findById(req.apiUser._id);
- if (log.listingType === 'folder') {
- const available = (log.subAccounts || []).filter(sa => !sa.sold);
- if (!available.length) return res.status(400).json({ error: 'Sold out' });
- let targetId = req.body.subAccountId;
- if (!targetId) {
- available.sort((a, b) => (a.price||0) - (b.price||0));
- targetId = available[0]._id;
- }
- const claimed = await Log.findOneAndUpdate(
- { _id: log._id, 'subAccounts._id': targetId, 'subAccounts.sold': false },
- { $set: { 'subAccounts.$.sold': true, 'subAccounts.$.soldTo': user._id, 'subAccounts.$.soldAt': new Date() } },
- { new: true }
- );
- if (!claimed) return res.status(400).json({ error: 'That account was just sold to someone else — try again or omit subAccountId to auto-pick another.' });
- const sub = claimed.subAccounts.id(targetId);
- if ((user.balance || 0) < sub.price) {
- await Log.updateOne({ _id: log._id, 'subAccounts._id': targetId }, { $set: { 'subAccounts.$.sold': false, 'subAccounts.$.soldTo': null, 'subAccounts.$.soldAt': null } });
- return res.status(400).json({ error: `Insufficient balance — this account costs ₦${sub.price}` });
- }
- user.balance = (user.balance || 0) - sub.price;
- user.purchaseDetails.push({
- logId: log._id, logTitle: `${log.title} — ${sub.label}`, logType: log.type, logDetails: sub.details || '',
- toolLink: sub.toolLink || '', deliveryType: sub.deliveryType || 'link',
- deliverableFile: sub.deliverableFile || '', deliverableFileName: sub.deliverableFileName || '',
- pricePaid: sub.price, subAccountId: sub._id
- });
- await user.save();
- const purchaseRecord = user.purchaseDetails[user.purchaseDetails.length - 1];
- await Transaction.create({ userId: user._id, type: 'purchase', amount: sub.price, description: `Purchased via API: ${log.title} — ${sub.label}`, status: 'success' });
- await creditReferralCommission(user, sub.price, `${log.title} — ${sub.label}`);
- checkAndAwardBadges(user._id).catch(() => {});
- return res.json({
- message: 'Purchase successful', newBalance: user.balance, purchaseId: purchaseRecord._id, purchasedAt: purchaseRecord.purchasedAt,
- itemPrice: sub.price, totalCharged: sub.price,
- logDetails: sub.details || '', toolLink: sub.toolLink || '', deliveryType: sub.deliveryType || 'link',
- deliverableFile: sub.deliverableFile || '', deliverableFileName: sub.deliverableFileName || ''
- });
- }
- if (log.type === 'log') {
- if (log.maxPurchases > 0 && log.soldCount >= log.maxPurchases) return res.status(400).json({ error: 'Sold out' });
- } else if (log.toolQty > 0 && log.soldCount >= log.toolQty) {
- return res.status(400).json({ error: 'Out of stock' });
- }
- if ((user.balance || 0) < log.price) return res.status(400).json({ error: `Insufficient balance — this item costs ₦${log.price}` });
- user.balance = (user.balance || 0) - log.price;
- user.purchaseDetails.push({
- logId: log._id, logTitle: log.title, logType: log.type, logDetails: log.details || '',
- toolLink: log.toolLink || '', deliveryType: log.deliveryType || 'link',
- deliverableFile: log.deliverableFile || '', deliverableFileName: log.deliverableFileName || '',
- pricePaid: log.price
- });
- await user.save();
- const purchaseRecord = user.purchaseDetails[user.purchaseDetails.length - 1];
- await Transaction.create({ userId: user._id, type: 'purchase', amount: log.price, description: `Purchased via API: ${log.title}`, status: 'success' });
- await creditReferralCommission(user, log.price, log.title);
- checkAndAwardBadges(user._id).catch(() => {});
- log.soldCount += 1;
- await log.save();
- res.json({
- message: 'Purchase successful', newBalance: user.balance, purchaseId: purchaseRecord._id, purchasedAt: purchaseRecord.purchasedAt,
- itemPrice: log.price, totalCharged: log.price,
- logDetails: log.details || '', toolLink: log.toolLink || '', deliveryType: log.deliveryType || 'link',
- deliverableFile: log.deliverableFile || '', deliverableFileName: log.deliverableFileName || ''
- });
- } catch (e) { res.status(500).json({ error: e.message }); }
-});
-app.post('/api/v1/buy-multi/:id', apiKeyAuth, async (req, res) => {
- const claimedIds = [];
- try {
- const { subAccountIds } = req.body;
- if (!Array.isArray(subAccountIds) || !subAccountIds.length)
- return res.status(400).json({ error: 'subAccountIds must be a non-empty array' });
- if (subAccountIds.length > 50) return res.status(400).json({ error: 'Max 50 accounts per batch' });
- const log = await Log.findById(req.params.id);
- if (!log || !log.available) return res.status(404).json({ error: 'Item not available' });
- if (log.listingType !== 'folder') return res.status(400).json({ error: 'This item does not support multi-buy' });
- const user = await User.findById(req.apiUser._id);
- const claimedSubs = [];
- for (const subId of subAccountIds) {
- const claimed = await Log.findOneAndUpdate(
- { _id: log._id, 'subAccounts._id': subId, 'subAccounts.sold': false },
- { $set: { 'subAccounts.$.sold': true, 'subAccounts.$.soldTo': user._id, 'subAccounts.$.soldAt': new Date() } },
- { new: true }
- );
- if (!claimed) {
- for (const rid of claimedIds) await Log.updateOne({ _id: log._id, 'subAccounts._id': rid }, { $set: { 'subAccounts.$.sold': false, 'subAccounts.$.soldTo': null, 'subAccounts.$.soldAt': null } });
- return res.status(400).json({ error: 'One of the requested accounts was already sold. Nothing was charged — retry with different IDs.' });
- }
- claimedIds.push(subId);
- claimedSubs.push(claimed.subAccounts.id(subId));
- }
- const total = claimedSubs.reduce((s, sa) => s + (sa.price || 0), 0);
- if ((user.balance || 0) < total) {
- for (const rid of claimedIds) await Log.updateOne({ _id: log._id, 'subAccounts._id': rid }, { $set: { 'subAccounts.$.sold': false, 'subAccounts.$.soldTo': null, 'subAccounts.$.soldAt': null } });
- return res.status(400).json({ error: `Insufficient balance — this batch costs ₦${total}` });
- }
- user.balance = (user.balance || 0) - total;
- for (const sub of claimedSubs) {
- user.purchaseDetails.push({
- logId: log._id, logTitle: `${log.title} — ${sub.label}`, logType: log.type, logDetails: sub.details || '',
- toolLink: sub.toolLink || '', deliveryType: sub.deliveryType || 'link',
- deliverableFile: sub.deliverableFile || '', deliverableFileName: sub.deliverableFileName || '',
- pricePaid: sub.price, subAccountId: sub._id
- });
- }
- await user.save();
- const newRecords = user.purchaseDetails.slice(-claimedSubs.length);
- await Transaction.create({ userId: user._id, type: 'purchase', amount: total, description: `Purchased ${claimedSubs.length} accounts via API: ${log.title}`, status: 'success' });
- for (const sub of claimedSubs) await creditReferralCommission(user, sub.price, `${log.title} — ${sub.label}`);
- checkAndAwardBadges(user._id).catch(() => {});
- res.json({
- message: `${claimedSubs.length} accounts purchased`, newBalance: user.balance, totalCharged: total,
- items: newRecords.map(r => ({
- purchaseId: r._id, purchasedAt: r.purchasedAt, pricePaid: r.pricePaid, logTitle: r.logTitle,
- logDetails: r.logDetails, toolLink: r.toolLink, deliveryType: r.deliveryType,
- deliverableFile: r.deliverableFile, deliverableFileName: r.deliverableFileName
- }))
- });
- } catch (e) {
- for (const rid of claimedIds) { try { await Log.updateOne({ _id: req.params.id, 'subAccounts._id': rid }, { $set: { 'subAccounts.$.sold': false, 'subAccounts.$.soldTo': null, 'subAccounts.$.soldAt': null } }); } catch {} }
- res.status(500).json({ error: e.message });
- }
-});
 // Developer API — same live services as Server 1, but with a slightly smaller profit (cheaper).
-app.get('/api/v1/numbers/countries', apiKeyAuth, async (req, res) => {
- try {
- const countries = await getLiveCountriesCached();
- res.json(countries.map(c => ({ code: c.country_code, name: c.country_name })));
- } catch (e) { res.status(502).json({ error: 'Could not load countries' }); }
-});
-app.get('/api/v1/numbers/options', apiKeyAuth, async (req, res) => {
- try {
- const country = String(req.query.country || 'US');
- const cfg = await getNumberServerConfig();
- const list = await getServer1Services(country, cfg, { api: true });
- res.json(list.map(s => ({ id: s.serviceId, serviceId: s.serviceId, provider: s.provider, country, price: s.price })));
- } catch (e) { res.status(500).json({ error: 'Failed to load options' }); }
-});
-app.post('/api/v1/buy-number', apiKeyAuth, async (req, res) => {
- try {
- const cfg = await getNumberServerConfig();
- if (!cfg.server1Enabled) return res.status(503).json({ error: 'Numbers are temporarily unavailable' });
- const country = String(req.body.country || 'US');
- const serviceId = String(req.body.serviceId || req.body.id || '');
- if (!serviceId) return res.status(400).json({ error: 'country and serviceId are required (see GET /api/v1/numbers/options?country=US)' });
- _s1ServicesCache.delete(country.trim());
- const live = (await getServer1Services(country, cfg, { api: true })).find(s => s.serviceId === serviceId);
- if (!live) return res.status(404).json({ error: 'That service/country is not available right now' });
- const countries = await getLiveCountriesCached();
- const countryName = (countries.find(c => c.country_code === country) || {}).country_name || country;
- const user = await User.findById(req.apiUser._id);
- let claimed;
- try { claimed = await rentNumberLive(user, live.provider, countryName, country, serviceId, live.price, live.costNgn); }
- catch (e) {
- const code = /insufficient balance/i.test(e.message) ? 402 : /no numbers/i.test(e.message) ? 409 : 400;
- return res.status(code).json({ error: e.message });
- }
- res.json({ order_id: claimed._id, number: claimed.phoneNumber, provider: claimed.provider, country: claimed.country, price: live.price, status: 'waiting' });
- } catch (e) { res.status(500).json({ error: e.message }); }
-});
-app.get('/api/v1/get-sms', apiKeyAuth, async (req, res) => {
- try {
- const { order_id } = req.query;
- if (!order_id) return res.status(400).json({ error: 'order_id is required' });
- let listing = await NumberListing.findOne({ _id: order_id, soldTo: req.apiUser._id });
- if (!listing) return res.status(404).json({ error: 'Order not found' });
- if (listing.status === 'sold' && !listing.code) {
- try {
- const result = await otpsuiteRequest('get', '/get-sms', { params: { order_id: listing.otpsuiteOrderId } });
- if (result.status === 'received' && result.sms) {
- listing.code = result.sms;
- listing.codeAddedAt = new Date();
- await listing.save();
- }
- } catch (e) { /* transient — client just polls again */ }
- }
- listing = await expireStaleNumberOrder(listing);
- res.json({
- order_id: listing._id,
- status: listing.code ? 'received' : listing.status === 'sold' ? 'waiting' : listing.status,
- sms: listing.code || null
- });
- } catch (e) { res.status(500).json({ error: e.message }); }
-});
-app.post('/api/v1/cancel-number', apiKeyAuth, async (req, res) => {
- try {
- const { order_id } = req.body;
- if (!order_id) return res.status(400).json({ error: 'order_id is required' });
- const listing = await NumberListing.findOne({ _id: order_id, soldTo: req.apiUser._id });
- if (!listing) return res.status(404).json({ error: 'Order not found' });
- if (listing.status !== 'sold' || listing.code) return res.status(400).json({ error: 'This order can no longer be cancelled' });
- if (listing.otpsuiteOrderId) {
- try { await otpsuiteRequest('post', '/cancel-number', { data: { order_id: listing.otpsuiteOrderId } }); } catch (e) {}
- }
- listing.status = 'cancelled';
- await listing.save();
- const user = await User.findById(listing.soldTo);
- user.balance = (user.balance || 0) + listing.sellPrice;
- await user.save();
- await Transaction.create({ userId: user._id, type: 'admin_credit', amount: listing.sellPrice, description: `Refund: ${listing.provider} number (${listing.country}) — cancelled via API`, status: 'success' });
- res.json({ order_id: listing._id, status: 'cancelled', refunded: listing.sellPrice });
- } catch (e) { res.status(500).json({ error: e.message }); }
-});
-app.get('/api/v1/categories', apiKeyAuth, async (req, res) => {
- try {
- const cats = await Category.find().sort({ name: 1 });
- res.json({ categories: cats.map(c => ({ id: c._id, name: c.name })) });
- } catch (e) { res.status(500).json({ error: e.message }); }
-});
-app.get('/api/v1/marketplace', apiKeyAuth, async (req, res) => {
- try {
- const { category, type, search } = req.query;
- const page = Math.max(1, parseInt(req.query.page) || 1);
- const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
- const skip = (page - 1) * limit;
- const filter = { available: true };
- if (type && type !== 'all') filter.type = type;
- if (category) filter.category = category;
- if (search) filter.$or = [
- { title: { $regex: search, $options: 'i' } },
- { description: { $regex: search, $options: 'i' } },
- { category: { $regex: search, $options: 'i' } }
- ];
- const [total, logs] = await Promise.all([
- Log.countDocuments(filter),
- Log.find(filter)
- .select('title description type category price soldCount maxPurchases toolQty listingType picture available createdAt')
- .sort({ createdAt: -1 })
- .skip(skip).limit(limit)
- ]);
- const items = logs.map(l => {
- const isTool = l.type === 'tool';
- const soldOut = isTool ? (l.toolQty > 0 && l.soldCount >= l.toolQty) : (l.maxPurchases > 0 && l.soldCount >= l.maxPurchases);
- return {
- id: l._id,
- title: l.title,
- description: l.description,
- type: l.type,
- listingType: l.listingType,
- category: l.category,
- price: l.price,
- soldCount: l.soldCount,
- stockLeft: isTool ? (l.toolQty > 0 ? Math.max(0, l.toolQty - l.soldCount) : null) : (l.maxPurchases > 0 ? Math.max(0, l.maxPurchases - l.soldCount) : null),
- soldOut,
- picture: l.picture || null,
- available: l.available,
- createdAt: l.createdAt
- };
- });
- res.json({
- page, limit, total,
- totalPages: Math.ceil(total / limit),
- items
- });
- } catch (e) { res.status(500).json({ error: e.message }); }
-});
-app.get('/api/v1/tools', apiKeyAuth, async (req, res) => {
- try {
- const { category, search } = req.query;
- const page = Math.max(1, parseInt(req.query.page) || 1);
- const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
- const skip = (page - 1) * limit;
- const filter = { available: true, type: 'tool' };
- if (category) filter.category = category;
- if (search) filter.$or = [{ title: { $regex: search, $options: 'i' } }, { description: { $regex: search, $options: 'i' } }];
- const [total, tools] = await Promise.all([
- Log.countDocuments(filter),
- Log.find(filter)
- .select('title description category price soldCount toolQty picture listingType createdAt')
- .sort({ createdAt: -1 })
- .skip(skip).limit(limit)
- ]);
- res.json({
- page, limit, total, totalPages: Math.ceil(total / limit),
- tools: tools.map(t => ({
- id: t._id, title: t.title, description: t.description,
- category: t.category, price: t.price, soldCount: t.soldCount,
- stockTotal: t.toolQty || null,
- stockLeft: t.toolQty > 0 ? Math.max(0, t.toolQty - t.soldCount) : null,
- soldOut: t.toolQty > 0 && t.soldCount >= t.toolQty,
- picture: t.picture || null, listingType: t.listingType, createdAt: t.createdAt
- }))
- });
- } catch (e) { res.status(500).json({ error: e.message }); }
-});
-app.get('/api/v1/marketplace/:id', apiKeyAuth, async (req, res) => {
- try {
- const log = await Log.findById(req.params.id)
- .select('-details -toolLink -deliverableFile -deliverableFileName -subAccounts');
- if (!log) return res.status(404).json({ error: 'Item not found' });
- const isTool = log.type === 'tool';
- const soldOut = isTool ? (log.toolQty > 0 && log.soldCount >= log.toolQty) : (log.maxPurchases > 0 && log.soldCount >= log.maxPurchases);
- res.json({
- id: log._id, title: log.title, description: log.description,
- type: log.type, listingType: log.listingType, category: log.category,
- price: log.price, soldCount: log.soldCount,
- stockLeft: isTool ? (log.toolQty > 0 ? Math.max(0, log.toolQty - log.soldCount) : null) : (log.maxPurchases > 0 ? Math.max(0, log.maxPurchases - log.soldCount) : null),
- soldOut, picture: log.picture || null, available: log.available,
- averageRating: log.reviews?.length ? (log.reviews.reduce((s,r)=>s+r.rating,0)/log.reviews.length).toFixed(1) : null,
- reviewCount: log.reviews?.length || 0,
- createdAt: log.createdAt
- });
- } catch (e) { res.status(500).json({ error: e.message }); }
-});
-app.get('/api/v1/transactions', apiKeyAuth, async (req, res) => {
- try {
- const page = Math.max(1, parseInt(req.query.page) || 1);
- const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
- const [total, txs] = await Promise.all([
- Transaction.countDocuments({ userId: req.apiUser._id }),
- Transaction.find({ userId: req.apiUser._id })
- .sort({ createdAt: -1 }).skip((page-1)*limit).limit(limit)
- .select('type amount description status createdAt')
- ]);
- res.json({ page, limit, total, totalPages: Math.ceil(total/limit), transactions: txs });
- } catch (e) { res.status(500).json({ error: e.message }); }
-});
+// Legacy {provider, country} callers: pick the cheapest matching service across servers.
+async function novaFindServiceByName(countryCode, provider, serverId) {
+  const rows = (await novaCatalogForCountry(countryCode)).services || [];
+  const want = String(provider || '').trim().toLowerCase();
+  const matches = rows.filter(s => [s.name, s.service, s.application, s.code, novaServiceDisplayName(s)].some(v => String(v || '').trim().toLowerCase() === want)
+    && (!serverId || Number(s.server_id ?? s.serverId) === serverId) && Number(s.price_minor) >= 0);
+  matches.sort((a, b) => Number(a.price_minor) - Number(b.price_minor));
+  const m = matches[0];
+  return m ? { serviceId: Number(m.id ?? m.service_id), serverId: Number(m.server_id ?? m.serverId) } : null;
+}
 app.get('/api/top-buyers', optionalAuth, async (req, res) => {
  try {
  const top = await Transaction.aggregate([
@@ -4902,7 +4897,9 @@ app.get('/api/top-buyers', optionalAuth, async (req, res) => {
 });
 app.post('/api/support', async (req, res) => {
  try {
- const { name, email, subject, message, userId } = req.body;
+ const clip = (v, n) => String(v == null ? '' : v).slice(0, n);
+ const name = clip(req.body.name, 120), email = clip(req.body.email, 200), subject = clip(req.body.subject, 200), message = clip(req.body.message, 5000);
+ const userId = /^[a-f0-9]{24}$/i.test(String(req.body.userId || '')) ? String(req.body.userId) : undefined;
  if (!name || !email || !message) return res.status(400).json({ error: 'Name, email and message required' });
  await Support.create({ name, email, subject: subject || 'General', message, userId });
  res.json({ message: 'Support ticket submitted!' });
@@ -5056,7 +5053,6 @@ const SUPPORT_FAQ = [
  { keywords: ['buy', 'purchase', 'order', 'checkout'], reply: "To buy something: open Marketplace, pick a listing, and confirm the purchase — it's deducted straight from your wallet balance and delivered instantly to your Purchases page." },
  { keywords: ['delivery', 'deliver', 'received', 'where is my'], reply: "Delivery is instant for almost everything — check your Purchases page right after buying. If nothing shows up after a few minutes, contact support with your receipt ID." },
  { keywords: ['referral', 'refer a friend', 'refer', 'commission', 'invite'], reply: "Share your referral link from the Referrals page. You earn a 4% commission automatically whenever someone you referred makes a purchase." },
- { keywords: ['api', 'developer', 'integrate', 'endpoint', 'fetch', 'json'], reply: "Generate an API Key + Secret from Settings API Access, then check the API Docs page (in the menu) for endpoints, JSON responses, and code examples in cURL, JavaScript, and Python." },
  { keywords: ['number', 'otp', 'virtual number', 'buy number', 'sms verification', 'phone verification'], reply: "Buy Numbers gives you a real phone number to receive SMS/OTP codes for verifying accounts. There are two servers: Server 1 is USA/Canada numbers for many different services (not only WhatsApp), and you can also pick other countries. Server 2 covers many other services (not just WhatsApp) across different countries. Pick a server on the Buy Numbers page, choose your service/country, and the code arrives automatically once the sender sends it — no manual refresh needed." },
  { keywords: ['server 1', 'server1', 'usa whatsapp', 'canada'], reply: "Server 1 is no longer USA WhatsApp only — it now gives USA/Canada numbers for many different services, and you can also choose any other country the provider has. Search your country, search your service, see the price, and buy." },
  { keywords: ['server 2', 'server2'], reply: "Server 2 covers a wide range of services beyond WhatsApp — pick your country and the service you need to verify (e.g. Telegram, Facebook, Google, etc.), buy a number, and the code arrives automatically once it's sent." },
@@ -5086,7 +5082,7 @@ app.post('/api/support/ai-chat', auth, async (req, res) => {
  } catch (e) { res.status(500).json({ error: 'Failed to get a reply — please try again.' }); }
 });
 app.post('/api/admin/verify', (req, res) => {
- adminPasscodeOk(req.body && req.body.passcode) ? res.json({ success: true }) : res.status(403).json({ error: 'Wrong passcode' });
+ passcodeOk(req.body && req.body.passcode) ? res.json({ success: true }) : res.status(403).json({ error: 'Wrong passcode' });
 });
 app.get('/api/admin/restock-requests', anyAdminAuth, async (req, res) => {
  try {
@@ -5701,7 +5697,7 @@ app.delete('/api/admin/deposit-tutorials/:method', adminAuth, async (req, res) =
  res.json({ message: 'Tutorial cleared' });
  } catch (e) { res.status(500).json({ error: 'Failed to clear tutorial' }); }
 });
-// Cancels an order on whichever provider it came from (Server 1 = otpsuite, Server 2 = Grizzly).
+// Cancels an order on whichever provider it came from (Server 1 = NovaSolution, Server 2 = Grizzly).
 async function releaseNumberOnProvider(listing) {
  if (listing.grizzlyActivationId) {
  // status 8 = cancel the activation on Grizzly so the same order is cancelled there too
@@ -5720,16 +5716,14 @@ async function releaseNumberOnProvider(listing) {
  return { ok: false, detail: listing.providerCancelDetail };
  }
  }
- if (listing.otpsuiteOrderId) {
+ if (listing.novaSessionId) {
  try {
- await otpsuiteRequest('post', '/cancel-number', { data: { order_id: listing.otpsuiteOrderId } });
- listing.providerCancelled = true;
- return { ok: true, detail: 'cancelled' };
+   const result = await novaRequest('POST', `/numbers/sessions/${encodeURIComponent(listing.novaSessionId)}/cancel`);
+   listing.providerCancelled = true; listing.providerCancelDetail = 'provider cancellation requested';
+   return { ok: true, detail: result };
  } catch (e) {
- console.error('otpsuite cancel failed (our refund still proceeds):', e.message);
- listing.providerCancelled = false;
- listing.providerCancelDetail = String(e.message || e).slice(0, 200);
- return { ok: false, detail: listing.providerCancelDetail };
+   listing.providerCancelled = false; listing.providerCancelDetail = String(e.message || e).slice(0, 200);
+   return { ok: false, detail: listing.providerCancelDetail };
  }
  }
  return { ok: false, detail: 'no provider order id' };
@@ -5742,131 +5736,661 @@ async function fetchCodeFromProvider(listing) {
  if (text.startsWith('STATUS_OK:')) return text.slice('STATUS_OK:'.length).trim();
  return '';
  }
- const result = await otpsuiteRequest('get', '/get-sms', { params: { order_id: listing.otpsuiteOrderId } });
- return result.status === 'received' && result.sms ? result.sms : '';
+ if (listing.novaSessionId) {
+   const result = novaUnwrap(await novaRequest('POST', `/numbers/sessions/${encodeURIComponent(listing.novaSessionId)}/poll`));
+   const session = result.session || result;
+   const sms = session.sms || session.code || result.sms || result.code || '';
+   if (typeof sms === 'string') return sms;
+   if (sms && typeof sms === 'object') return String(sms.code || sms.otp || sms.text || '');
+   return '';
+ }
+ return '';
 }
 async function expireStaleNumberOrder(listing) {
  if (listing.status === 'sold' && listing.expiresAt && listing.expiresAt.getTime() < Date.now() && !listing.code) {
- await releaseNumberOnProvider(listing);
-
- listing.status = 'expired';
- listing.expiredAt = new Date();
- await listing.save();
- const user = await User.findById(listing.soldTo);
- if (user) {
- user.balance = (user.balance || 0) + listing.sellPrice;
- await user.save();
- await Transaction.create({ userId: user._id, type: 'admin_credit', amount: listing.sellPrice, description: `Refund: ${listing.provider} number (${listing.country}) — no code received in time`, status: 'success' });
- }
+   await releaseNumberOnProvider(listing);
+   const expired = await NumberListing.findOneAndUpdate(
+     { _id: listing._id, status: 'sold', code: '' },
+     { $set: { status: 'expired', expiredAt: new Date(), providerCancelled: !!listing.providerCancelled, providerCancelDetail: listing.providerCancelDetail || '' } },
+     { new: true }
+   );
+   if (expired) {
+     const user = await User.findById(expired.soldTo);
+     if (user) {
+       await User.updateOne({ _id: user._id }, { $inc: { balance: expired.sellPrice } });
+       await Transaction.create({ userId: user._id, type: 'admin_credit', amount: expired.sellPrice, description: `Refund: ${expired.provider} number (${expired.country}) — no code received in time`, status: 'success' });
+     }
+     return expired;
+   }
+   return await NumberListing.findById(listing._id) || listing;
  }
  return listing;
 }
+
+// Retries provider-side cancellation for Server 1 orders we already refunded (cancelled/expired) when Nova's
+// cancel call failed, so we are not left paying for a number the customer no longer holds.
+let _novaCancelRetryRunning = false;
+async function retryFailedNovaCancellations() {
+  if (_novaCancelRetryRunning || !process.env.NOVA_API_KEY || mongoose.connection.readyState !== 1) return;
+  _novaCancelRetryRunning = true;
+  try {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const rows = await NumberListing.find({
+      server: 'server1', novaSessionId: { $ne: '' }, status: { $in: ['cancelled', 'expired'] },
+      providerCancelled: false, providerCancelAttempts: { $lt: 5 },
+      $or: [{ cancelledAt: { $gte: since } }, { expiredAt: { $gte: since } }]
+    }).limit(25);
+    for (const l of rows) {
+      try {
+        await novaRequest('POST', `/numbers/sessions/${encodeURIComponent(l.novaSessionId)}/cancel`);
+        await NumberListing.updateOne({ _id: l._id }, { $set: { providerCancelled: true, providerCancelDetail: 'provider cancellation confirmed on retry' }, $inc: { providerCancelAttempts: 1 } });
+      } catch (e) {
+        await NumberListing.updateOne({ _id: l._id }, { $set: { providerCancelDetail: String(e.message || e).slice(0, 200) }, $inc: { providerCancelAttempts: 1 } });
+      }
+    }
+  } catch (e) { console.error('[nova-cancel-retry] error:', e.message); }
+  finally { _novaCancelRetryRunning = false; }
+}
+// Orders whose Nova outcome was unclear (timeout/5xx on both attempts). The wallet stays debited until an admin decides.
+app.get('/api/admin/numbers/needs-review', anyAdminAuth, async (req, res) => {
+  try {
+    const rows = await NumberListing.find({ status: 'needs_review' }).sort({ soldAt: -1 }).limit(200).populate('soldTo', 'email username');
+    res.json(rows.map(l => ({ id: l._id, user: l.soldTo, provider: l.provider, country: l.country, amount: l.sellPrice, novaServiceId: l.novaServiceId, novaServerId: l.novaServerId, idempotencyKey: l.novaIdempotencyKey, error: l.providerError, at: l.soldAt })));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+// action 'refund'  : Nova did NOT create the order -> credit the wallet (atomic, once).
+// action 'confirm' : Nova DID create it -> attach the number/session so the customer can poll for the SMS.
+app.post('/api/admin/numbers/:id/resolve', adminAuth, async (req, res) => {
+  try {
+    const action = String(req.body.action || '');
+    if (action === 'refund') {
+      const l = await NumberListing.findOneAndUpdate({ _id: req.params.id, status: 'needs_review' }, { $set: { status: 'cancelled', cancelledAt: new Date(), providerCancelDetail: 'Manual review: no provider order found, refunded' } }, { new: true });
+      if (!l) return res.status(409).json({ error: 'Order is not awaiting review (already resolved?)' });
+      await User.updateOne({ _id: l.soldTo }, { $inc: { balance: l.sellPrice } });
+      await Transaction.create({ userId: l.soldTo, type: 'admin_credit', amount: l.sellPrice, description: `Refund: ${l.provider} number order could not be confirmed with the provider`, status: 'success' });
+      return res.json({ status: 'cancelled', refunded: l.sellPrice });
+    }
+    if (action === 'confirm') {
+      const phoneNumber = String(req.body.phoneNumber || '').trim();
+      const sessionId = String(req.body.sessionId || '').trim();
+      if (!phoneNumber || !sessionId) return res.status(400).json({ error: 'phoneNumber and sessionId (from the provider dashboard) are required' });
+      const expiresAt = req.body.expiresAt ? new Date(req.body.expiresAt) : new Date(Date.now() + NUMBER_RENTAL_WINDOW_MS);
+      if (isNaN(expiresAt)) return res.status(400).json({ error: 'expiresAt is not a valid date' });
+      const l = await NumberListing.findOneAndUpdate({ _id: req.params.id, status: 'needs_review' }, { $set: { status: 'sold', phoneNumber, novaSessionId: sessionId, novaOrderNumber: phoneNumber, expiresAt, providerError: '' } }, { new: true });
+      if (!l) return res.status(409).json({ error: 'Order is not awaiting review (already resolved?)' });
+      try { await Transaction.create({ userId: l.soldTo, type: 'purchase', amount: l.sellPrice, description: `Rented ${l.provider} number (${l.country}) via the provider`, status: 'success' }); } catch (_) {}
+      return res.json({ status: 'sold', orderId: l._id, phoneNumber });
+    }
+    res.status(400).json({ error: "action must be 'refund' or 'confirm'" });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── NovaSolution number-provider integration ────────────────────────────────
+// Configure NOVA_API_KEY in Render Environment. Never expose this key to browsers.
+const NOVA_BASE_URL = String(process.env.NOVA_BASE_URL || 'https://www.novasolution.ng/api/v1').replace(/\/+$/, '');
+const novaAxios = axios.create({
+  baseURL: NOVA_BASE_URL,
+  timeout: 25000,
+  headers: {
+    Accept: 'application/json',
+    ...(process.env.NOVA_API_KEY ? { Authorization: `Bearer ${process.env.NOVA_API_KEY}` } : {})
+  }
+});
+// The provider allows 60 requests/minute per key. Every call (numbers, Boost 2, purchases) goes
+// through this gate so we never exceed ~50/minute no matter how many things run together.
+var _novaGateNext = 0;
+async function novaGate() {
+  const now = Date.now();
+  const at = Math.max(now, _novaGateNext);
+  _novaGateNext = at + 1200;
+  if (at > now) await new Promise(r => setTimeout(r, at - now));
+}
+async function novaRequest(method, path, options = {}) {
+  if (!process.env.NOVA_API_KEY) {
+    const e = new Error('This service is not available right now. Please contact the administrator.');
+    e.status = 503;
+    throw e;
+  }
+  try {
+    await novaGate();
+    const response = await novaAxios.request({ method, url: path, ...options });
+    return response.data;
+  } catch (err) {
+    const status = err.response?.status || err.status || 502;
+    const message = err.response?.data?.message || err.response?.data?.error ||
+      (status === 502 ? 'The service could not be reached. Please try again.' : 'Request failed. Please try again.');
+    const e = new Error(message);
+    e.status = status;
+    e.retryAfter = Number(err.response?.headers?.['retry-after']) || 0;
+    e.provider = true;
+    // No HTTP response (timeout / dropped connection), a 5xx, or 408 => we cannot know whether Nova acted on the request.
+    e.ambiguous = !err.response || status >= 500 || status === 408;
+    e.details = err.response?.data?.errors;
+    throw e;
+  }
+}
+function novaErrorResponse(res, err) {
+  const status = Number(err.status) || 502;
+  return res.status(status >= 400 && status <= 599 ? status : 502)
+    .json({ error: err.message || 'Request failed', details: err.details || undefined });
+}
+
+function novaUnwrap(payload) {
+  if (payload && payload.data && typeof payload.data === 'object') return payload.data;
+  return payload || {};
+}
+function novaServiceRows(payload) {
+  const d = novaUnwrap(payload);
+  return Array.isArray(d.services) ? d.services : (Array.isArray(payload?.services) ? payload.services : []);
+}
+function novaCountryRows(payload) {
+  const d = novaUnwrap(payload);
+  return Array.isArray(d.countries) ? d.countries : (Array.isArray(payload?.countries) ? payload.countries : []);
+}
+function novaServerRows(payload) {
+  const d = novaUnwrap(payload);
+  return Array.isArray(d.servers) ? d.servers : (Array.isArray(payload?.servers) ? payload.servers : []);
+}
+function novaCountryParam(c) {
+  // The provider accepts an ISO code or a name. ISO is the most reliable.
+  const iso = String(c.iso || c.iso2 || c.country_code || '').trim();
+  if (iso) return iso.toUpperCase();
+  return String(c.slug || c.country_slug || c.api_value || c.name || c.country_name || c.label || c.code || '').trim().toLowerCase().replace(/\s+/g, '-');
+}
+async function novaResolveCountry(rawCountry) {
+  const raw = String(rawCountry || '').trim();
+  if (/^(us|usa|united states)$/i.test(raw)) return { scope: 'usa', country: undefined };
+  const payload = await novaGetCatalog({ scope: 'global' });
+  const rows = novaCountryRows(payload);
+  const match = rows.find(c => [c.iso, c.code, c.country_code, c.iso2, c.id, c.slug, c.name, c.country_name, c.label]
+    .some(v => String(v || '').trim().toLowerCase() === raw.toLowerCase()));
+  const apiCountry = match ? novaCountryParam(match) : raw.toLowerCase().replace(/\s+/g, '-');
+  return { scope: 'global', country: apiCountry };
+}
+
+// ── Real service names + logos ───────────────────────────────────────────────
+// Providers sometimes send short codes ("wa", "tg", "vn") instead of names. Turn those into the
+// real brand name so customers see WhatsApp / Telegram / TikTok, never a bare code.
+const NOVA_CODE_NAMES = {
+  wa: 'WhatsApp', wb: 'WhatsApp', bye: 'WhatsApp Business', tg: 'Telegram', vi: 'Viber', sg: 'Signal',
+  go: 'Google', gp: 'Google', gm: 'Gmail', yl: 'YouTube', ig: 'Instagram', ig4: 'Instagram', fb: 'Facebook',
+  tw: 'Twitter / X', x: 'Twitter / X', tk: 'TikTok', tt: 'TikTok', lf: 'TikTok', ds: 'Discord',
+  sn: 'Snapchat', li: 'LinkedIn', nf: 'Netflix', am: 'Amazon', pp: 'PayPal', ub: 'Uber', we: 'WeChat',
+  wx: 'WeChat', vk: 'VK', ok: 'Odnoklassniki', ya: 'Yandex', qq: 'Tencent QQ', st: 'Spotify',
+  tn: 'Tinder', ab: 'Airbnb', ew: 'eBay', re: 'Reddit', ts: 'Twitch', pm: 'Pinterest',
+  ot: 'Other (any service)'
+};
+const NOVA_BRAND_NAMES = [
+  [/whats\s*app/i, 'WhatsApp'], [/telegram/i, 'Telegram'], [/tik\s*tok|douyin/i, 'TikTok'], [/facebook/i, 'Facebook'],
+  [/instagram/i, 'Instagram'], [/twitter|^x$/i, 'Twitter / X'], [/gmail/i, 'Gmail'], [/youtube/i, 'YouTube'],
+  [/google/i, 'Google'], [/discord/i, 'Discord'], [/snap\s*chat/i, 'Snapchat'], [/linked\s*in/i, 'LinkedIn'],
+  [/viber/i, 'Viber'], [/we\s*chat|weixin/i, 'WeChat'], [/signal/i, 'Signal'], [/microsoft|outlook|hotmail/i, 'Microsoft'],
+  [/apple|icloud/i, 'Apple'], [/amazon/i, 'Amazon'], [/paypal/i, 'PayPal'], [/uber/i, 'Uber'], [/netflix/i, 'Netflix'],
+  [/spotify/i, 'Spotify'], [/tinder/i, 'Tinder'], [/openai|chat\s*gpt/i, 'OpenAI / ChatGPT']
+];
+function novaServiceDisplayName(s) {
+  const cands = [s?.name, s?.service, s?.application, s?.service_name, s?.display_name, s?.title, s?.label]
+    .map(v => String(v == null ? '' : v).trim()).filter(Boolean);
+  const code = String(s?.code || s?.slug || s?.short_name || '').trim().toLowerCase();
+  const codeLike = v => /^[a-z0-9]{1,3}$/i.test(v) || (v === v.toLowerCase() && /^[a-z]{1,4}\d?$/.test(v));
+  // A real descriptive name (e.g. "WhatsApp Business", "Amazon Prime") is kept as sent, just tidied.
+  const real = cands.find(v => !codeLike(v));
+  if (real) {
+    const brand = NOVA_BRAND_NAMES.find(([re]) => re.test(real));
+    if (brand && real.length <= brand[1].length + 2) return brand[1];
+    return real.replace(/[_]+/g, ' ').replace(/\s{2,}/g, ' ').replace(/\b[a-z]/g, c => c.toUpperCase()).trim();
+  }
+  for (const v of [code, ...cands.map(c => c.toLowerCase())]) if (v && NOVA_CODE_NAMES[v]) return NOVA_CODE_NAMES[v];
+  return cands[0] || (code ? code.toUpperCase() : `Service ${s?.id ?? ''}`.trim());
+}
+
+// Services for one country across EVERY server that can sell it. USA numbers can live on the
+// dedicated USA servers (scope 'usa') and also on the all-countries servers, so for the United States
+// both catalogues are merged — that is why picking "United States" on a global server used to say
+// "not available". Any one catalogue failing never hides the others.
+function novaIsUsa(raw) { return /^(us|usa|united states|united states of america)$/i.test(String(raw || '').trim()); }
+async function novaCatalogForCountry(rawCountry, opts = {}) {
+  const raw = String(rawCountry || '').trim();
+  const jobs = [];
+  if (novaIsUsa(raw)) {
+    jobs.push(novaGetCatalog({ scope: 'usa' }, opts));
+    jobs.push((async () => {
+      const g = await novaGetCatalog({ scope: 'global' });
+      const row = novaCountryRows(g).find(c => novaIsUsa(c.iso || c.iso2 || c.code || c.country_code) || novaIsUsa(c.name || c.country_name || c.label));
+      return novaGetCatalog({ scope: 'global', country: row ? novaCountryParam(row) : 'US' }, opts);
+    })());
+  } else {
+    const r = await novaResolveCountry(raw);
+    const params = { scope: 'global' }; if (r.country) params.country = r.country;
+    jobs.push(novaGetCatalog(params, opts));
+  }
+  const settled = await Promise.allSettled(jobs);
+  const ok = settled.filter(x => x.status === 'fulfilled').map(x => x.value);
+  if (!ok.length) throw settled[0].reason;
+  const seen = new Set(), services = [], servers = [], countries = [];
+  for (const cat of ok) {
+    for (const sv of (cat.services || [])) {
+      const k = `${sv.id ?? sv.service_id}:${sv.server_id ?? sv.serverId ?? sv.server?.id ?? ''}`;
+      if (!seen.has(k)) { seen.add(k); services.push(sv); }
+    }
+    servers.push(...(cat.servers || [])); countries.push(...(cat.countries || []));
+  }
+  const newest = ok.map(c => c.syncedAt).filter(Boolean).sort().pop();
+  return { services, servers, countries, syncedAt: newest, stale: ok.some(c => c.stale) };
+}
+function novaServicePriceNgn(service, cfg, opts) {
+  // Nova's price_minor is a minor-unit amount; convert to major units before markup.
+  const minor = Number(service?.price_minor);
+  if (!Number.isFinite(minor) || minor < 0) return null;
+  const cost = minor / 100;
+  const tiers = Array.isArray(cfg?.server1MarkupTiers) ? cfg.server1MarkupTiers : [];
+  const sorted = tiers.slice().sort((a, b) => Number(a.upTo) - Number(b.upTo));
+  const tier = sorted.find(t => cost <= Number(t.upTo));
+  const fallback = sorted.length ? Number(sorted[sorted.length - 1].profit || 0) : 0;
+  let markup = tier ? Number(tier.profit || 0) : Math.max(fallback, Math.round(cost * (Number(cfg?.highCostMarkupPercent) || 20) / 100));
+  // Developer-API buyers keep apiProfitPercent % of the normal profit (cheaper than the site price).
+  if (opts && opts.api) { const pct = Number(cfg?.apiProfitPercent); markup = Math.round(Math.max(0, markup) * (Number.isFinite(pct) ? pct : 75) / 100); }
+  return Math.ceil(cost + Math.max(0, markup));
+}
+
+// Internal proxy endpoints for the number-picker flow. Catalog requests are server-side,
+// so the Nova key is never sent to the customer browser.
+app.get('/api/nova/numbers/catalog', auth, async (req, res) => {
+  try {
+    const scope = String(req.query.scope || 'usa').toLowerCase() === 'global' ? 'global' : 'usa';
+    const params = { scope };
+    if (req.query.country) params.country = String(req.query.country);
+    const data = await novaRequest('GET', '/catalog/numbers', { params });
+    res.json(data);
+  } catch (err) { novaErrorResponse(res, err); }
+});
+app.get('/api/nova/balance', adminAuth, async (req, res) => {
+  try { res.json(await novaRequest('GET', '/balance')); }
+  catch (err) { novaErrorResponse(res, err); }
+});
+// Purchases, polling and cancellation go through the wallet-owned /api/numbers routes below.
+// ── End NovaSolution integration ────────────────────────────────────────────
+
+
 app.get('/api/numbers/options', async (req, res) => {
  try {
  const rows = await NumberPricing.find({ enabled: true }).sort({ country: 1, provider: 1 });
  res.json(rows.map(r => ({ id: r._id, provider: r.provider, country: r.country, price: r.price, available: true })));
  } catch (e) { res.status(500).json({ error: 'Failed to load numbers' }); }
 });
-let _liveCountriesCache = null, _liveCountriesCachedAt = 0;
-async function getLiveCountriesCached() {
- if (_liveCountriesCache && Date.now() - _liveCountriesCachedAt < 30 * 60 * 1000) return _liveCountriesCache;
- const r = await otpsuiteRequest('get', '/countries');
- const list = Array.isArray(r) ? r : (Array.isArray(r?.countries) ? r.countries : []);
- if (!list.length) return []; // never cache an empty list for 30 min
- _liveCountriesCache = list;
- _liveCountriesCachedAt = Date.now();
- return _liveCountriesCache;
-}
-app.get('/api/numbers/live-countries', async (req, res) => {
+app.get('/api/numbers/nova-servers', optionalAuth, async (req, res) => {
  try {
- const countries = await getLiveCountriesCached();
- const rows = countries.filter(c => c && c.country_code).map(c => ({ code: String(c.country_code).trim(), name: c.country_name || c.country_code, flag: countryFlag(c.country_name), pinned: OTPSUITE_PINNED.includes(String(c.country_code).trim().toUpperCase()) }));
- rows.sort((a, b) => (b.pinned - a.pinned) || (a.pinned && b.pinned ? OTPSUITE_PINNED.indexOf(a.code.toUpperCase()) - OTPSUITE_PINNED.indexOf(b.code.toUpperCase()) : 0) || a.name.localeCompare(b.name));
- res.set('Cache-Control', 'no-store');
- res.json(rows);
- } catch (e) { console.error('live-countries failed:', e.otpsuiteStatus, e.message); res.status(502).json({ error: 'Could not load countries right now — please try again shortly.' }); }
+   // 'usa' scope = servers that sell USA numbers; 'global' scope = all-countries servers.
+   // Keep the provider's own server names (e.g. "USA Server 1"), minus any brand word.
+   const scopes = await Promise.allSettled(['usa', 'global'].map(scope => novaGetCatalog({ scope })));
+   if (scopes.every(r => r.status === 'rejected')) throw scopes[0].reason;
+   const clean = n => String(n || '').replace(/nova\s*solution|novasolution|nova/ig, '').replace(/\s{2,}/g, ' ').replace(/^[\s\-–—:·|]+|[\s\-–—:·|]+$/g, '').trim();
+   const seen = new Map();
+   const add = (id, rawName, scope) => {
+     id = Number(id);
+     if (!Number.isInteger(id) || id <= 0) return;
+     const name = clean(rawName);
+     const prev = seen.get(id);
+     if (!prev) seen.set(id, { id, name, scope });
+     else { if (!prev.name && name) prev.name = name; if (scope === 'usa') prev.scope = 'usa'; }
+   };
+   ['usa', 'global'].forEach((scope, i) => {
+     if (scopes[i].status !== 'fulfilled') return;
+     for (const sv of novaServerRows(scopes[i].value)) add(sv.id, sv.name || sv.label || sv.title, scope);
+     for (const row of novaServiceRows(scopes[i].value)) add(row.server_id ?? row.serverId, row.server_name || row.server, scope);
+   });
+   const servers = [...seen.values()].sort((x, y) => (x.scope === y.scope ? x.id - y.id : (x.scope === 'usa' ? -1 : 1)))
+     .map(sv => {
+       const isUsa = sv.scope === 'usa';
+       const base = sv.name || `Server ${sv.id}`;
+       const name = isUsa ? (/usa|united states/i.test(base) ? base : `USA ${base}`) : (/^all\b/i.test(base) ? base : `All Countries ${base}`);
+       return { id: sv.id, name, scope: isUsa ? 'usa' : 'global' };
+     });
+   res.set('Cache-Control', 'no-store'); res.json(servers);
+ } catch (e) { novaErrorResponse(res, e); }
 });
-// Every service the API has for that country, with live cost + profit ladder — no manual prices.
+app.get('/api/numbers/live-countries', optionalAuth, async (req, res) => {
+ try {
+   const usa = await novaGetCatalog({ scope: 'usa' });
+   const global = await novaGetCatalog({ scope: 'global' });
+   const rows = [...novaCountryRows(usa), ...novaCountryRows(global)];
+   const unique = new Map();
+   for (const c of rows) {
+     const code = String(c.iso || c.code || c.country_code || c.iso2 || c.id || '').trim();
+     const name = String(c.name || c.country_name || c.label || code).trim();
+     if (code && name && !unique.has(code.toLowerCase())) unique.set(code.toLowerCase(), { code, name, flag: countryFlag(name), pinned: /^(us|usa|united states|ca|canada)$/i.test(code) || /united states|canada/i.test(name) });
+   }
+   res.set('Cache-Control', 'no-store'); res.json([...unique.values()].sort((a,b)=>(b.pinned-a.pinned)||a.name.localeCompare(b.name)));
+ } catch (e) { novaErrorResponse(res, e); }
+});
+// ── Catalog cache ───────────────────────────────────────────────────────────
+// The provider's catalog is stored in our database. Customers read the stored copy, so opening
+// the page never hits the provider (no more rate-limit errors). It is only re-pulled when the
+// admin syncs, when a customer taps Refresh (at most once per cooldown), or when nothing is
+// stored yet. If a re-pull fails, the previously stored copy keeps being served.
+const NovaCache = mongoose.models.NovaCache || mongoose.model('NovaCache', new mongoose.Schema({
+  key: { type: String, unique: true, index: true },
+  payload: { type: mongoose.Schema.Types.Mixed },
+  syncedAt: { type: Date, default: Date.now },
+  error: { type: String, default: '' }
+}, { minimize: false }));
+const NOVA_REFRESH_COOLDOWN_MS = 30 * 1000;
+const _novaInflight = new Map();
+const _sleep = ms => new Promise(r => setTimeout(r, ms));
+// v2: the old keys may hold a truncated (first-page-only) catalogue, so a new prefix forces one clean re-pull.
+function novaCacheKey(params) {
+  if (params.scope === 'usa') return 'numbers:v2:usa';
+  return params.country ? 'numbers:v2:c:' + params.country : 'numbers:v2:global';
+}
+async function novaRequestRetry(method, path, options) {
+  for (let attempt = 0; ; attempt++) {
+    try { return await novaRequest(method, path, options); }
+    catch (e) { if (e.status === 429 && attempt < 3) { await _sleep(Math.min(65, e.retryAfter || 20) * 1000); continue; } throw e; }
+  }
+}
+// Reads every page of a number catalog (the provider may paginate).
+async function novaFetchCatalogFull(params) {
+  const first = await novaRequestRetry('GET', '/catalog/numbers', { params });
+  let services = novaServiceRows(first);
+  const rowKey = r => `${r.id ?? r.service_id}:${r.server_id ?? r.serverId ?? r.server?.id ?? ''}`;
+  const seen = new Set(services.map(rowKey));
+  const hasMoreFlag = payload => {
+    const d = novaUnwrap(payload) || {}, top = payload || {};
+    const pg = d.pagination || top.pagination || d.meta || top.meta || {};
+    const cur = Number(pg.current_page ?? pg.page), last = Number(pg.last_page ?? pg.total_pages ?? pg.pages);
+    return !!(d.has_more || top.has_more || d.next_page || top.next_page || d.next_page_url || top.next_page_url ||
+      pg.has_more || pg.next_page || (top.links && top.links.next) || (d.links && d.links.next) ||
+      (Number.isFinite(cur) && Number.isFinite(last) && cur < last));
+  };
+  // Keep asking for the next page while the provider says there is one — or, if it gives no hint,
+  // while a full-looking page keeps bringing NEW rows (stops the moment a page adds nothing new).
+  let page = 1, last = first;
+  while (page < 60) {
+    const flagged = hasMoreFlag(last);
+    if (!flagged && !(page === 1 && services.length >= 20) && !(page > 1 && last.__added >= 20)) break;
+    page++;
+    let next;
+    try { next = await novaRequestRetry('GET', '/catalog/numbers', { params: { ...params, page } }); } catch (e) { break; }
+    const more = novaServiceRows(next).filter(r => { const k = rowKey(r); if (seen.has(k)) return false; seen.add(k); return true; });
+    if (!more.length) break;
+    services = services.concat(more);
+    last = Object.assign({}, next, { __added: more.length });
+  }
+  return { servers: novaServerRows(first), countries: novaCountryRows(first), services };
+}
+async function novaGetCatalog(params, opts = {}) {
+  const key = novaCacheKey(params);
+  const doc = await NovaCache.findOne({ key }).lean();
+  const age = doc ? Date.now() - new Date(doc.syncedAt).getTime() : Infinity;
+  const need = !doc || (opts.refresh && age > NOVA_REFRESH_COOLDOWN_MS) || (opts.fresh && age > 60 * 1000);
+  if (!need) return { ...doc.payload, syncedAt: doc.syncedAt, stale: false };
+  let job = _novaInflight.get(key);
+  if (!job) {
+    job = novaFetchCatalogFull(params).then(async payload => {
+      const syncedAt = new Date();
+      await NovaCache.updateOne({ key }, { $set: { payload, syncedAt, error: '' } }, { upsert: true });
+      return { ...payload, syncedAt, stale: false };
+    }).finally(() => _novaInflight.delete(key));
+    _novaInflight.set(key, job);
+  }
+  try { return await job; }
+  catch (e) {
+    if (doc) {
+      NovaCache.updateOne({ key }, { $set: { error: String(e.message || '').slice(0, 300) } }).catch(() => {});
+      return { ...doc.payload, syncedAt: doc.syncedAt, stale: true, error: e.message };
+    }
+    throw e;
+  }
+}
+async function novaCatalogServices(params, opts) { return (await novaGetCatalog(params, opts)).services || []; }
+// Pre-load the two main catalogues shortly after boot so the first customer isn't waiting on the provider.
+setTimeout(() => { novaGetCatalog({ scope: 'usa' }).catch(() => {}); novaGetCatalog({ scope: 'global' }).catch(() => {}); }, 6000);
+
+// Admin "Sync all": pulls the server/country lists and every country's services, one at a time
+// with a short pause so the provider is never hammered. Old data stays if a country fails.
+const novaSync = { running: false, total: 0, done: 0, failed: 0, current: '', startedAt: null, finishedAt: null, message: '' };
+async function novaSyncAll() {
+  if (novaSync.running) return;
+  Object.assign(novaSync, { running: true, total: 2, done: 0, failed: 0, current: 'servers', startedAt: new Date(), finishedAt: null, message: 'Starting…' });
+  try {
+    const usa = await novaGetCatalog({ scope: 'usa' }, { refresh: true, fresh: true }); novaSync.done++;
+    const glob = await novaGetCatalog({ scope: 'global' }, { refresh: true, fresh: true }); novaSync.done++;
+    const slugs = [...new Set(novaCountryRows(glob).map(novaCountryParam).filter(Boolean))];
+    novaSync.total = 2 + slugs.length;
+    for (const slug of slugs) {
+      novaSync.current = slug;
+      try {
+        const r = await novaGetCatalog({ scope: 'global', country: slug }, { refresh: true, fresh: true });
+        if (r.stale) novaSync.failed++;
+      } catch (e) { novaSync.failed++; }
+      novaSync.done++;
+    }
+    novaSync.message = `Synced. ${usa.services.length} USA service(s), ${slugs.length} countr${slugs.length === 1 ? 'y' : 'ies'}${novaSync.failed ? `, ${novaSync.failed} could not be refreshed (old data kept)` : ''}.`;
+  } catch (e) {
+    novaSync.message = 'Sync failed: ' + (e.message || 'provider unreachable') + ' — previously stored services are still shown to customers.';
+  } finally { novaSync.running = false; novaSync.current = ''; novaSync.finishedAt = new Date(); }
+}
+app.post('/api/admin/numbers/sync', anyAdminAuth, (req, res) => { if (!novaSync.running) novaSyncAll().catch(() => {}); res.status(202).json({ ...novaSync }); });
+app.get('/api/admin/numbers/sync-status', anyAdminAuth, async (req, res) => {
+  const stored = await NovaCache.countDocuments({ key: /^numbers:/ }).catch(() => 0);
+  const last = await NovaCache.findOne({ key: /^numbers:/ }).sort({ syncedAt: -1 }).select('syncedAt').lean().catch(() => null);
+  res.json({ ...novaSync, stored, lastSyncedAt: last?.syncedAt || null });
+});
 app.get('/api/numbers/live-services', optionalAuth, async (req, res) => {
  try {
- const countryCode = req.query.country;
- if (!countryCode) return res.status(400).json({ error: 'country is required' });
- const cfg = await getNumberServerConfig();
- const list = await getServer1Services(String(countryCode).trim(), cfg);
- res.set('Cache-Control', 'no-store');
- res.json(list.map(({ costNgn, ...pub }) => pub));
- } catch (e) { console.error('live-services failed:', e.otpsuiteStatus, e.message); res.status(502).json({ error: 'Could not load services for that country right now — please try again shortly.' }); }
+   const country = String(req.query.country || '').trim();
+   if (!country) return res.status(400).json({ error: 'country is required' });
+   const serverId = Number(req.query.serverId || req.query.server_id || 0);
+   const cat = await novaCatalogForCountry(country, { refresh: String(req.query.refresh || '') === '1' });
+   const services = cat.services || [];
+   const cfg = await getNumberServerConfig();
+   const sidOf = s => Number(s.server_id ?? s.serverId ?? s.server?.id);
+   // Only filter by server when the rows actually say which server they belong to.
+   const hasServerInfo = services.some(s => Number.isInteger(sidOf(s)) && sidOf(s) > 0);
+   const picked = (serverId && hasServerInfo) ? services.filter(s => sidOf(s) === serverId) : services;
+   const minorOf = s => { const m = Number(s.price_minor); if (Number.isFinite(m)) return m; const x = Number(s.price ?? s.cost); return Number.isFinite(x) ? Math.round(x * 100) : NaN; };
+   const out = picked.map(s => {
+     const minor = minorOf(s);
+     const name = novaServiceDisplayName(s);
+     return {
+       serviceId: String(s.id ?? s.service_id), provider: name,
+       serverId: sidOf(s), serverName: String(s.server_name || s.server?.name || ''),
+       price: novaServicePriceNgn({ ...s, price_minor: minor }, cfg), costNgn: Number.isFinite(minor) ? minor / 100 : 0, priceMinor: Number.isFinite(minor) ? minor : 0,
+       emoji: serviceEmoji(s.code || s.slug || name, name), icon: serviceIconUrl(s.code || s.slug || name, name), rawName: s.name || s.service || '',
+       syncedAt: cat.syncedAt, stale: !!cat.stale
+     };
+   }).filter(x => x.price != null && x.price > 0)
+     // Popular apps first (WhatsApp, Telegram, …), then A→Z, so nothing is hard to find.
+     .sort((a, b) => {
+       const pa = POPULAR_NAME_ORDER(a.provider), pb = POPULAR_NAME_ORDER(b.provider);
+       return (pa - pb) || a.provider.localeCompare(b.provider) || a.price - b.price;
+     });
+   res.set('Cache-Control', 'no-store');
+   res.json(out);
+ } catch (e) { novaErrorResponse(res, e); }
 });
-async function rentNumberForUser(user, pricing, chargeAmount) {
- if ((user.balance || 0) < chargeAmount) throw new Error('Insufficient balance. Please deposit funds.');
- if (!pricing.otpsuiteCountryCode || !pricing.otpsuiteServiceId) {
- console.error(`Number pricing "${pricing.provider} — ${pricing.country}" is missing its otpsuite country/service mapping.`);
- SystemError.create({
- source: 'otpsuite',
- message: `Pricing entry missing otpsuite mapping: ${pricing.provider} — ${pricing.country}`,
- detail: 'Re-save this entry in Admin Numbers Price Sheet, picking its otpsuite country and service, then Save Price.',
- context: { pricingId: pricing._id, userId: user._id }
- }).catch(() => {});
- throw new Error('This number option is temporarily unavailable — please try again shortly or contact support.');
- }
- return rentNumberLive(user, pricing.provider, pricing.country, pricing.otpsuiteCountryCode, pricing.otpsuiteServiceId, chargeAmount);
+function POPULAR_NAME_ORDER(name) {
+  const order = ['whatsapp', 'telegram', 'tiktok', 'facebook', 'instagram', 'google', 'twitter', 'snapchat', 'discord', 'linkedin', 'viber', 'microsoft', 'amazon', 'netflix', 'paypal', 'uber'];
+  const n = String(name || '').toLowerCase();
+  const i = order.findIndex(k => n.includes(k));
+  return i === -1 ? 999 : i;
 }
-async function rentNumberLive(user, providerLabel, countryLabel, countryCode, serviceId, chargeAmount, expectedCostNgn) {
- if ((user.balance || 0) < chargeAmount) throw new Error('Insufficient balance. Please deposit funds.');
- let bought;
- try {
- bought = await otpsuiteRequest('post', '/buy-number', { data: { country: countryCode, service: serviceId } });
- } catch (e) {
- if (e.otpsuiteStatus === 409) {
- throw new Error('No numbers currently available for that selection — please try again shortly.');
- }
- console.error('otpsuite /buy-number failed:', e.otpsuiteStatus, e.message);
- SystemError.create({
- source: 'otpsuite',
- message: `otpsuite /buy-number failed (HTTP ${e.otpsuiteStatus || '?'}): ${e.message}`,
- detail: `Sent: {"country":"${countryCode}","service":"${serviceId}"} — Raw response: ${JSON.stringify(e.otpsuiteRaw)}`,
- context: { userId: user._id, otpsuiteStatus: e.otpsuiteStatus }
- }).catch(() => {});
- throw new Error(`Number setup issue (code ${e.otpsuiteStatus || '?'}): ${e.message}. Please contact support if this persists.`);
- }
- // Loss guard: if the API charged us more than the customer pays, release the number instead of selling at a loss.
- const actualCost = Number(bought.price || 0);
- if (actualCost > 0 && actualCost >= chargeAmount) {
- try { await otpsuiteRequest('post', '/cancel-number', { data: { order_id: bought.order_id } }); } catch (_) {}
- throw new Error('The price for this number just changed — please refresh and try again.');
- }
- const claimed = await NumberListing.create({
- provider: providerLabel, country: countryLabel, phoneNumber: bought.number, sellPrice: chargeAmount, cost: actualCost || expectedCostNgn || 0, server: 'server1',
- status: 'sold', soldTo: user._id, soldAt: new Date(), expiresAt: new Date(Date.now() + NUMBER_RENTAL_WINDOW_MS),
- otpsuiteOrderId: bought.order_id
- });
- user.balance = (user.balance || 0) - chargeAmount;
- await user.save();
- await Transaction.create({ userId: user._id, type: 'purchase', amount: chargeAmount, description: `Rented ${claimed.provider} number (${claimed.country})`, status: 'success' });
- await creditReferralCommission(user, chargeAmount, `${claimed.provider} number (${claimed.country})`);
- return claimed;
+function novaHttpError(status, message, extra) {
+  const e = new Error(message); e.status = status; Object.assign(e, extra || {}); return e;
 }
-app.post('/api/numbers/buy', auth, async (req, res) => {
+// Places the provider order with a stable Idempotency-Key. It either returns the response or throws:
+//  - a plain Nova error  -> Nova clearly rejected the order (4xx), so refunding is safe;
+//  - an error with ambiguousOutcome=true -> timeout / network drop / 5xx on both attempts. Nova MAY have
+//    created the order, so the caller must NOT refund automatically.
+async function novaPlaceOrder(serviceId, idempotencyKey) {
+  const call = () => novaRequest('POST', '/orders', { headers: { 'Idempotency-Key': idempotencyKey }, data: { type: 'numbers', service_id: serviceId } });
+  try { return await call(); }
+  catch (first) {
+    if (!first.ambiguous) throw first;
+    console.error('[NOVA] order outcome unclear, retrying once with the same Idempotency-Key:', first.message);
+    await new Promise(r => setTimeout(r, 1500));
+    try { return await call(); }
+    catch (second) {
+      // A 409 on the replay usually means "this key already created an order", so it is also unclear.
+      if (!second.ambiguous && second.status !== 409) throw second;
+      second.ambiguousOutcome = true;
+      throw second;
+    }
+  }
+}
+// Shared Server 1 (NovaSolution) purchase used by the customer route and the developer API.
+// pricing: 'customer' (normal markup) or 'api' (apiProfitPercent % of the markup).
+async function novaPurchaseNumber({ userId, serviceId, serverId, countryCode, expectedPrice, pricing }) {
+  const cfg = await getNumberServerConfig();
+  if (!cfg.server1Enabled) throw novaHttpError(400, 'Number purchases are temporarily disabled.');
+  if (!Number.isInteger(serviceId) || serviceId <= 0 || !countryCode || !Number.isInteger(serverId) || serverId <= 0) {
+    throw novaHttpError(400, 'Select a server, country and service before purchasing.');
+  }
+  const catalogPayload = await novaCatalogForCountry(countryCode, { fresh: true });
+  const services = catalogPayload.services || [];
+  const sidOf = x => Number(x.server_id ?? x.serverId ?? x.server?.id);
+  const hasServerInfo = services.some(x => Number.isInteger(sidOf(x)) && sidOf(x) > 0);
+  let service = services.find(x => Number(x.id ?? x.service_id) === serviceId && (!hasServerInfo || sidOf(x) === serverId));
+  if (service && !Number.isFinite(Number(service.price_minor)) && Number.isFinite(Number(service.price ?? service.cost))) service = { ...service, price_minor: Math.round(Number(service.price ?? service.cost) * 100) };
+  if (!service) throw novaHttpError(400, 'That service is no longer available on this server. Refresh and choose again.', { code: 'SERVICE_UNAVAILABLE' });
+  const sellPrice = novaServicePriceNgn(service, cfg, { api: pricing === 'api' });
+  if (!Number.isFinite(sellPrice) || sellPrice <= 0) throw novaHttpError(400, 'No valid price is available for this service right now.');
+  // Price lock: the caller sends the price the customer confirmed; never charge a different amount silently.
+  const expected = Number(expectedPrice);
+  const hasExpected = expectedPrice !== undefined && expectedPrice !== null && expectedPrice !== '' && Number.isFinite(expected);
+  if (hasExpected && expected !== sellPrice) {
+    throw novaHttpError(409, `The price changed from ₦${expected.toLocaleString('en-NG')} to ₦${sellPrice.toLocaleString('en-NG')}. You have not been charged — please review and confirm again.`, { code: 'PRICE_CHANGED', newPrice: sellPrice });
+  }
+  // Atomic wallet debit prevents simultaneous requests from spending the same balance.
+  const debitedUser = await User.findOneAndUpdate({ _id: userId, balance: { $gte: sellPrice } }, { $inc: { balance: -sellPrice } }, { new: true });
+  if (!debitedUser) throw novaHttpError(400, 'Insufficient balance. Please deposit funds.');
+  const idempotencyKey = require('crypto').randomUUID();
+  let providerResult;
+  try {
+    providerResult = await novaPlaceOrder(serviceId, idempotencyKey);
+  } catch (providerErr) {
+    if (providerErr.ambiguousOutcome) {
+      // Nova may have created the order. Keep the money on hold and flag it for a manual check
+      // instead of refunding (which could leave you paying Nova for a number the customer got refunded for).
+      let held = null;
+      try {
+        held = await NumberListing.create({
+          provider: novaServiceDisplayName(service),
+          country: String(countryCode), phoneNumber: 'pending-review',
+          cost: Number(service.price_minor || 0) / 100, sellPrice, status: 'needs_review', soldTo: userId, soldAt: new Date(),
+          server: 'server1', novaServiceId: serviceId, novaServerId: serverId, novaIdempotencyKey: idempotencyKey,
+          providerError: String(providerErr.message || '').slice(0, 300), providerErrorAt: new Date()
+        });
+      } catch (recErr) {
+        console.error('[NOVA-REVIEW] could not record held order:', recErr.message);
+      }
+      console.error(`[NOVA-REVIEW] UNCONFIRMED ORDER user=${userId} amount=${sellPrice} service=${serviceId} server=${serverId} idempotencyKey=${idempotencyKey} listing=${held?._id || 'NOT SAVED'}`);
+      throw novaHttpError(502, 'We could not confirm this order with the provider. Your payment is on hold while we check — if no number was issued you will be refunded in full. Please do not retry yet.', { code: 'ORDER_UNCONFIRMED', orderId: held?._id });
+    }
+    await User.updateOne({ _id: userId }, { $inc: { balance: sellPrice } });
+    await Transaction.create({ userId, type: 'admin_credit', amount: sellPrice, description: 'Refund: the provider rejected the number order', status: 'success' });
+    throw providerErr;
+  }
+  const pd = novaUnwrap(providerResult);
+  const order = pd.order || providerResult.order || {};
+  const session = pd.session || providerResult.session || {};
+  const phoneNumber = String(session.number || order.number || pd.number || '').trim();
+  const sessionId = String(session.id ?? pd.session_id ?? order.session_id ?? '').trim();
+  const actualMinor = Number(session.price_minor ?? order.price_minor ?? pd.price_minor);
+  const actualCostNgn = Number.isFinite(actualMinor) && actualMinor >= 0 ? actualMinor / 100 : null;
+  if (actualCostNgn !== null && actualCostNgn >= sellPrice) {
+    try { if (sessionId) await novaRequest('POST', `/numbers/sessions/${encodeURIComponent(sessionId)}/cancel`); } catch (_) {}
+    await User.updateOne({ _id: userId }, { $inc: { balance: sellPrice } });
+    await Transaction.create({ userId, type: 'admin_credit', amount: sellPrice, description: 'Refund: the provider price exceeded the configured customer price', status: 'success' });
+    throw novaHttpError(409, 'Pricing changed during checkout. Your wallet was refunded; refresh the catalog and try again.', { code: 'PRICE_CHANGED' });
+  }
+  if (!phoneNumber || !sessionId) {
+    try { if (sessionId) await novaRequest('POST', `/numbers/sessions/${encodeURIComponent(sessionId)}/cancel`); } catch (_) {}
+    await User.updateOne({ _id: userId }, { $inc: { balance: sellPrice } });
+    await Transaction.create({ userId, type: 'admin_credit', amount: sellPrice, description: 'Refund: the provider returned an incomplete number order', status: 'success' });
+    throw novaHttpError(502, 'The order came back incomplete. Your wallet has been refunded; please try again.');
+  }
+  let listing;
+  let serverName = `Server ${serverId}`;
+  try {
+    const servers = novaServerRows(catalogPayload);
+    const countries = novaCountryRows(catalogPayload);
+    const serverRow = servers.find(x => Number(x.id) === serverId) || {};
+    serverName = String(serverRow.name || serverName);
+    const countryRow = countries.find(x => String(x.code || x.country_code || x.iso2 || '').toLowerCase() === String(countryCode).toLowerCase()) || {};
+    listing = await NumberListing.create({
+      provider: novaServiceDisplayName(service),
+      country: String(session.country || countryRow.name || countryRow.country_name || countryCode),
+      phoneNumber, cost: actualCostNgn !== null ? actualCostNgn : Number(service.price_minor || 0) / 100, sellPrice, status: 'sold', soldTo: userId, soldAt: new Date(),
+      expiresAt: session.expires_at ? new Date(session.expires_at) : new Date(Date.now() + NUMBER_RENTAL_WINDOW_MS),
+      server: 'server1', novaSessionId: sessionId, novaOrderNumber: String(order.number || phoneNumber),
+      novaServiceId: serviceId, novaServerId: serverId, novaIdempotencyKey: idempotencyKey
+    });
+  } catch (saveErr) {
+    try { await novaRequest('POST', `/numbers/sessions/${encodeURIComponent(sessionId)}/cancel`); } catch (_) {}
+    await User.updateOne({ _id: userId }, { $inc: { balance: sellPrice } });
+    await Transaction.create({ userId, type: 'admin_credit', amount: sellPrice, description: 'Refund: the provider order could not be saved locally', status: 'success' });
+    throw saveErr;
+  }
+  // The provider order and local listing now exist. Do not refund a valid number just
+  // because the transaction-log or referral subsystem has a temporary database error.
+  try { await Transaction.create({ userId, type: 'purchase', amount: sellPrice, description: `Rented ${listing.provider} number (${listing.country}) via ${serverName}${pricing === 'api' ? ' (API)' : ''}`, status: 'success' }); }
+  catch (txErr) { console.error('the provider purchase transaction log failed:', txErr.message); }
+  creditReferralCommission(debitedUser, sellPrice, `${listing.provider} number (${listing.country})`).catch(err => console.error('the provider referral credit failed:', err.message));
+  return { listing, sellPrice, sessionId, serverName };
+}
+function novaPurchaseErrorResponse(res, e) {
+  console.error('the provider number purchase failed:', e.message);
+  let st = Number(e.status);
+  if (!(st >= 400 && st <= 599)) st = 500;
+  // A provider-side 401/403 means OUR Nova key is wrong; never send that to the customer as 401
+  // (the browser would treat it as "you are logged out").
+  if (e.provider && (st === 401 || st === 403)) st = 502;
+  const body = { error: e.message || 'Failed to buy number from the provider.' };
+  if (typeof e.code === 'string') body.code = e.code;
+  if (e.newPrice) body.newPrice = e.newPrice;
+  if (e.orderId) body.orderId = e.orderId;
+  res.status(st).json(body);
+}
+// One number purchase at a time per customer: a double-tap / retry while the first request is still running
+// is rejected instead of buying (and charging for) a second number.
+const numberBuyInFlight = new Set();
+function numberBuyGuard(req, res, next) {
+ const k = String(req.user && req.user._id);
+ if (numberBuyInFlight.has(k)) return res.status(429).json({ error: 'Your previous purchase is still being processed. Please wait a moment — nothing extra was charged.' });
+ numberBuyInFlight.add(k);
+ let done = false;
+ const release = () => { if (!done) { done = true; numberBuyInFlight.delete(k); } };
+ res.on('finish', release); res.on('close', release);
+ next();
+}
+app.post('/api/numbers/buy', auth, numberBuyGuard, async (req, res) => {
  try {
- const cfg = await getNumberServerConfig();
- if (!cfg.server1Enabled) return res.status(400).json({ error: 'Server 1 is temporarily switched off — please use Server 2.' });
- const { country, serviceId, provider } = req.body;
- if (!country || !serviceId || !provider) return res.status(400).json({ error: 'country, provider and serviceId are required — please re-select and try again.' });
-
- const countries = await getLiveCountriesCached();
- const countryEntry = countries.find(c => c.code === country || c.country_code === country);
- const countryName = countryEntry ? (countryEntry.name || countryEntry.country_name) : country;
- _s1ServicesCache.delete(String(country).trim()); // always re-price right before charging
- const live = (await getServer1Services(country, cfg)).find(s => s.serviceId === String(serviceId));
- if (!live) return res.status(400).json({ error: 'That number option is no longer available — please refresh the page and pick again.' });
- const finalPrice = live.price;
- const user = await User.findById(req.user._id);
- let claimed;
- try { claimed = await rentNumberLive(user, live.provider, countryName, country, serviceId, finalPrice, live.costNgn); }
- catch (e) { return res.status(400).json({ error: e.message }); }
- res.json({ orderId: claimed._id, phoneNumber: claimed.phoneNumber, expiresAt: claimed.expiresAt, provider: claimed.provider, country: claimed.country });
- } catch (e) { res.status(500).json({ error: 'Failed to buy number: ' + e.message }); }
+   const r = await novaPurchaseNumber({
+     userId: req.user._id,
+     serviceId: Number(req.body.serviceId || req.body.service_id),
+     serverId: Number(req.body.serverId || req.body.server_id),
+     countryCode: String(req.body.country || '').trim(),
+     expectedPrice: req.body.expectedPrice,
+     pricing: 'customer'
+   });
+   const l = r.listing;
+   res.json({ orderId: l._id, phoneNumber: l.phoneNumber, expiresAt: l.expiresAt, provider: l.provider, country: l.country, server: `Server ${l.novaServerId}`, amountPaid: r.sellPrice, sessionId: r.sessionId });
+ } catch (e) { novaPurchaseErrorResponse(res, e); }
 });
+// Cancel eligibility, computed on the server so the browser never guesses.
+// Server 2 (Grizzly) refuses cancellations in the first 2 minutes (EARLY_CANCEL_DENIED).
+const GRIZZLY_MIN_CANCEL_MS = 2 * 60 * 1000;
+function numberCancelInfo(listing) {
+ const soldAt = new Date(listing.soldAt || listing.createdAt || Date.now()).getTime();
+ const cancelAvailableAt = listing.grizzlyActivationId ? new Date(soldAt + GRIZZLY_MIN_CANCEL_MS) : null;
+ const open = listing.status === 'sold' && !listing.code;
+ return {
+  cancellable: open && (!cancelAvailableAt || cancelAvailableAt.getTime() <= Date.now()),
+  cancelAvailableAt,
+  serverTime: new Date().toISOString()
+ };
+}
 app.get('/api/numbers/status/:orderId', auth, async (req, res) => {
  try {
  let listing = await NumberListing.findOne({ _id: req.params.orderId, soldTo: req.user._id });
@@ -5884,6 +6408,7 @@ app.get('/api/numbers/status/:orderId', auth, async (req, res) => {
  if (listing.grizzlyActivationId) {
  grizzlyRequest('setStatus', { id: listing.grizzlyActivationId, status: 6 }).catch(() => {});
  }
+ if (listing.novaSessionId) novaRequest('POST', `/numbers/sessions/${encodeURIComponent(listing.novaSessionId)}/done`).catch(() => {});
  } else if (listing.providerError) {
  listing.providerError = '';
  listing.providerErrorAt = null;
@@ -5905,7 +6430,8 @@ app.get('/api/numbers/status/:orderId', auth, async (req, res) => {
  server: listing.server || 'server1', sellPrice: listing.sellPrice,
  providerError: listing.providerError || '', providerErrorAt: listing.providerErrorAt || null,
  codeAddedAt: listing.codeAddedAt || null, cancelledAt: listing.cancelledAt || null, expiredAt: listing.expiredAt || null, operator: listing.operator || '', providerCancelled: !!listing.providerCancelled,
- refunded: listing.status === 'expired' || listing.status === 'cancelled' ? listing.sellPrice : null
+ refunded: listing.status === 'expired' || listing.status === 'cancelled' ? listing.sellPrice : null,
+ ...numberCancelInfo(listing)
  });
  } catch (e) { res.status(500).json({ error: 'Failed to check status' }); }
 });
@@ -5913,16 +6439,30 @@ app.post('/api/numbers/cancel/:orderId', auth, async (req, res) => {
  try {
  const listing = await NumberListing.findOne({ _id: req.params.orderId, soldTo: req.user._id });
  if (!listing) return res.status(404).json({ error: 'Order not found' });
- if (listing.status !== 'sold' || listing.code) return res.status(400).json({ error: 'This order can no longer be cancelled' });
+ if (listing.status !== 'sold' || listing.code) return res.status(400).json({ error: 'This order can no longer be cancelled', status: listing.code ? 'delivered' : listing.status, code: listing.code || '' });
+ // Last-second check: if the SMS already reached the provider, record it and refuse the refund.
+ try {
+  const lateCode = await fetchCodeFromProvider(listing);
+  if (lateCode) {
+   const upd = await NumberListing.findOneAndUpdate({ _id: listing._id, status: 'sold', code: '' }, { $set: { code: lateCode, codeAddedAt: new Date() } }, { new: true });
+   if (listing.grizzlyActivationId) grizzlyRequest('setStatus', { id: listing.grizzlyActivationId, status: 6 }).catch(() => {});
+   if (listing.novaSessionId) novaRequest('POST', `/numbers/sessions/${encodeURIComponent(listing.novaSessionId)}/done`).catch(() => {});
+   return res.status(409).json({ error: 'The verification code has just arrived, so this number can no longer be cancelled or refunded.', status: 'delivered', code: (upd && upd.code) || lateCode });
+  }
+ } catch (e) { console.error('pre-cancel code check failed (continuing):', e.message); }
+ // Server 2 minimum wait: do not refund when the provider will not accept the cancellation yet.
+ const early = numberCancelInfo(listing);
+ if (early.cancelAvailableAt && !early.cancellable) {
+  return res.status(409).json({ error: GRIZZLY_ERRORS.EARLY_CANCEL_DENIED, cancelAvailableAt: early.cancelAvailableAt, serverTime: early.serverTime });
+ }
  const released = await releaseNumberOnProvider(listing);
-
- listing.status = 'cancelled';
- listing.cancelledAt = new Date();
- await listing.save();
+ if (listing.grizzlyActivationId && /EARLY_CANCEL_DENIED/i.test(String(released?.detail || ''))) {
+  return res.status(409).json({ error: GRIZZLY_ERRORS.EARLY_CANCEL_DENIED, cancelAvailableAt: new Date(Date.now() + 30000), serverTime: new Date().toISOString() });
+ }
+ const cancelled = await NumberListing.findOneAndUpdate({ _id: listing._id, soldTo: req.user._id, status: 'sold', code: '' }, { $set: { status: 'cancelled', cancelledAt: new Date(), providerCancelled: !!released?.ok, providerCancelDetail: String(released?.detail || '').slice(0, 200) } }, { new: true });
+ if (!cancelled) return res.status(409).json({ error: 'This order has already changed state; refresh your order status.' });
  const user = await User.findById(listing.soldTo);
- user.balance = (user.balance || 0) + listing.sellPrice;
- await user.save();
- await Transaction.create({ userId: user._id, type: 'admin_credit', amount: listing.sellPrice, description: `Refund: ${listing.provider} number (${listing.country}) — cancelled by user`, status: 'success' });
+ if (user) { await User.updateOne({ _id: user._id }, { $inc: { balance: listing.sellPrice } }); await Transaction.create({ userId: user._id, type: 'admin_credit', amount: listing.sellPrice, description: `Refund: ${listing.provider} number (${listing.country}) — cancelled by user`, status: 'success' }); }
  res.json({
  status: 'cancelled', refunded: listing.sellPrice,
  providerCancelled: !!released?.ok,
@@ -6094,7 +6634,7 @@ app.get('/api/admin/numbers/analytics', anyAdminAuth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: 'Failed to build analytics: ' + e.message }); }
 });
 
-// ── Live health checks for Server 1 (otpsuite) and Server 2 (GrizzlySMS) ─────
+// ── Live health checks for Server 1 (NovaSolution) and Server 2 (GrizzlySMS) ─────
 // Results are cached briefly so a busy page doesn't hammer the providers.
 let _healthCache = null, _healthCheckedAt = 0, _healthInFlight = null;
 const HEALTH_TTL_MS = 60 * 1000;
@@ -6103,7 +6643,7 @@ async function checkNumberServersHealth() {
  const cfg = await getNumberServerConfig().catch(() => ({ server1Enabled: true, server2Enabled: true, usdToNgn: 0 }));
  const started = Date.now();
 
- const s1 = { id: 'server1', name: 'Server 1 — USA/Canada Numbers', enabled: !!cfg.server1Enabled, online: false, latencyMs: null, message: '', balance: null };
+ const s1 = { id: 'server1', name: 'Server 1 — NovaSolution Numbers', enabled: !!cfg.server1Enabled, online: false, latencyMs: null, message: '', balance: null };
  const s2 = { id: 'server2', name: 'Server 2 — All services', enabled: !!cfg.server2Enabled, online: false, latencyMs: null, message: '', balance: null, balanceNgn: null };
 
  await Promise.all([
@@ -6111,9 +6651,9 @@ async function checkNumberServersHealth() {
  if (!s1.enabled) { s1.message = 'Switched off by admin'; return; }
  const t = Date.now();
  try {
- const r = await otpsuiteRequest('get', '/balance');
+ const r = novaUnwrap(await novaRequest('GET', '/balance'));
  s1.online = true;
- s1.balance = Number(r.balance ?? r.data?.balance ?? 0);
+ s1.balance = Number(r.balance_ngn ?? r.balance ?? 0);
  s1.message = 'Reachable';
  } catch (e) { s1.message = String(e.message || e).slice(0, 200); }
  s1.latencyMs = Date.now() - t;
@@ -6195,40 +6735,131 @@ app.get('/api/numbers/servers', async (req, res) => {
  try {
  const cfg = await getNumberServerConfig();
  res.json([
- { id: 'server1', name: 'Server 1 — USA/Canada Numbers', description: 'Not only WhatsApp anymore — USA/Canada numbers (plus every other country the provider stocks) for many different services, with live prices.', enabled: !!cfg.server1Enabled },
+ { id: 'server1', name: 'Server 1', description: 'Live server catalog with services and live prices.', enabled: !!cfg.server1Enabled },
  { id: 'server2', name: 'Server 2 — All services & countries', description: 'Hundreds of services and countries, live stock and live prices.', enabled: !!cfg.server2Enabled, providerMode: cfg.server2ProviderMode || 'pools', defaultOperator: cfg.server2DefaultOperator || 'any' }
  ]);
  } catch (e) { res.status(500).json({ error: 'Failed to load servers' }); }
 });
 
-let _grizzlyServicesCache = null, _grizzlyServicesAt = 0;
+// ── Server 2 data store ─────────────────────────────────────────────────────
+// Same idea as Server 1's stored catalogue: everything the picker needs is kept in memory AND in
+// the database, so customers are answered instantly from the stored copy. Refreshing from the
+// provider happens in the background (stale-while-revalidate) and never makes a customer wait.
+// Buying still re-checks live stock and price with the provider before any money is taken.
+const GrizzlyCache = mongoose.models.GrizzlyCache || mongoose.model('GrizzlyCache', new mongoose.Schema({
+ key: { type: String, unique: true, index: true },
+ payload: { type: mongoose.Schema.Types.Mixed },
+ syncedAt: { type: Date, default: Date.now }
+}, { minimize: false }));
+function gzSave(key, payload) { return GrizzlyCache.updateOne({ key }, { $set: { payload, syncedAt: new Date() } }, { upsert: true }).catch(() => {}); }
+async function gzLoad(key) { try { return await GrizzlyCache.findOne({ key }).lean(); } catch (e) { return null; } }
+
+let _grizzlyServicesCache = null, _grizzlyServicesAt = 0, _grizzlyServicesJob = null;
+let _grizzlyCountriesCache = null, _grizzlyCountriesAt = 0, _grizzlyCountriesJob = null;
+const GRIZZLY_LIST_TTL = 60 * 60 * 1000;
+function refreshGrizzlyServices() {
+ if (_grizzlyServicesJob) return _grizzlyServicesJob;
+ _grizzlyServicesJob = (async () => {
+  const r = await grizzlyRequest('getServicesList');
+  const list = (r.services || []).map(s => ({
+   code: s.code,
+   name: prettifyServiceName(s.name),
+   emoji: serviceEmoji(s.code, s.name),
+   icon: serviceIconUrl(s.code, s.name),
+   popular: POPULAR_SERVICE_CODES.includes(String(s.code).toLowerCase())
+  }));
+  if (list.length) { _grizzlyServicesCache = list; _grizzlyServicesAt = Date.now(); gzSave('services', list); }
+  return _grizzlyServicesCache || list;
+ })().finally(() => { _grizzlyServicesJob = null; });
+ return _grizzlyServicesJob;
+}
+// Instant answer from memory, else from the database copy, else (first ever time) the provider.
 async function getGrizzlyServices() {
- if (_grizzlyServicesCache && Date.now() - _grizzlyServicesAt < 60 * 60 * 1000) return _grizzlyServicesCache;
- const r = await grizzlyRequest('getServicesList');
- _grizzlyServicesCache = (r.services || []).map(s => ({
- code: s.code,
- name: prettifyServiceName(s.name),
- emoji: serviceEmoji(s.code, s.name),
- icon: serviceIconUrl(s.code, s.name),
- popular: POPULAR_SERVICE_CODES.includes(String(s.code).toLowerCase())
- }));
- _grizzlyServicesAt = Date.now();
- return _grizzlyServicesCache;
+ if (!_grizzlyServicesCache) {
+  const d = await gzLoad('services');
+  if (d && Array.isArray(d.payload) && d.payload.length) { _grizzlyServicesCache = d.payload; _grizzlyServicesAt = new Date(d.syncedAt).getTime(); }
+ }
+ if (_grizzlyServicesCache) {
+  if (Date.now() - _grizzlyServicesAt >= GRIZZLY_LIST_TTL) refreshGrizzlyServices().catch(() => {});
+  return _grizzlyServicesCache;
+ }
+ return refreshGrizzlyServices();
 }
-let _grizzlyCountriesCache = null, _grizzlyCountriesAt = 0;
+function refreshGrizzlyCountries() {
+ if (_grizzlyCountriesJob) return _grizzlyCountriesJob;
+ _grizzlyCountriesJob = (async () => {
+  const r = await grizzlyRequest('getCountries');
+  const list = Object.values(r || {})
+   .filter(c => c && c.visible !== 0)
+   .map(c => {
+    const name = c.eng || c.rus || String(c.id);
+    return { id: String(c.id), name, flag: countryFlag(name) };
+   });
+  if (list.length) { _grizzlyCountriesCache = list; _grizzlyCountriesAt = Date.now(); gzSave('countries', list); }
+  return _grizzlyCountriesCache || list;
+ })().finally(() => { _grizzlyCountriesJob = null; });
+ return _grizzlyCountriesJob;
+}
 async function getGrizzlyCountries() {
- if (_grizzlyCountriesCache && Date.now() - _grizzlyCountriesAt < 60 * 60 * 1000) return _grizzlyCountriesCache;
- const r = await grizzlyRequest('getCountries');
- const list = Object.values(r || {})
- .filter(c => c && c.visible !== 0)
- .map(c => {
- const name = c.eng || c.rus || String(c.id);
- return { id: String(c.id), name, flag: countryFlag(name) };
- });
- _grizzlyCountriesCache = list;
- _grizzlyCountriesAt = Date.now();
- return _grizzlyCountriesCache;
+ if (!_grizzlyCountriesCache) {
+  const d = await gzLoad('countries');
+  if (d && Array.isArray(d.payload) && d.payload.length) { _grizzlyCountriesCache = d.payload; _grizzlyCountriesAt = new Date(d.syncedAt).getTime(); }
+ }
+ if (_grizzlyCountriesCache) {
+  if (Date.now() - _grizzlyCountriesAt >= GRIZZLY_LIST_TTL) refreshGrizzlyCountries().catch(() => {});
+  return _grizzlyCountriesCache;
+ }
+ return refreshGrizzlyCountries();
 }
+// Generic stale-while-revalidate cache with request de-duplication.
+function makeSwrCache({ fresh, hardMax, max = 400, fetcher, persistKey }) {
+ const store = new Map(), jobs = new Map();
+ function refresh(k, args) {
+  if (jobs.has(k)) return jobs.get(k);
+  const job = fetcher(...args).then(data => {
+   store.set(k, { at: Date.now(), data });
+   if (store.size > max) store.delete(store.keys().next().value);
+   if (persistKey) gzSave(persistKey(k), data);
+   return data;
+  }).finally(() => jobs.delete(k));
+  jobs.set(k, job);
+  return job;
+ }
+ return async function get(k, ...args) {
+  let hit = store.get(k);
+  if (!hit && persistKey) {
+   const d = await gzLoad(persistKey(k));
+   if (d && d.payload && Date.now() - new Date(d.syncedAt).getTime() < hardMax) { hit = { at: new Date(d.syncedAt).getTime(), data: d.payload }; store.set(k, hit); }
+  }
+  if (hit && Date.now() - hit.at < hardMax) {
+   if (Date.now() - hit.at >= fresh) refresh(k, args).catch(() => {});
+   return hit.data;
+  }
+  try { return await refresh(k, args); } catch (e) { if (hit) return hit.data; throw e; }
+ };
+}
+// Stock + price per country for ONE service (drives the country list).
+const _grizzlyPricesSwr = makeSwrCache({
+ fresh: 20 * 1000, hardMax: 6 * 60 * 60 * 1000,
+ fetcher: service => grizzlyRequest('getPrices', { service }),
+ persistKey: k => 'prices:' + k
+});
+const getGrizzlyPricesCached = service => _grizzlyPricesSwr(service, service);
+// Pools (price tiers) for one service + country (drives the provider list).
+const getGrizzlyPoolsCached = makeSwrCache({
+ fresh: 15 * 1000, hardMax: 30 * 60 * 1000,
+ fetcher: (service, country) => grizzlyRequest('getPricesV2', { service, country })
+});
+// Warm everything the picker needs right after boot, then keep it fresh in the background.
+function warmGrizzly() {
+ getGrizzlyServices().catch(() => {});
+ getGrizzlyCountries().catch(() => {});
+ POPULAR_SERVICE_CODES.forEach((c, i) => setTimeout(() => getGrizzlyPricesCached(c).catch(() => {}), 1200 * (i + 1)));
+}
+setTimeout(warmGrizzly, 4000);
+setInterval(() => { refreshGrizzlyServices().catch(() => {}); refreshGrizzlyCountries().catch(() => {}); }, 45 * 60 * 1000);
+// Keep the popular services' stock fresh so the first tap is always instant.
+setInterval(() => { POPULAR_SERVICE_CODES.forEach((c, i) => setTimeout(() => getGrizzlyPricesCached(c).catch(() => {}), 1500 * i)); }, 5 * 60 * 1000);
 
 async function requireServer2(res) {
  const cfg = await getNumberServerConfig();
@@ -6261,8 +6892,7 @@ app.get('/api/numbers/server2/countries', async (req, res) => {
  if (!cfg) return;
  const service = String(req.query.service || '').trim();
  if (!service) return res.status(400).json({ error: 'service is required' });
- const prices = await grizzlyRequest('getPrices', { service });
- const countries = await getGrizzlyCountries();
+ const [prices, countries] = await Promise.all([getGrizzlyPricesCached(service), getGrizzlyCountries()]);
  const byId = new Map(countries.map(c => [c.id, c]));
  const out = [];
  for (const [countryId, services] of Object.entries(prices || {})) {
@@ -6288,9 +6918,8 @@ app.get('/api/numbers/server2/providers', async (req, res) => {
  const service = String(req.query.service || '').trim();
  const country = String(req.query.country || '').trim();
  if (!service || !country) return res.status(400).json({ error: 'service and country are required' });
- const data = await grizzlyRequest('getPricesV2', { service, country });
+ const [data, countries] = await Promise.all([getGrizzlyPoolsCached(service + '|' + country, service, country), getGrizzlyCountries()]);
  const tiers = data?.[country]?.[service] || {};
- const countries = await getGrizzlyCountries();
  const meta = countries.find(c => c.id === String(country));
  const availableTiers = Object.entries(tiers).filter(([, count]) => Number(count) > 0)
    .sort(([a], [b]) => Number(a) - Number(b));
@@ -6340,7 +6969,7 @@ app.get('/api/numbers/server2/operators', async (req, res) => {
 });
 
 // Buy: charge the customer in ₦, then request the number from Grizzly.
-app.post('/api/numbers/server2/buy', auth, async (req, res) => {
+app.post('/api/numbers/server2/buy', auth, numberBuyGuard, async (req, res) => {
  try {
  const cfg = await requireServer2(res);
  if (!cfg) return;
@@ -6608,19 +7237,15 @@ app.get('/api/admin/numbers/profit', anyAdminAuth, async (req, res) => {
  } catch (e) { res.status(500).json({ error: 'Failed to load profit report' }); }
 });
 
-app.get('/api/admin/numbers/otpsuite-balance', anyAdminAuth, async (req, res) => {
- try { res.json(await otpsuiteRequest('get', '/balance')); }
- catch (e) { res.status(502).json({ error: 'otpsuite says: ' + e.message + (e.otpsuiteStatus ? ' (HTTP ' + e.otpsuiteStatus + ')' : '') }); }
+app.get('/api/admin/numbers/nova-balance', anyAdminAuth, async (req, res) => {
+ try { res.json(novaUnwrap(await novaRequest('GET', '/balance'))); } catch (e) { novaErrorResponse(res, e); }
 });
-app.get('/api/admin/numbers/otpsuite-countries', anyAdminAuth, async (req, res) => {
- try { res.json(await otpsuiteRequest('get', '/countries')); }
- catch (e) { res.status(502).json({ error: 'otpsuite says: ' + e.message + (e.otpsuiteStatus ? ' (HTTP ' + e.otpsuiteStatus + ')' : '') }); }
-});
-app.get('/api/admin/numbers/otpsuite-services', anyAdminAuth, async (req, res) => {
+app.get('/api/admin/numbers/nova-catalog', anyAdminAuth, async (req, res) => {
  try {
- if (!req.query.country) return res.status(400).json({ error: 'country is required' });
- res.json(await otpsuiteRequest('get', '/services', { params: { country: req.query.country } }));
- } catch (e) { res.status(502).json({ error: 'otpsuite says: ' + e.message + (e.otpsuiteStatus ? ' (HTTP ' + e.otpsuiteStatus + ')' : '') }); }
+   const scope = String(req.query.scope || 'usa') === 'global' ? 'global' : 'usa';
+   const params = { scope, ...(req.query.country ? { country: String(req.query.country) } : {}) };
+   res.json(await novaGetCatalog(params, { refresh: String(req.query.refresh || '') === '1' }));
+ } catch (e) { novaErrorResponse(res, e); }
 });
 app.get('/api/admin/user-number-prices', anyAdminAuth, async (req, res) => {
  try {
@@ -6658,35 +7283,10 @@ app.get('/api/admin/number-pricing', anyAdminAuth, async (req, res) => {
 });
 app.post('/api/admin/number-pricing', anyAdminAuth, async (req, res) => {
  try {
- const { provider, country, price, apiPrice, enabled, mode, otpsuiteCountryCode, otpsuiteServiceId } = req.body;
- if (!provider || !country || price === undefined) return res.status(400).json({ error: 'provider, country and price are required' });
- if (mode === 'live' && (!otpsuiteCountryCode || !otpsuiteServiceId)) {
- return res.status(400).json({ error: 'Live mode needs both an otpsuite country code and service id' });
- }
- if (mode === 'live') {
- let liveServices;
- try {
- liveServices = await otpsuiteRequest('get', '/services', { params: { country: otpsuiteCountryCode } });
- } catch (e) {
- return res.status(502).json({ error: `Could not verify this with otpsuite: ${e.message}` });
- }
- const match = (liveServices.services || []).find(s => s.service_id === otpsuiteServiceId);
- if (!match) {
- return res.status(400).json({ error: `That service isn't currently valid for ${otpsuiteCountryCode} on otpsuite — please re-select the country and service from the dropdowns (their catalog may have just changed).` });
- }
- }
- const doc = await NumberPricing.findOneAndUpdate(
- { provider: provider.trim(), country: country.trim() },
- {
- price: Number(price), apiPrice: apiPrice ? Number(apiPrice) : 0,
- enabled: enabled !== undefined ? !!enabled : true, updatedAt: new Date(),
- mode: mode === 'live' ? 'live' : 'manual',
- otpsuiteCountryCode: mode === 'live' ? otpsuiteCountryCode : '',
- otpsuiteServiceId: mode === 'live' ? otpsuiteServiceId : ''
- },
- { upsert: true, new: true }
- );
- res.json(doc);
+   const { provider, country, price, apiPrice, enabled } = req.body;
+   if (!provider || !country || price === undefined || !Number.isFinite(Number(price)) || Number(price) <= 0) return res.status(400).json({ error: 'provider, country and a valid price are required' });
+   const doc = await NumberPricing.findOneAndUpdate({ provider: String(provider).trim(), country: String(country).trim() }, { price: Number(price), apiPrice: apiPrice ? Number(apiPrice) : 0, enabled: enabled !== undefined ? !!enabled : true, updatedAt: new Date(), mode: 'manual' }, { upsert: true, new: true });
+   res.json(doc);
  } catch (e) { res.status(500).json({ error: 'Failed to save price: ' + e.message }); }
 });
 app.put('/api/admin/number-pricing/:id/toggle', anyAdminAuth, async (req, res) => {
@@ -6713,14 +7313,12 @@ app.put('/api/admin/number-pricing/:id/price', anyAdminAuth, async (req, res) =>
 });
 app.put('/api/admin/number-pricing/:id', anyAdminAuth, async (req, res) => {
  try {
- const { provider, country, price, apiPrice, otpsuiteCountryCode, otpsuiteServiceId, enabled } = req.body;
+ const { provider, country, price, apiPrice, enabled } = req.body;
  const update = { updatedAt: new Date() };
  if (provider !== undefined) update.provider = String(provider).trim();
  if (country !== undefined) update.country = String(country).trim();
  if (price !== undefined) update.price = Number(price);
  if (apiPrice !== undefined) update.apiPrice = Number(apiPrice);
- if (otpsuiteCountryCode !== undefined) update.otpsuiteCountryCode = otpsuiteCountryCode;
- if (otpsuiteServiceId !== undefined) update.otpsuiteServiceId = otpsuiteServiceId;
  if (enabled !== undefined) update.enabled = !!enabled;
  const doc = await NumberPricing.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true });
  if (!doc) return res.status(404).json({ error: 'Not found' });
@@ -6859,6 +7457,22 @@ app.get('/api/deposit/payment-methods', optionalAuth, async (req, res) => {
  byMethod.payCurrency = klsCountries.payCurrencyFor(geo.code);
  byMethod.methods = isNg ? ['virtualaccount', 'paymentlink'] : ['paymentlink'];
  byMethod.checkoutMethods = klsFlwMethods.describeFor(geo.code);
+ // Gateways the customer can choose between for the payment link.
+ const gw = await getGatewayStates();
+ const payCur = klsCountries.payCurrencyFor(geo.code);
+ byMethod.gateways = {
+  flutterwave: { enabled: gw.flutterwave.enabled, available: gw.flutterwave.available, disabledMessage: gw.flutterwave.disabledMessage },
+  paystack: { enabled: gw.paystack.enabled, available: gw.paystack.available && paystackSupportsCurrency(payCur), disabledMessage: gw.paystack.disabledMessage }
+ };
+ byMethod.defaultGateway = byMethod.gateways.flutterwave.available ? 'flutterwave' : (byMethod.gateways.paystack.available ? 'paystack' : '');
+ // Virtual accounts can be issued by Flutterwave or Paystack — a gateway that is switched off stops issuing them.
+ byMethod.vaGateways = { flutterwave: gw.flutterwave.enabled, paystack: gw.paystack.available };
+ if (!byMethod.vaGateways.flutterwave && !byMethod.vaGateways.paystack) {
+  byMethod.virtualaccount = { enabled: false, disabledMessage: gw.flutterwave.disabledMessage || gw.paystack.disabledMessage || 'Bank transfer is temporarily unavailable. Please use Payment Link instead.' };
+ }
+ if (!gw.flutterwave.enabled) {
+  byMethod.banktransfer = { enabled: false, disabledMessage: gw.flutterwave.disabledMessage || 'Bank transfer is temporarily unavailable. Please use Payment Link instead.' };
+ }
  res.json(byMethod);
  } catch (e) { res.status(500).json({ error: 'Failed to load payment method settings' }); }
 });
@@ -6883,7 +7497,7 @@ app.get('/api/public/site-links', async (req, res) => {
  const links = await getSiteLinks();
  const tgUser = String(links.telegramUsername || 'klslogs').replace(/^@/, '');
    const tgLink = links.telegramLink || ('https://t.me/' + tgUser);
-   res.json({ whatsappNumber: links.whatsappNumber, adminPhone: links.adminPhone || links.whatsappNumber, whatsappGroupLink: links.whatsappGroupLink, whatsappChannelLink: links.whatsappChannelLink, telegramUsername: tgUser, telegramLink: tgLink, whatsappChatLink: links.whatsappChatLink || ('https://wa.me/' + links.whatsappNumber), supportHours: links.supportHours || '' });
+   res.json({ whatsappNumber: links.whatsappNumber, termsNumber: links.termsNumber || '', adminPhone: links.adminPhone || links.whatsappNumber, whatsappGroupLink: links.whatsappGroupLink, whatsappChannelLink: links.whatsappChannelLink, telegramUsername: tgUser, telegramLink: tgLink, telegramChannelLink: links.telegramChannelLink || '', telegramCommunityLink: links.telegramCommunityLink || '', whatsappChatLink: links.whatsappChatLink || ('https://wa.me/' + links.whatsappNumber), supportHours: links.supportHours || '' });
  } catch (e) { res.status(500).json({ error: 'Failed to load site links' }); }
 });
 app.get('/api/admin/site-links', anyAdminAuth, async (req, res) => {
@@ -6891,7 +7505,7 @@ app.get('/api/admin/site-links', anyAdminAuth, async (req, res) => {
 });
 app.post('/api/admin/site-links', anyAdminAuth, async (req, res) => {
  try {
- const { whatsappNumber, adminPhone, whatsappGroupLink, whatsappChannelLink , telegramUsername, telegramLink, whatsappChatLink, supportHours } = req.body;
+ const { whatsappNumber, adminPhone, termsNumber, whatsappGroupLink, whatsappChannelLink , telegramUsername, telegramLink, telegramChannelLink, telegramCommunityLink, whatsappChatLink, supportHours } = req.body;
  const update = { updatedAt: new Date() };
  if (whatsappNumber !== undefined) {
  const cleaned = String(whatsappNumber).replace(/[^\d]/g, '');
@@ -6903,6 +7517,12 @@ app.post('/api/admin/site-links', anyAdminAuth, async (req, res) => {
  const cleaned = String(adminPhone).replace(/[^\d]/g, '');
  if (cleaned.length < 10) return res.status(400).json({ error: 'Admin phone must be at least 10 digits' });
  update.adminPhone = cleaned;
+ }
+ if (termsNumber !== undefined) {
+ // blank clears it (the Terms page then falls back to the main contact number)
+ const cleaned = String(termsNumber).replace(/[^\d]/g, '');
+ if (cleaned && cleaned.length < 10) return res.status(400).json({ error: 'Terms number must be at least 10 digits (or leave it empty)' });
+ update.termsNumber = cleaned;
  }
  if (whatsappGroupLink !== undefined) {
  const link = String(whatsappGroupLink).trim();
@@ -6939,7 +7559,7 @@ app.post('/api/admin/site-links', anyAdminAuth, async (req, res) => {
   if (supportHours !== undefined) update.supportHours = String(supportHours).trim().slice(0, 120);
  const doc = await SiteLinks.findByIdAndUpdate('main', { $set: update }, { upsert: true, new: true });
  console.log(`[admin] site-links updated:`, JSON.stringify(update));
- res.json({ ok: true, whatsappNumber: doc.whatsappNumber, adminPhone: doc.adminPhone || doc.whatsappNumber, whatsappGroupLink: doc.whatsappGroupLink, whatsappChannelLink: doc.whatsappChannelLink, telegramUsername: doc.telegramUsername, telegramLink: doc.telegramLink, whatsappChatLink: doc.whatsappChatLink, supportHours: doc.supportHours });
+ res.json({ ok: true, whatsappNumber: doc.whatsappNumber, adminPhone: doc.adminPhone || doc.whatsappNumber, whatsappGroupLink: doc.whatsappGroupLink, whatsappChannelLink: doc.whatsappChannelLink, telegramUsername: doc.telegramUsername, telegramLink: doc.telegramLink, telegramChannelLink: doc.telegramChannelLink || '', telegramCommunityLink: doc.telegramCommunityLink || '', whatsappChatLink: doc.whatsappChatLink, supportHours: doc.supportHours });
  } catch (e) { res.status(500).json({ error: 'Failed to update site links: ' + e.message }); }
 });
 app.get('/api/admin/payment-methods', anyAdminAuth, async (req, res) => {
@@ -6961,6 +7581,36 @@ app.post('/api/admin/payment-methods/:method', adminAuth, async (req, res) => {
  const doc = await PaymentMethodSetting.findOneAndUpdate({ method }, update, { upsert: true, new: true });
  res.json(doc);
  } catch (e) { res.status(500).json({ error: 'Failed to update payment method: ' + e.message }); }
+});
+app.get('/api/admin/payment-gateways', anyAdminAuth, async (req, res) => {
+ try {
+  const states = await getGatewayStates();
+  const site = (process.env.SITE_URL || '').replace(/\/$/, '');
+  res.json({
+   ...states,
+   paystackUsdEnabled: String(process.env.PAYSTACK_ALLOW_USD || '').toLowerCase() === 'true',
+   webhookUrls: { flutterwave: `${site}/api/webhooks/flutterwave`, paystack: `${site}/api/webhooks/paystack` }
+  });
+ } catch (e) { res.status(500).json({ error: 'Failed to load payment gateways' }); }
+});
+app.post('/api/admin/payment-gateways/:gateway', adminAuth, async (req, res) => {
+ try {
+  const { gateway } = req.params;
+  if (!GATEWAY_LIST.includes(gateway)) return res.status(400).json({ error: 'Invalid gateway' });
+  const { enabled, disabledMessage } = req.body;
+  const update = { gateway, updatedAt: new Date() };
+  if (enabled !== undefined) {
+   if (enabled && !gatewayConfigured(gateway)) {
+    const keyName = gateway === 'paystack' ? 'PAYSTACK_SECRET_KEY' : 'FLW_V3_SECRET_KEY';
+    return res.status(400).json({ error: `${GATEWAY_LABELS[gateway]} cannot be switched on yet — ${keyName} is not set on the server.` });
+   }
+   update.enabled = !!enabled;
+  }
+  if (disabledMessage !== undefined) update.disabledMessage = String(disabledMessage).slice(0, 300);
+  await GatewaySetting.findOneAndUpdate({ gateway }, update, { upsert: true, new: true });
+  console.log(`[admin] payment gateway ${gateway} updated:`, JSON.stringify(update));
+  res.json({ ok: true, gateways: await getGatewayStates() });
+ } catch (e) { res.status(500).json({ error: 'Failed to update payment gateway: ' + e.message }); }
 });
 app.get('/api/admin/giveaways', adminAuth, async (req, res) => {
  res.json(await Giveaway.find().sort({ createdAt: -1 }));
@@ -7073,9 +7723,7 @@ function renderIndexWithSeo(reqPath) {
  html = html.replace('<!--SEO_META-->', ogTags);
  return html;
 }
-const _adminSecretPath = String(process.env.ADMIN_SECRET_PATH || '').replace(/[^A-Za-z0-9_-]/g, '');
-if (!_adminSecretPath) console.warn(' ADMIN_SECRET_PATH is not set — the secret admin URL is disabled (use /admin.html).');
-app.get(`/${_adminSecretPath || '_admin_disabled_' + crypto.randomBytes(8).toString('hex')}`, (req, res) => {
+app.get(`/${process.env.ADMIN_SECRET_PATH || 'ksl-admin-secret'}`, (req, res) => {
   // No caching: admins were seeing an old admin.html (missing the Boost tab)
   // served from the browser/proxy cache after a deploy.
   res.set('Cache-Control', 'no-store, must-revalidate');
@@ -7087,13 +7735,12 @@ app.get('/admin.html', (req, res) => {
   (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 });
 app.get('/dashboard', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'dashboard.html'))));
-app.get('/games', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'game.html'))));
-app.get('/giveaways', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'giveaway.html'))));
 app.get('/buy-number', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'buy-number.html'))));
 app.get('/virtual-account', (req, res) => res.redirect(301, '/deposit'));
 app.get('/number-history', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'number-history.html'))));
 app.get('/order-status', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'order-status.html'))));
 app.get('/marketplace2', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'marketplace2.html'))));
+app.get('/marketplace3', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'marketplace3.html'))));
 app.get('/marketplace', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'marketplace.html'))));
 app.get('/tools', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'tools.html'))));
 // Friendly category deep links — /logs/whatsapp, /marketplace/gmail, /tools/vpn.
@@ -7106,6 +7753,8 @@ app.get('/tools/:category', (req, res) => (res.set('Cache-Control', 'no-store, m
 app.get('/referrals', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'referrals.html'))));
 app.get('/purchases', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'purchases.html'))));
 app.get('/boost', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'boost.html'))));
+app.get('/boost1', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'boost1.html'))));
+app.get('/boost2', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'boost2.html'))));
 app.get('/boost-history', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'boost-history.html'))));
 app.get('/boost-services', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'boost-services.html'))));
 app.get('/all-services', (req, res) => res.redirect(301, '/boost-services'));
@@ -7114,12 +7763,9 @@ app.get('/support', (req, res) => (res.set('Cache-Control', 'no-store, must-reva
 // Legacy bill/VTU paths (airtime, data, cable TV, electricity, betting) were removed.
 // Kept as permanent redirects so old links and bookmarks land on the homepage.
 app.get(['/services', '/airtime', '/data', '/cable', '/electricity', '/betting', '/data-bill'], (req, res) => res.redirect(301, '/'));
+// Removed customer features (games, giveaways, group chat, messages): old links just go to the dashboard.
+app.get(['/games', '/giveaways', '/groups', '/messages', '/chat', '/game.html', '/giveaway.html', '/groups.html', '/messages.html', '/chat.html'], (req, res) => res.redirect(302, '/dashboard'));
 app.get('/settings', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'settings.html'))));
-app.get('/api-docs', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'apidocs.html'))));
-app.get('/apidocs', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'apidocs.html'))));
-app.get('/groups', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'groups.html'))));
-app.get('/messages', (req, res) => (res.set('Cache-Control', 'no-store, must-revalidate'), res.sendFile(path.join(__dirname, 'public', 'messages.html'))));
-app.get('/chat', (req, res) => res.redirect(301, '/groups'));
 // NOTE: the SPA catch-all used to live here, which silently shadowed EVERY route
 // registered further down this file (global payments, wallet, countries, the
 // operations layer). Those endpoints answered with index.html instead of JSON,
@@ -7162,7 +7808,7 @@ function pushBalanceToUser(userId, newBalance, creditAmount = null) {
 // against Flutterwave so users do NOT stay stuck in pending and do NOT require admin manual acceptance.
 // Also marks failed/cancelled/refunded payments so they never credit the user balance.
 let _pendingCheckRunning = false;
-async function checkAllPendingDeposits() {
+async function checkAllPendingFlutterwaveDeposits() {
   if (_pendingCheckRunning) return;
   _pendingCheckRunning = true;
   try {
@@ -7172,6 +7818,7 @@ async function checkAllPendingDeposits() {
     // 1. Check all pending PaymentLinkDeposit records
     const pendingPLs = await PaymentLinkDeposit.find({
       status: 'pending',
+      gateway: { $ne: 'paystack' },
       createdAt: { $gte: since48h }
     }).limit(60);
 
@@ -7338,11 +7985,48 @@ async function reconcileVADeposits() {
  _vaReconcileRunning = false;
  }
 }
+// Paystack pending deposits: verify each one with Paystack and credit / fail it — independent of
+// Flutterwave's keys, so a Paystack-only setup still self-heals when a webhook is missed.
+let _pendingPsCheckRunning = false;
+async function checkPendingPaystackDeposits() {
+  if (_pendingPsCheckRunning || !process.env.PAYSTACK_SECRET_KEY) return;
+  _pendingPsCheckRunning = true;
+  try {
+    const since48h = new Date(Date.now() - 48 * 60 * 60 * 1000);
+    const pending = await PaymentLinkDeposit.find({ status: 'pending', gateway: 'paystack', createdAt: { $gte: since48h } }).limit(60);
+    for (const dep of pending) {
+      try {
+        const tx = await paystackVerify(dep.txRef);
+        if (paystackTxOk(tx, dep)) {
+          console.log(`[Auto-Reconcile] Pending Paystack deposit ${dep.txRef} succeeded! Crediting user...`);
+          await creditPaymentLinkDeposit(dep, tx);
+        } else if (tx && ['failed', 'reversed'].includes(String(tx.status || '').toLowerCase())) {
+          await PaymentLinkDeposit.updateOne({ _id: dep._id, status: 'pending' }, { $set: { status: 'failed', rawPayload: tx } });
+        } else if (Date.now() - new Date(dep.createdAt).getTime() > 24 * 60 * 60 * 1000 && (!tx || String(tx.status || '').toLowerCase() === 'abandoned')) {
+          await PaymentLinkDeposit.updateOne({ _id: dep._id, status: 'pending' }, { $set: { status: 'failed' } });
+        }
+      } catch (err) {
+        console.warn(`[Auto-Reconcile] Paystack check failed for ${dep.txRef}:`, err.response?.data?.message || err.message);
+      }
+    }
+  } catch (e) {
+    console.error('[Auto-Reconcile] checkPendingPaystackDeposits error:', e.message);
+  } finally {
+    _pendingPsCheckRunning = false;
+  }
+}
+async function checkAllPendingDeposits() {
+  await checkAllPendingFlutterwaveDeposits();
+  await checkPendingPaystackDeposits();
+}
 setTimeout(() => {
   reconcileVADeposits();
   checkAllPendingDeposits();
   setInterval(reconcileVADeposits, 60 * 1000);
+  reconcilePaystackVADeposits();
+  setInterval(reconcilePaystackVADeposits, 2 * 60 * 1000);
   setInterval(checkAllPendingDeposits, 30 * 1000);
+  setInterval(retryFailedNovaCancellations, 5 * 60 * 1000);
 }, 5000);
 // ═══ MACHINE TRANSLATION (whole-site language switch) ═════════════════════
 // The phrase table in public/js/i18n.js covers the common UI strings instantly
@@ -7416,6 +8100,13 @@ async function retryDepositConfirmation(source, id) {
     const dep = await PaymentLinkDeposit.findById(id);
     if (!dep) return { ok: false, message: 'Deposit not found' };
     if (dep.status === 'success') return { ok: true, credited: false, reference: dep.txRef, message: 'Already credited' };
+    if (dep.gateway === 'paystack') {
+      const psTx = await paystackVerify(dep.txRef);
+      if (!paystackTxOk(psTx, dep)) return { ok: true, credited: false, reference: dep.txRef, message: `Paystack reports status: ${psTx?.status || 'not found'}` };
+      await creditPaymentLinkDeposit(dep, psTx);
+      const freshPs = await PaymentLinkDeposit.findById(id).lean();
+      return { ok: true, credited: freshPs.status === 'success', creditNgn: dep.creditAmount, reference: dep.txRef, message: 'Confirmation re-run against Paystack' };
+    }
     const verify = await flwAxios.get('/transactions/verify_by_reference', { params: { tx_ref: dep.txRef }, timeout: 15000 });
     const tx = verify.data?.data;
     if (!tx || tx.status !== 'successful') return { ok: true, credited: false, reference: dep.txRef, message: `Flutterwave reports status: ${tx?.status || 'not found'}` };
@@ -7443,6 +8134,15 @@ async function retryDepositConfirmation(source, id) {
     const dep = await VirtualAccountDeposit.findById(id);
     if (!dep) return { ok: false, message: 'Deposit not found' };
     if (dep.status === 'success') return { ok: true, credited: false, reference: dep.flwRef, message: 'Already credited' };
+    if (dep.gateway === 'paystack') {
+      const psOwner = await User.findById(dep.userId);
+      if (!psOwner) return { ok: false, message: 'Owner account no longer exists' };
+      const psVtx = await paystackVerify(String(dep.flwRef).replace(/^PSK-/, ''));
+      if (!psVtx) return { ok: true, credited: false, reference: dep.flwRef, message: 'Paystack has no record of this payment' };
+      await handlePaystackVaCredit(psOwner, psVtx);
+      const psFresh = await VirtualAccountDeposit.findById(id).lean();
+      return { ok: true, credited: psFresh.status === 'success', creditNgn: psFresh.creditAmount, reference: dep.flwRef, message: 'Paystack virtual account credit re-run' };
+    }
     const user = await User.findById(dep.userId);
     if (!user) return { ok: false, message: 'Owner account no longer exists' };
     await handleVaWebhookCredit(user, dep.rawPayload || { flw_ref: dep.flwRef, id: dep.flwTxId, amount: dep.amount, currency: 'NGN', status: 'successful' });
@@ -7481,9 +8181,7 @@ klsCampaigns = require('./lib/campaigns')({
 let klsBoost = null;
 try {
   klsBoost = require('./lib/boost')({
-    app, mongoose, User, Transaction, auth, anyAdminAuth, SystemError, Announcement,
-    // Unlocks the public developer endpoints /api/v1/boost/* (X-API-Key + X-API-Secret).
-    apiKeyAuth
+    app, mongoose, User, Transaction, auth, anyAdminAuth, SystemError, Announcement
   });
 } catch (boostErr) {
   console.error('[boost] module failed to load:', boostErr.message);

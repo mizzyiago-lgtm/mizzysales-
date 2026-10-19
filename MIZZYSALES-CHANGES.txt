@@ -1,0 +1,31 @@
+MIZZYSALES - BACKGROUNDS, MOVING TEXT, LOGO + FAVICON
+
+Merge into the existing project (keep folder paths), then restart/redeploy.
+
+What changed
+- 5 new backgrounds (public/img/mizzysales-bg-*.webp), chosen per page:
+  hero (home/login/register) = tunnel M, social = phone + social icons,
+  speed (boost/marketplace/tools) = blue M network, phone (numbers/wallet) = dark phone,
+  wave (default/other pages) = blue waves.
+- Moving text behind the site now reads "Mizzy Sales" (css/js: marvinums-brand).
+- Logo/icon: public/favicon.png (also served as /favicon.ico), public/img/mizzysales-icon.png
+  (used for the brand badge in the header), public/img/mizzysales-logo.png (full logo with name).
+- manifest.json renamed MIZZYSALES with new icons.
+- All pages: favicon + CSS/JS cache-bust (v=mz3 / v=3) so browsers load the new look.
+
+Not changed: other "Mizzysales" wording inside page text.
+
+MARKETPLACE 2 CREDENTIAL DELIVERY (merged into this package)
+- lib/market2.js: your credential-delivery fix (reads strings/arrays/nested objects, raw-JSON fallback,
+  refunds on provider failure) PLUS server logging of the raw NovaSolution /orders response
+  ("[market2] /orders response ...") to diagnose any remaining delivery problem.
+- public/market2.js (+ marketplace2.html cache bump): buy popup no longer says plain "Delivered".
+  If the supplier returned no recognisable credentials it says the order was placed and details are pending.
+- Needs NOVA_API_KEY in the hosting environment. Restart the Node app after uploading.
+
+FULL REBRAND PASS (Marvel Nums -> Mizzysales)
+- Every visible "Marvel Nums" / "MARVEL NUMS" in pages, scripts, emails, PDFs and config is now "Mizzysales" / "MIZZYSALES".
+- site.config.js: BRAND name/fullName = Mizzysales. Set BRAND_DOMAIN, BRAND_TELEGRAM, SUPPORT_EMAIL, ADMIN_WHATSAPP in your env.
+- Added public/apidocs.html (present in Marvel Nums, was missing here), rebranded.
+- File names such as marvinums-brand.css/js are kept on purpose so nothing breaks.
+- Features are unchanged: backend (server.js, lib/) is identical to Marvel Nums.

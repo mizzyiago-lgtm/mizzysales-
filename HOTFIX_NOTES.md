@@ -1,4 +1,4 @@
-# Mizzy Sales Hotfix — Deployment Issues Resolved
+# Mizzysales Hotfix — Deployment Issues Resolved
 
 ## Issues Fixed
 

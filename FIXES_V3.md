@@ -1,4 +1,4 @@
-# Mizzy Sales Fixes v3 — Airtime / Data / Utilities
+# Mizzysales Fixes v3 — Airtime / Data / Utilities
 
 ## The real bug (this is why plans never showed up)
 `lib/clubkonnect.js` was parsing ClubKonnect's data-bundle response with
