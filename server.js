@@ -2534,6 +2534,10 @@ app.post('/api/logs/:id/notify-restock', auth, async (req, res) => {
  res.json({ ok: true });
  } catch (e) { res.status(500).json({ error: 'Failed to save — please try again' }); }
 });
+// A sub-account is only sellable if the admin actually put credentials/delivery content on it.
+function subHasCredentials(sa) {
+  return !!(sa && ((sa.details && String(sa.details).trim()) || (sa.toolLink && String(sa.toolLink).trim()) || (sa.deliverableFile && String(sa.deliverableFile).trim())));
+}
 app.post('/api/logs/buy/:id', auth, async (req, res) => {
  try {
  const { subAccountId } = req.body;
@@ -2546,7 +2550,7 @@ app.post('/api/logs/buy/:id', auth, async (req, res) => {
    // ATOMIC CLAIM — only touches the ONE matching sub-account (sold:false).
    // Two concurrent buyers can never both get the same account.
    const claimed = await Log.findOneAndUpdate(
-     { _id: log._id, 'subAccounts._id': subAccountId, 'subAccounts.sold': false },
+     { _id: log._id, subAccounts: { $elemMatch: { _id: subAccountId, sold: false } } },
      { $set: { 'subAccounts.$.sold': true, 'subAccounts.$.soldTo': user._id, 'subAccounts.$.soldAt': new Date() } },
      { new: true }
    );
@@ -2556,6 +2560,10 @@ app.post('/api/logs/buy/:id', auth, async (req, res) => {
      // Roll back — safety net
      await Log.updateOne({ _id: log._id, 'subAccounts._id': subAccountId }, { $set: { 'subAccounts.$.sold': false, 'subAccounts.$.soldTo': null, 'subAccounts.$.soldAt': null } });
      return res.status(500).json({ error: 'Sub-account data error — please try again' });
+   }
+   if (!subHasCredentials(sub)) {
+     await Log.updateOne({ _id: log._id, 'subAccounts._id': subAccountId }, { $set: { 'subAccounts.$.sold': false, 'subAccounts.$.soldTo': null, 'subAccounts.$.soldAt': null } });
+     return res.status(409).json({ error: 'This account has no login details added yet, so you were NOT charged. Please contact admin or choose another account.' });
    }
    // BALANCE CHECK after claim — roll back if insufficient
    if ((user.balance || 0) < sub.price) {
@@ -2659,7 +2667,7 @@ app.post('/api/logs/buy-multi/:id', auth, async (req, res) => {
     const claimedSubs = []; // { _id, price, label, details, ... } for each successfully claimed sub
     for (const subId of subAccountIds) {
       const claimed = await Log.findOneAndUpdate(
-        { _id: log._id, 'subAccounts._id': subId, 'subAccounts.sold': false },
+        { _id: log._id, subAccounts: { $elemMatch: { _id: subId, sold: false } } },
         { $set: { 'subAccounts.$.sold': true, 'subAccounts.$.soldTo': user._id, 'subAccounts.$.soldAt': new Date() } },
         { new: true }
       );
@@ -2671,6 +2679,13 @@ app.post('/api/logs/buy-multi/:id', auth, async (req, res) => {
       }
       claimedIds.push(subId);
       claimedSubs.push(claimed.subAccounts.id(subId));
+    }
+    if (claimedSubs.some(sa => !subHasCredentials(sa))) {
+      for (const rid of claimedIds) {
+        await Log.updateOne({ _id: log._id, 'subAccounts._id': rid }, { $set: { 'subAccounts.$.sold': false, 'subAccounts.$.soldTo': null, 'subAccounts.$.soldAt': null } });
+      }
+      claimedIds.length = 0;
+      return res.status(409).json({ error: 'This account has no login details added yet, so you were NOT charged. Please contact admin or choose another account.' });
     }
     const total = claimedSubs.reduce((sum, s) => sum + (s.price || 0), 0);
     if ((user.balance || 0) < total) {
@@ -5260,6 +5275,8 @@ app.post('/api/admin/logs', adminAuth, uploadLogFields, async (req, res) => {
  };
  });
  if (parsedSubAccounts.some(sa => !sa.price)) return res.status(400).json({ error: 'Every sub-account needs a price' });
+ { const blankIdx = parsedSubAccounts.findIndex(sa => !subHasCredentials(sa));
+   if (blankIdx !== -1) return res.status(400).json({ error: `"${parsedSubAccounts[blankIdx].label}" has no login details. Paste its credentials in the Details box before saving.` }); }
  }
  const log = await Log.create({
  type: type || 'log', listingType: isFolder ? 'folder' : 'simple',
@@ -5320,12 +5337,15 @@ app.put('/api/admin/logs/:id', adminAuth, uploadLogFields, async (req, res) => {
  }
  return {
  _id: sa._id, label: sa.label || 'Account', details: sa.details || '', toolLink: sa.toolLink || '',
+ deliverableFile: (existing.subAccounts.id(sa._id) || {}).deliverableFile || '', deliverableFileName: (existing.subAccounts.id(sa._id) || {}).deliverableFileName || '',
  deliveryType: sa.deliveryType === 'file' ? 'file' : 'link',
  price: parseFloat(sa.price) || 0, picture: sa.picture || '',
  sold: !!sa.sold, soldTo: sa.soldTo, soldAt: sa.soldAt, reviews: sa.reviews || [],
  adminReview: saAdminReview, tutorial: saTutorial
  };
  });
+  const blank = update.subAccounts.find(sa => !sa.sold && !subHasCredentials(sa));
+ if (blank) return res.status(400).json({ error: `"${blank.label}" has no login details. Paste its credentials in the Details box before saving.` });
  } catch { return res.status(400).json({ error: 'Invalid sub-accounts data' }); }
  }
  if (deliveryType) update.deliveryType = deliveryType === 'file' ? 'file' : 'link';
