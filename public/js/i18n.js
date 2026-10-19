@@ -1,5 +1,5 @@
 /**
- * public/js/i18n.js — Mizzy Sales multi-language layer
+ * public/js/i18n.js — Mizzysales multi-language layer
  * ─────────────────────────────────────────────────────────────────────────────
  * Two ways to translate, both handled here:
  *

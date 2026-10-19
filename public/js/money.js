@@ -1,7 +1,7 @@
 /**
  * public/js/money.js — one place that decides how money is shown
  * ─────────────────────────────────────────────────────────────────────────────
- * The Mizzy Sales ledger is denominated in naira. That is an accounting decision, not a
+ * The Mizzysales ledger is denominated in naira. That is an accounting decision, not a
  * customer-facing one:
  *
  *   • Nigeria      → everything is shown and charged in naira (₦)

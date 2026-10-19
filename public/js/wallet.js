@@ -199,7 +199,7 @@
       '<div class="kls-gate-box" role="dialog" aria-modal="true" aria-labelledby="klsGateTitle">' +
         '<h2 id="klsGateTitle">Update your phone number</h2>' +
         '<p class="kls-gate-lead">Before you continue, add your phone number and select your country. ' +
-          'Your country decides which payment methods and currency you use on Mizzy Sales.</p>' +
+          'Your country decides which payment methods and currency you use on Mizzysales.</p>' +
         '<label class="kls-gate-label" for="klsGateCountry">Country</label>' +
         '<select id="klsGateCountry" class="kls-gate-input">' + countryOptions(preset) + '</select>' +
         '<label class="kls-gate-label" for="klsGatePhone">Phone Number</label>' +

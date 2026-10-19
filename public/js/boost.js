@@ -17,7 +17,7 @@
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + T(), ...(opts.headers || {}) },
       });
     } catch (netErr) {
-      const e = new Error('No connection to Mizzy Sales. Check your internet and try again.');
+      const e = new Error('No connection to Mizzysales. Check your internet and try again.');
       e.status = 0; throw e;
     }
     const raw = await r.text();

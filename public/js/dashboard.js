@@ -1,4 +1,4 @@
-/* Mizzy Sales dashboard — wallet, unified activity, profile and balance controls. */
+/* Mizzysales dashboard — wallet, unified activity, profile and balance controls. */
 (function () {
   'use strict';
 

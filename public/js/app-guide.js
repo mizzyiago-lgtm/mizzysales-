@@ -1,5 +1,5 @@
 /* ────────────────────────────────────────────────────────────────────────────
-   Mizzy Sales App Guide — presentation-only add-on that runs on every page.
+   Mizzysales App Guide — presentation-only add-on that runs on every page.
 
      1. Injects a friendly "How it works" panel on the Numbers, Boost and
         Deposit pages so customers know exactly what to do.

@@ -1,5 +1,5 @@
 /* ────────────────────────────────────────────────────────────────────────────
-   Mizzy Sales App Shell (js)
+   Mizzysales App Shell (js)
 
    Runs on every page. Responsibilities:
      1. Mark <body> as app-shell and remove the old slide-out drawer.
@@ -182,13 +182,13 @@
     wrap.innerHTML =
       '<div class="hm-top">' +
         '<span class="hm-ava" id="hmAva">' + esc(initial) + '</span>' +
-        '<span class="hm-hi">Hi, ' + esc(name) + '<small>Welcome back to Mizzy Sales</small></span>' +
+        '<span class="hm-hi">Hi, ' + esc(name) + '<small>Welcome back to Mizzysales</small></span>' +
         '<a class="hm-ico-btn" href="/support" aria-label="Support">' + ico('i-headset') + '</a>' +
         '<a class="hm-ico-btn" href="/notifications" aria-label="Notifications">' + ico('i-bell') +
           '<span class="hm-dot" id="hmNotifDot" style="display:none">0</span></a>' +
       '</div>' +
       '<a class="hm-ticker" id="hmTicker" href="/notifications">' + ico('i-bell') +
-        '<span id="hmTickerText">Mizzy Sales is fully operational — deposits and orders are running normally</span>' + ico('i-arrow-right') + '</a>' +
+        '<span id="hmTickerText">Mizzysales is fully operational — deposits and orders are running normally</span>' + ico('i-arrow-right') + '</a>' +
       '<div>' +
         '<div class="hm-bal">' +
           '<div class="hm-bal-row">' +
@@ -220,8 +220,6 @@
           '<a href="/buy-number"><span class="hm-g-ico">' + ico('i-smartphone') + '</span>Numbers</a>' +
           '<a href="/boost"><span class="hm-g-ico">' + ico('i-zap') + '</span>Boost</a>' +
           '<a href="/tools"><span class="hm-g-ico">' + ico('i-wrench') + '</span>Tools &amp; FMT</a>' +
-          '<a href="/games"><span class="hm-g-ico">' + ico('i-gamepad') + '</span>Games</a>' +
-          '<a href="/giveaways"><span class="hm-g-ico">' + ico('i-gift') + '</span>Giveaways</a>' +
           '<a href="/referrals"><span class="hm-g-ico">' + ico('i-link') + '</span>Referrals</a>' +
           '<a href="/settings"><span class="hm-g-ico">' + ico('i-settings') + '</span>Settings</a>' +
         '</div>' +
