@@ -3,27 +3,24 @@
 <head>
 <script src="/js/auth-keeper.js?v=1"></script>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Buy Numbers — Mizzy Sales</title>
-<meta name="description" content="Rent a virtual number for SMS/OTP verification on Mizzy Sales."/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Buy Numbers — Mizzysales</title>
+<meta name="description" content="Rent a virtual number for SMS/OTP verification on Mizzysales."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232f7bf6'/><text y='72' x='50' font-size='58' text-anchor='middle' fill='white' font-family='system-ui,sans-serif' font-weight='800'>M</text></svg>"/>
-<meta name="theme-color" content="#00b4f8"/>
+<meta name="theme-color" content="#0788e8"/>
 <!-- shared site stylesheet: loaded before this page's own <style> so page rules still win -->
 <link rel="stylesheet" href="style.css?v=20260910a"/>
 <link rel="stylesheet" href="/css/marketplace-standard.css?v=1"/>
 <link rel="stylesheet" href="/css/numbers-redesign.css?v=2"/>
   <link rel="stylesheet" href="/css/app-structure.css?v=3"/>
-<link rel="stylesheet" href="/css/mizzy-unified.css?v=2"/>
-<link rel="stylesheet" href="/css/numbers-workspace.css?v=1"/>
 <script>
 function PRICE(n) { return window.KLSMoney ? window.KLSMoney.price(n) : '₦' + Number(n || 0).toLocaleString('en-NG'); }
 function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' + Number(n || 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
   (function(){
     try {
-      var pref = localStorage.getItem('ksl_theme');
+      var pref = 'dark'; /* dark-only brand */
       var effective = (pref === 'light' || pref === 'dark') ? pref : (function(){ var h = new Date().getHours(); return (h >= 19 || h < 7) ? 'dark' : 'light'; })();
       document.documentElement.setAttribute('data-theme', effective);
     } catch(e) {}
@@ -37,25 +34,25 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
     --border:#252535; --border2:#2e2e42; --border-hover:#3e3e5a;
     --t1:#eeeef5; --t2:#8888a8; --t2b:#aaaacc;
     --navbar-bg:rgba(10,10,20,.92);
-    --gold:#2f7bf6; --green:#00d46a; --red:#ff4757; --blue:#4a9eff;
+    --gold:#0788e8; --green:#00d46a; --red:#ff4757; --blue:#4ade80;
   }
   [data-theme="light"] {
     --bg:#f4f6fb; --card:#ffffff; --card2:#f7f9fc; --card3:#eef1f8;
     --border:#dde3ee; --border2:#ccd5e6; --border-hover:#b3bfd6;
     --t1:#1a2035; --t2:#636c85; --t2b:#454e66;
     --navbar-bg:rgba(255,255,255,.92);
-    --gold:#1d5fd1; --green:#00a854; --red:#e5373d; --blue:#2a7de1;
+    --gold:#0a6fd0; --green:#00a854; --red:#e5373d; --blue:#0788e8;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--t1);font-family:'Plus Jakarta Sans',sans-serif;padding-bottom:40px;transition:background .25s,color .25s;font-size:12px}
   a{color:var(--blue)}
   .navbar{position:sticky;top:0;z-index:50;background:var(--navbar-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;transition:background .25s,border-color .25s}
   .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--t1);font-weight:800}
-  .brand-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#4a9eff,#2f7de0);display:flex;align-items:center;justify-content:center;font-size:17px}
-  .back-btn{padding:8px 14px;border-radius:8px;background:#4a9eff;color:#fff;text-decoration:none;font-weight:700;font-size:13px}
+  .brand-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#4ade80,#0788e8);display:flex;align-items:center;justify-content:center;font-size:17px}
+  .back-btn{padding:8px 14px;border-radius:8px;background:#4ade80;color:#fff;text-decoration:none;font-weight:700;font-size:13px}
   .wrap{max-width:560px;margin:0 auto;padding:20px 16px}
   .hero{text-align:center;padding:20px 8px 24px}
-  .chip{display:inline-block;background:rgba(74,158,255,.12);color:#4a9eff;padding:5px 14px;border-radius:20px;font-size:12.5px;font-weight:700;margin-bottom:10px}
+  .chip{display:inline-block;background:rgba(74,222,128,.12);color:#4ade80;padding:5px 14px;border-radius:20px;font-size:12.5px;font-weight:700;margin-bottom:10px}
   h1{font-size:23px;margin:0 0 8px}
   .hero p{color:var(--t2);font-size:14px;margin:0;line-height:1.5}
   .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;transition:background .25s,border-color .25s}
@@ -64,9 +61,9 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
   select,input{width:100%;padding:11px;border:1px solid var(--border2);border-radius:9px;background:var(--card3);color:var(--t1);font-size:14px;font-family:inherit;margin-bottom:12px;transition:background .25s,color .25s,border-color .25s;outline:none}
   select:focus,input:focus{border-color:var(--gold)}
   select:disabled{opacity:.5}
-  .price-box{display:none;background:rgba(74,158,255,.1);border:1px solid #4a9eff;border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
-  .price-box b{color:#4a9eff;font-size:18px}
-  .btn{width:100%;padding:13px;border:none;border-radius:10px;background:#4a9eff;color:#fff;font-weight:700;font-size:14.5px;cursor:pointer;font-family:inherit}
+  .price-box{display:none;background:rgba(74,222,128,.1);border:1px solid #4ade80;border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+  .price-box b{color:#4ade80;font-size:18px}
+  .btn{width:100%;padding:13px;border:none;border-radius:10px;background:#4ade80;color:#fff;font-weight:700;font-size:14.5px;cursor:pointer;font-family:inherit}
   .btn:disabled{opacity:.5;cursor:not-allowed}
   .btn-outline{background:transparent;border:1px solid var(--border2);color:var(--t1)}
   .btn-danger{background:transparent;border:1px solid #ff4757;color:#ff4757}
@@ -79,7 +76,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
   .empty .icon{font-size:38px;margin-bottom:8px}
   .phone-display{text-align:center}
   .phone-num{font-size:24px;font-weight:800;letter-spacing:.5px;margin:10px 0}
-  .countdown{font-size:34px;font-weight:800;color:#4a9eff;margin:8px 0;font-variant-numeric:tabular-nums}
+  .countdown{font-size:34px;font-weight:800;color:#4ade80;margin:8px 0;font-variant-numeric:tabular-nums}
   .lock-note{background:rgba(255,199,0,.1);border:1px solid #ffc700;color:#ffc700;border-radius:10px;padding:10px 12px;font-size:12.5px;margin:12px 0;text-align:left}
   .code-box{display:none;background:rgba(0,212,106,.1);border:1.5px solid #00d46a;border-radius:10px;padding:16px;margin:14px 0;text-align:center}
   .code-box .code{font-size:26px;font-weight:800;letter-spacing:3px;color:#00d46a}
@@ -92,10 +89,10 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
   .order-row:last-child{border-bottom:none}
   .order-row .meta{color:var(--t2);font-size:11.5px;margin-top:2px}
   .order-row{cursor:pointer}
-  .bal-card{background:linear-gradient(135deg,rgba(74,158,255,.16),rgba(47,125,224,.05));border:1px solid rgba(74,158,255,.35);border-radius:14px;padding:16px 18px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+  .bal-card{background:linear-gradient(135deg,rgba(74,222,128,.16),rgba(47,125,224,.05));border:1px solid rgba(74,222,128,.35);border-radius:14px;padding:16px 18px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
   .bal-card .lbl{font-size:12px;color:var(--t2);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
   .bal-card .amt{font-size:24px;font-weight:800;color:var(--t1);margin-top:2px}
-  .bal-refresh{background:rgba(74,158,255,.15);border:1px solid rgba(74,158,255,.4);color:#4a9eff;font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:9px;cursor:pointer;font-family:inherit}
+  .bal-refresh{background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.4);color:#4ade80;font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:9px;cursor:pointer;font-family:inherit}
   .wa-note{background:rgba(0,212,106,.08);border:1px solid rgba(0,212,106,.35);border-radius:10px;padding:12px 14px;margin-top:14px;font-size:12.5px;line-height:1.6;text-align:left}
   .wa-note b{color:#00d46a}
 
@@ -103,32 +100,32 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
      normal, fully-accessible native dropdown while looking like a custom component. */
   .select-tile{position:relative;display:flex;align-items:center;gap:12px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:12px;cursor:pointer;transition:background .25s,border-color .25s}
   .select-tile:hover{border-color:var(--border-hover)}
-  .st-icon{width:38px;height:38px;flex-shrink:0;background:rgba(74,158,255,.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .st-icon{width:38px;height:38px;flex-shrink:0;background:rgba(74,222,128,.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
   .st-body{flex:1;min-width:0}
   .st-label{font-size:10.5px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:2px}
   .st-value{font-size:14.5px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .st-chev{color:var(--t2);font-size:16px;flex-shrink:0}
   .select-tile select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
 
-  .an-count-chip{background:rgba(74,158,255,.15);color:#4a9eff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:20px}
+  .an-count-chip{background:rgba(74,222,128,.15);color:#4ade80;font-size:12px;font-weight:800;padding:3px 10px;border-radius:20px}
   .an-table-wrap{overflow-x:auto}
   .an-table{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
   .an-table th{text-align:left;color:var(--t2);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;padding:0 10px 8px;font-weight:700}
   .an-table td{padding:10px;border-top:1px solid var(--border)}
-  .an-table tr:hover td{background:rgba(74,158,255,.04)}
+  .an-table tr:hover td{background:rgba(74,222,128,.04)}
   .an-code{font-weight:800;color:#00d46a;font-family:monospace;font-size:13px}
   .an-waiting{color:var(--t2);font-style:italic}
-  .an-time{color:#4a9eff;font-weight:700;font-variant-numeric:tabular-nums}
+  .an-time{color:#4ade80;font-weight:700;font-variant-numeric:tabular-nums}
 
   .ann-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:999;padding:20px}
   .ann-overlay.show{display:flex}
   .ann-box{background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:32px 26px;max-width:360px;width:100%;text-align:center;animation:annPop .25s ease;transition:background .25s,border-color .25s}
   @keyframes annPop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
-  .ann-icon{width:76px;height:76px;margin:0 auto 18px;background:rgba(74,158,255,.12);border:1px solid rgba(74,158,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px}
+  .ann-icon{width:76px;height:76px;margin:0 auto 18px;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px}
   .ann-box h2{margin:0 0 14px;font-size:22px}
   .ann-box p{color:var(--t2b);font-size:14px;line-height:1.7;margin:0 0 22px}
   .ann-box p b{color:var(--t1)}
-  .ann-btn{width:100%;background:linear-gradient(135deg,#4a9eff,#2f7bf6);color:#fff;border:none;padding:14px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer}
+  .ann-btn{width:100%;background:linear-gradient(135deg,#4ade80,#0788e8);color:#fff;border:none;padding:14px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer}
 
   /* ══ STANDARD BLUE + BLACK SKIN ═══════════════════════════════════════════
      One accent (blue) on true black surfaces, so the numbers page reads as a
@@ -136,7 +133,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
      (gold, amber, green, blue) competing on the same page. Declared last so it
      wins over the rules above without touching them. */
   :root, [data-theme="dark"] {
-    --nb-blue:#2f7bf6; --nb-blue-2:#1d5fd1; --nb-blue-soft:rgba(47,123,246,.14);
+    --nb-blue:#0788e8; --nb-blue-2:#0a6fd0; --nb-blue-soft:rgba(7,136,232,.14);
     --bg:#05060b; --card:#0c0f18; --card2:#111522; --card3:#151a29;
     --border:#1c2233; --border2:#26304a; --border-hover:#38466b;
     --t1:#eef2fb; --t2:#8792ad; --t2b:#aab4cc;
@@ -144,7 +141,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
     --gold:var(--nb-blue); --blue:var(--nb-blue);
   }
   [data-theme="light"] {
-    --nb-blue:#1d5fd1; --nb-blue-2:#16489f; --nb-blue-soft:rgba(29,95,209,.10);
+    --nb-blue:#0a6fd0; --nb-blue-2:#166534; --nb-blue-soft:rgba(10,111,208,.10);
     --bg:#f5f7fc; --card:#ffffff; --card2:#f7f9fd; --card3:#eef2fa;
     --border:#dde4f0; --border2:#c8d3e6; --border-hover:#a9b8d4;
     --t1:#0a0d14; --t2:#5b6580; --t2b:#3d465c;
@@ -249,10 +246,25 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
   <!-- Brand colours/fonts from site.config.js — keep last so it can override -->
   <link rel="stylesheet" href="/brand.css"/>
   <link rel="stylesheet" href="/css/mobile-fix.css">
-  <link rel="stylesheet" href="/css/mizzy-unified.css?v=2"/>
-  <link rel="stylesheet" href="/css/dashboard-look.css?v=20261016"/>
+<script src="/kls-ui.js?v=2"></script>
+<script>
+/* Safety net: if the pop-up helper file failed to load, still ask before spending money (never silently do nothing). */
+if (typeof window.mnPurchase !== 'function') {
+  window.mnPurchase = function () { try { alert('The purchase window could not load. Please refresh the page and try again — nothing was charged.'); } catch (_) {} return Promise.resolve({ status: 'cancelled' }); };
+}
+if (typeof window.kslConfirm !== 'function') {
+  window.kslConfirm = function (m) { return Promise.resolve(window.confirm(m)); };
+}
+</script>
+
+<link rel="icon" type="image/png" sizes="128x128" href="/favicon.png?v=mz3">
+<link rel="shortcut icon" href="/favicon.ico?v=mz3">
+<link rel="stylesheet" href="/css/marvinums-brand.css">
+<script defer src="/js/marvinums-brand.js"></script>
+  <link rel="stylesheet" href="/css/marvel-nums-mobile-polish.css?v=2">
+  <link rel="stylesheet" href="/css/glass-ui.css?v=1">
 </head>
-<body>
+<body class="mn-bg-phone">
 <!-- Shared UI icon sprite (replaces emoji site-wide) — referenced via <svg class="icon i-NAME"><use href="#i-NAME"/></svg> -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-check-circle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></g></symbol>
@@ -345,7 +357,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
 </script>
 
 <nav class="navbar">
- <a href="/dashboard" class="brand"><span class="brand-icon"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg></span> Mizzy Sales Numbers</a>
+ <a href="/dashboard" class="brand"><span class="brand-icon"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg></span> Mizzysales Numbers</a>
   <div style="display:flex;gap:8px">
  <a href="/number-history" class="back-btn"><svg class="icon i-scroll" aria-hidden="true"><use href="#i-scroll"/></svg> History</a>
  <a href="/dashboard" class="back-btn"><svg class="icon i-grid" aria-hidden="true"><use href="#i-grid"/></svg> Dashboard</a>
@@ -357,7 +369,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
   <div class="ann-box">
  <div class="ann-icon"><svg class="icon i-megaphone" aria-hidden="true"><use href="#i-megaphone"/></svg></div>
  <h2>Announcement <svg class="icon i-rocket" aria-hidden="true"><use href="#i-rocket"/></svg></h2>
-    <p><b>Server 1 is not only for USA WhatsApp anymore.</b> It now gives <b>USA / Canada numbers</b> for many different services — and you can pick other countries too.</p>
+    <p><b>Pick a server</b>, then a country and service. Live stock and prices are shown before you pay.</p>
     <button class="ann-btn" onclick="dismissAnnouncement()">Got it</button>
   </div>
 </div>
@@ -374,15 +386,13 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
   </div>
 
   <div class="hero" id="numHero">
-    <span class="number-overline">MIZZY SALES / NUMBERS</span>
  <div class="chip"><svg class="icon i-smartphone" aria-hidden="true"><use href="#i-smartphone"/></svg> Buy Numbers</div>
-    <h1>Your next number starts here.</h1>
+    <h1>Rent a Virtual Number</h1>
     <p>Get a real number for SMS/OTP verification. Your payment is only ever kept if a code actually arrives — otherwise it's refunded automatically.</p>
   </div>
 
   <!-- BALANCE -->
   <div class="bal-card">
-    <span class="number-balance-mark" aria-hidden="true">₦</span>
     <div>
       <div class="lbl">Wallet Balance</div>
       <div class="amt"><span id="numBalDisplay">—</span></div>
@@ -402,7 +412,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
   </div>
 
   <style>
-    /* Server switcher — Server 1 (USA WhatsApp) vs Server 2 (GrizzlySMS: all services) */
+    /* Server switcher — Server 1 vs Server 2 */
     .srv-tabs{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
     .srv-tab{flex:1 1 150px;padding:12px 10px;border-radius:12px;border:1px solid var(--border2,#2a2a40);
       background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer;text-align:left;line-height:1.35}
@@ -416,6 +426,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
     .step-label{font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
       opacity:.75;margin:14px 0 8px}
     .quick-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+    .chip.on{border-color:#4ade80;background:rgba(74,222,128,.16)}
     .chip-btn{padding:7px 12px;border-radius:999px;border:1px solid var(--border2,#2a2a40);background:transparent;color:inherit;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
     .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border2,#2a2a40);
       background:transparent;color:inherit;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
@@ -432,10 +443,10 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
       gap:13px;text-align:left;padding:15px 14px;border-radius:14px;cursor:pointer;width:100%;
       border:1px solid var(--border2,#2a2a40);background:var(--card2,transparent);
       color:inherit;font:inherit;transition:border-color .15s ease,background .15s ease}
-    .srv-card:hover{border-color:#3b82f6;background:rgba(59,130,246,.06)}
+    .srv-card:hover{border-color:#22c55e;background:rgba(34,197,94,.06)}
     .srv-card[disabled]{opacity:.5;cursor:not-allowed}
     .srv-card .srv-ico{width:40px;height:40px;flex:none;border-radius:11px;display:flex;align-items:center;justify-content:center;
-      background:rgba(59,130,246,.13);color:#3b82f6}
+      background:rgba(34,197,94,.13);color:#22c55e}
     .srv-card .srv-ico .icon{width:20px;height:20px}
     .srv-card .srv-body{min-width:0}
     .srv-card h4{margin:0 0 3px;font-size:14.5px;line-height:1.3}
@@ -444,7 +455,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
     .srv-card .srv-chev .icon{width:17px;height:17px}
     /* Quiet availability pill: green when the server is taking orders, grey when not. */
     .online-pill{display:inline-flex;align-items:center;gap:5px;margin-bottom:5px;
-      padding:3px 9px;border-radius:999px;background:rgba(34,197,94,.13);color:#16a34a;
+      padding:3px 9px;border-radius:999px;background:rgba(34,197,94,.13);color:#0788e8;
       font-size:10.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}
     .online-pill .pdot{width:6px;height:6px;border-radius:50%;background:currentColor}
     .online-pill.off{background:rgba(148,163,184,.16);color:#64748b}
@@ -454,7 +465,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
       padding:10px 12px;margin:0 0 12px;border-radius:14px;backdrop-filter:blur(10px);
       background:color-mix(in srgb,var(--bg,#0b0b14) 82%,transparent);border:1px solid var(--border2,#2a2a40)}
     .srv-topbar .tb-back{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;
-      border:1px solid #3b82f6;background:rgba(59,130,246,.12);color:#3b82f6;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer}
+      border:1px solid #22c55e;background:rgba(34,197,94,.12);color:#22c55e;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer}
     .srv-topbar .tb-title{font-weight:800;font-size:14px}
     .srv-topbar .tb-spacer{flex:1}
     .srv-topbar a.tb-link{font-size:12.5px;font-weight:700;color:var(--gold,#f4b942)}
@@ -468,7 +479,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
     .sugg-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:transparent;
       border:0;border-bottom:1px solid var(--border2,#2a2a40);color:inherit;font:inherit;font-size:13px;text-align:left;cursor:pointer}
     .sugg-item:last-child{border-bottom:0}
-    .sugg-item:hover,.sugg-item.active{background:rgba(59,130,246,.12)}
+    .sugg-item:hover,.sugg-item.active{background:rgba(34,197,94,.12)}
     .sugg-item .si-name{font-weight:700}
     .app-ico{width:22px;height:22px;border-radius:6px;object-fit:contain;background:rgba(255,255,255,.06);padding:2px;flex:0 0 auto}
     .app-ico-fb{display:inline-flex;width:22px;height:22px;align-items:center;justify-content:center;flex:0 0 auto}
@@ -492,13 +503,13 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
     .copy-steps{display:grid;gap:8px;margin-top:12px}
     .copy-step{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;
       border:1px solid var(--border2,#2a2a40)}
-    .copy-step .cs-n{width:22px;height:22px;border-radius:50%;background:rgba(59,130,246,.18);color:#3b82f6;
+    .copy-step .cs-n{width:22px;height:22px;border-radius:50%;background:rgba(34,197,94,.18);color:#22c55e;
       display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex:0 0 auto}
     .copy-step .cs-body{min-width:0}
     .copy-step .cs-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.04em;opacity:.7;font-weight:800}
     .copy-step .cs-val{font-size:13.5px;font-weight:700;word-break:break-all}
-    .copy-step .cs-btn{margin-left:auto;padding:7px 11px;border-radius:9px;border:1px solid #3b82f6;
-      background:rgba(59,130,246,.12);color:#3b82f6;font:inherit;font-size:12px;font-weight:800;cursor:pointer;flex:0 0 auto}
+    .copy-step .cs-btn{margin-left:auto;padding:7px 11px;border-radius:9px;border:1px solid #22c55e;
+      background:rgba(34,197,94,.12);color:#22c55e;font:inherit;font-size:12px;font-weight:800;cursor:pointer;flex:0 0 auto}
   </style>
 
   <!-- SERVER SWITCHER — the only thing shown until a server is tapped -->
@@ -511,8 +522,8 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
         <span class="srv-ico"><svg class="icon i-smartphone" aria-hidden="true"><use href="#i-smartphone"/></svg></span>
         <span class="srv-body">
           <span class="online-pill" id="srvPill1"><span class="pdot"></span>Online</span>
-          <h4>Server 1 — USA/Canada Numbers</h4>
-          <span class="srv-sub">USA/Canada + more countries · many services · live prices</span>
+          <h4>Server 1</h4>
+          <span class="srv-sub">Live server catalog · countries · services · prices</span>
           <span class="srv-sub" id="srvHealth1">Checking availability…</span>
         </span>
         <span class="srv-chev"><svg class="icon i-arrow-right" aria-hidden="true"><use href="#i-arrow-right"/></svg></span>
@@ -564,7 +575,13 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
     </div>
 
     <div id="numPickerForm">
-      <div class="step-label">Step 1 — Search &amp; pick the country</div>
+      <div class="step-label">Step 1 — Select a server</div>
+      <div class="select-tile" style="margin-bottom:12px">
+        <div class="st-icon">🖥️</div><div class="st-body"><div class="st-label">Server</div><div class="st-value">Choose the server that offers your service</div></div>
+        <select id="numNovaServerSelect" data-retry="loadNumOptions" onchange="onNovaServerChange()"><option value="">Loading servers…</option></select>
+      </div>
+      <div id="numCountryStep">
+      <div class="step-label">Step 2 — Search &amp; pick the country</div>
       <div class="sugg-wrap">
         <input class="srv-search" id="s1CountrySearch" autocomplete="off" placeholder="Type a country — USA, Canada, UK…"
                oninput="filterS1Countries()" onfocus="filterS1Countries()" autocorrect="off" spellcheck="false" name="s1-country-search-nofill" readonly onfocusin="this.removeAttribute('readonly')"/>
@@ -578,10 +595,13 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
           <div class="st-value" id="numCountryValueText">Loading…</div>
         </div>
         <div class="st-chev">⌄</div>
-        <select id="numCountrySelect" autocomplete="off" onchange="s1UserPickedCountry = true; onNumCountryChange()"><option value="">Loading…</option></select>
+        <select id="numCountrySelect" data-retry="loadNumOptions" autocomplete="off" onchange="s1UserPickedCountry = true; onNumCountryChange()"><option value="">Loading…</option></select>
       </div>
 
-      <div class="step-label">Step 2 — Search &amp; pick the service</div>
+      </div><!-- /numCountryStep -->
+      <div class="step-label" id="numSvcStepLabel">Step 3 — Search &amp; pick the service</div>
+      <div class="quick-chips" id="s1PopularChips"></div>
+      <div id="numSyncRow" style="display:none;font-size:12.5px;opacity:.75;margin:-4px 0 8px"><span id="numSyncedAt"></span> <a href="#" id="numRefreshBtn" onclick="refreshNumServices();return false" style="margin-left:8px;font-weight:700;color:#0788e8">⟳ Refresh</a></div>
       <div class="sugg-wrap">
         <input class="srv-search" id="s1ServiceSearch" autocomplete="off" placeholder="Type a service — WhatsApp, Telegram, Google…"
                oninput="filterS1Services()" onfocus="filterS1Services()" disabled/>
@@ -594,7 +614,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
           <div class="st-value" id="numProviderValueText">Select a country first</div>
         </div>
         <div class="st-chev">⌄</div>
-        <select id="numProviderSelect" onchange="onNumProviderChange()" disabled><option value="">Select a country first</option></select>
+        <select id="numProviderSelect" data-retry="onNumCountryChange" data-retry-arg="true" onchange="onNumProviderChange()" disabled><option value="">Select a country first</option></select>
       </div>
 
       <div class="price-box" id="numPriceBox">
@@ -634,7 +654,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
           <div class="st-value" id="g2ServiceValueText">Loading…</div>
         </div>
         <div class="st-chev">⌄</div>
-        <select id="g2ServiceSelect" onchange="onG2ServiceChange()"><option value="">Loading…</option></select>
+        <select id="g2ServiceSelect" data-retry="loadG2Services" onchange="onG2ServiceChange()"><option value="">Loading…</option></select>
       </div>
 
       <div class="step-label">Step 2 — Search &amp; pick the country</div>
@@ -652,7 +672,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
           <div class="st-value" id="g2CountryValueText">Select a service first</div>
         </div>
         <div class="st-chev">⌄</div>
-        <select id="g2CountrySelect" onchange="onG2CountryChange()" disabled><option value="">Select a service first</option></select>
+        <select id="g2CountrySelect" data-retry="onG2ServiceChange" onchange="onG2CountryChange()" disabled><option value="">Select a service first</option></select>
       </div>
 
       <div id="g2OperatorWrap" style="display:none">
@@ -686,7 +706,7 @@ function AMT(n)   { return window.KLSMoney ? window.KLSMoney.amount(n) : '₦' +
           <div class="st-value" id="g2ProviderValueText">Select a country first</div>
         </div>
         <div class="st-chev">⌄</div>
-        <select id="g2ProviderSelect" onchange="onG2ProviderChange()" disabled><option value="">Select a country first</option></select>
+        <select id="g2ProviderSelect" data-retry="onG2CountryChange" onchange="onG2ProviderChange()" disabled><option value="">Select a country first</option></select>
       </div>
 
 
@@ -825,13 +845,21 @@ window.addEventListener('storage', e => {
 // root cause of the balance never loading and the page generally not working.
 const bnToken = localStorage.getItem('ksl_token');
 
-async function req(url, method = 'GET', body = null, needsAuth = false) {
+async function req(url, method = 'GET', body = null, needsAuth = false, timeoutMs = 45000) {
   const headers = { 'Content-Type': 'application/json' };
   if (needsAuth && bnToken) headers['Authorization'] = 'Bearer ' + bnToken;
-  const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'Request failed');
-  return data;
+  // A request can never hang forever: after the timeout the customer gets a clear message instead of a frozen button.
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined, signal: ctl.signal });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    return data;
+  } catch (e) {
+    if (e && e.name === 'AbortError') throw new Error(method === 'POST' ? 'This is taking longer than expected. Check “Active Numbers” below — if your number was issued it will appear there; if not, you were not charged. Then try again.' : 'The server is slow right now. Please try again.');
+    throw e;
+  } finally { clearTimeout(timer); }
 }
 function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function fmtN(n) { return Number(n || 0).toLocaleString('en-NG'); }
@@ -855,48 +883,112 @@ let numServices = [];
 let numPollTimer = null;
 let numCountdownTimer = null;
 let numCurrentOrder = null;
+let numNovaServers = [];
+let selectedNovaServerId = '';
 
 async function loadBalance() {
   const el = document.getElementById('numBalDisplay');
   if (!bnToken) { el.textContent = '—'; return; }
   try {
     const me = await req('/api/user/me', 'GET', null, true);
+    window._numBal = Number(me.balance) || 0;
     el.textContent = AMT(me.balance);
-  } catch (e) { el.textContent = '—'; }
+    return window._numBal;
+  } catch (e) { el.textContent = '—'; return null; }
+}
+
+// After a CONFIRMED purchase, open the order in Number History — the one purchased-number card
+// (copy number, 20-min countdown, SMS status, Cancel & Refund). Same order, same backend; no second flow.
+function goToPurchasedNumber(order, server) {
+  const id = order && (order.orderId || order.id);
+  if (!id) { loadBalance(); return; }
+  window.location.href = '/number-history?' + new URLSearchParams({ order: String(id), server }).toString();
+}
+// Text shown in the picked option of a <select>, without the trailing " — price" part.
+function selText(id) {
+  const sel = document.getElementById(id);
+  const t = sel && sel.selectedOptions && sel.selectedOptions[0] ? sel.selectedOptions[0].textContent : '';
+  return String(t || '').split(' — ')[0].replace(/^[^\p{L}\p{N}]+/u, '').trim();
 }
 
 // Countries are fetched live, same as the admin panel — no static list to go stale.
 async function loadNumOptions() {
-  const countrySelect = document.getElementById('numCountrySelect');
-  const countryValueText = document.getElementById('numCountryValueText');
   const emptyState = document.getElementById('numEmptyState');
   const pickerForm = document.getElementById('numPickerForm');
+  const serverSelect = document.getElementById('numNovaServerSelect');
   try {
-    numCountries = await req('/api/numbers/live-countries', 'GET', null, false);
-    if (!numCountries.length) {
-      emptyState.style.display = 'block';
-      pickerForm.style.display = 'none';
-      return;
-    }
-    emptyState.style.display = 'none';
-    pickerForm.style.display = 'block';
-    countrySelect.innerHTML = '<option value="">Select a country…</option>' +
-      numCountries.map(c => `<option value="${esc(c.code)}">${flagEmoji(c.code)} ${esc(c.name)}${c.pinned ? ' ⭐' : ''}</option>`).join('');
-    countryValueText.textContent = 'Select a country…';
-    document.getElementById('s1CountryChips').innerHTML = numCountries.filter(c => c.pinned).map(c =>
-      `<button type="button" class="chip-btn" onclick="pickS1Country('${esc(c.code)}')">${flagEmoji(c.code)} ${esc(c.name)}</button>`).join('');
-    // The customer picks the country themselves — nothing is pre-selected, ever.
-    clearS1Selection();
+    [numNovaServers, numCountries] = await Promise.all([
+      req('/api/numbers/nova-servers', 'GET', null, false),
+      req('/api/numbers/live-countries', 'GET', null, false)
+    ]);
+    if (!numNovaServers.length || !numCountries.length) throw new Error('No servers or countries are available right now.');
+    serverSelect.innerHTML = '<option value="">Select a server…</option>' + numNovaServers.map(s => `<option value="${Number(s.id)}">${esc(s.name)}</option>`).join('');
+    const countrySelect = document.getElementById('numCountrySelect');
+    countrySelect.innerHTML = '<option value="">Select a country…</option>' + numCountries.map(c => `<option value="${esc(c.code)}">${flagEmoji(c.code)} ${esc(c.name)}${c.pinned ? ' ⭐' : ''}</option>`).join('');
+    document.getElementById('s1CountryChips').innerHTML = numCountries.filter(c => c.pinned).map(c => `<button type="button" class="chip-btn" onclick="pickS1Country('${esc(c.code)}')">${flagEmoji(c.code)} ${esc(c.name)}</button>`).join('');
+    emptyState.style.display = 'none'; pickerForm.style.display = 'block'; clearS1Selection();
   } catch (e) {
-    emptyState.style.display = 'block';
-    pickerForm.style.display = 'none';
+    emptyState.style.display = 'block'; pickerForm.style.display = 'none';
+    const msg = emptyState.querySelector('p:last-child'); if (msg) msg.textContent = e.message || 'Could not load servers right now. Please try again or contact the administrator.';
+  }
+}
+function onNovaServerChange() {
+  selectedNovaServerId = document.getElementById('numNovaServerSelect').value;
+  clearS1Selection();
+  const srv = numNovaServers.find(s => String(s.id) === String(selectedNovaServerId));
+  const isUsa = !!(srv && srv.scope === 'usa');
+  const countryStep = document.getElementById('numCountryStep');
+  const svcLabel = document.getElementById('numSvcStepLabel');
+  const countrySelect = document.getElementById('numCountrySelect');
+  countrySelect.disabled = !selectedNovaServerId;
+  document.getElementById('s1CountrySearch').disabled = !selectedNovaServerId;
+  document.getElementById('s1CountrySearch').placeholder = selectedNovaServerId ? 'Type a country — UK, Ghana, India…' : 'Select a server first';
+  // USA servers only sell USA numbers: skip the country step and go straight to services.
+  if (countryStep) countryStep.style.display = isUsa ? 'none' : '';
+  if (svcLabel) svcLabel.textContent = isUsa ? 'Step 2 — Search & pick the service' : 'Step 3 — Search & pick the service';
+  if (isUsa) {
+    const usa = numCountries.find(c => /^(us|usa)$/i.test(String(c.code)) || /united states/i.test(c.name));
+    const code = usa ? usa.code : 'USA';
+    if (![...countrySelect.options].some(o => o.value === code)) countrySelect.insertAdjacentHTML('beforeend', `<option value="${esc(code)}">🇺🇸 USA</option>`);
+    countrySelect.value = code;
+    s1UserPickedCountry = true;
+    onNumCountryChange();
   }
 }
 
-// Providers are fetched live for the chosen country — only ones admin has actually priced come
-// back, so an empty list here just means "nothing priced for this country yet", not an error.
-async function onNumCountryChange() {
+// Services for the chosen country. The last list seen on this device is painted instantly, then refreshed
+// quietly in the background; a first-time pull shows what has arrived so far and keeps filling in.
+const S1_CACHE_PREFIX = 'kls_s1svc_';
+let s1LoadToken = 0, s1PartialTimer = null, s1PartialTries = 0;
+function s1CacheGet(k) { try { const v = JSON.parse(localStorage.getItem(S1_CACHE_PREFIX + k) || 'null'); return Array.isArray(v) && v.length ? v : null; } catch (e) { return null; } }
+function s1CacheSet(k, list) { try { localStorage.setItem(S1_CACHE_PREFIX + k, JSON.stringify(list)); } catch (e) {} }
+
+function renderS1Services(list, keepId) {
+  const providerSelect = document.getElementById('numProviderSelect');
+  const providerValueText = document.getElementById('numProviderValueText');
+  numServices = list;
+  renderS1PopularChips();
+  providerSelect.innerHTML = '<option value="">Select a provider…</option>' +
+    list.map(s => `<option value="${esc(s.serviceId)}" data-name="${esc(s.provider)}" data-icon="${esc(s.icon || '')}" data-meta="${esc(PRICE(s.price))}">${esc(s.emoji || '')} ${esc(s.provider)} — ${PRICE(s.price)}</option>`).join('');
+  providerSelect.disabled = false;
+  const ss = document.getElementById('s1ServiceSearch'); ss.disabled = false;
+  if (keepId && list.some(x => x.serviceId === keepId)) { providerSelect.value = keepId; onNumProviderChange(); }
+  else {
+    providerValueText.textContent = 'Select a provider…';
+    document.getElementById('numPriceBox').style.display = 'none';
+    document.getElementById('numBuyBtn').disabled = true;
+    ss.value = '';
+  }
+  const sr = document.getElementById('numSyncRow');
+  if (sr && list[0] && list[0].syncedAt) {
+    sr.style.display = 'block';
+    document.getElementById('numSyncedAt').textContent = list[0].partial ? 'Loading more services…' : ((list[0].stale ? 'Showing saved list · ' : '') + 'Updated ' + new Date(list[0].syncedAt).toLocaleString());
+  }
+}
+
+async function onNumCountryChange(refresh) {
   const country = document.getElementById('numCountrySelect').value;
+  if (!selectedNovaServerId) { showToast('Select a server first'); return; }
   const providerSelect = document.getElementById('numProviderSelect');
   const countryValueText = document.getElementById('numCountryValueText');
   const providerValueText = document.getElementById('numProviderValueText');
@@ -904,6 +996,8 @@ async function onNumCountryChange() {
   const buyBtn = document.getElementById('numBuyBtn');
   priceBox.style.display = 'none';
   buyBtn.disabled = true;
+  clearTimeout(s1PartialTimer); s1PartialTries = 0;
+  const token = ++s1LoadToken;
   numServices = [];
   const countryEntry = numCountries.find(c => c.code === country);
   countryValueText.textContent = countryEntry ? `${flagEmoji(countryEntry.code)} ${countryEntry.name}` : 'Select a country…';
@@ -913,28 +1007,53 @@ async function onNumCountryChange() {
     providerValueText.textContent = 'Select a country first';
     return;
   }
-  providerSelect.innerHTML = '<option value="">Loading…</option>';
-  providerSelect.disabled = true;
-  providerValueText.textContent = 'Loading…';
+  const cacheKey = selectedNovaServerId + '_' + country;
+  const cached = refresh === true ? null : s1CacheGet(cacheKey);
+  if (cached) renderS1Services(cached);
+  else {
+    providerSelect.innerHTML = '<option value="">Loading…</option>';
+    providerSelect.disabled = true;
+    providerValueText.textContent = 'Loading services…';
+  }
+  await loadS1Services(country, refresh === true, token, !!cached);
+}
+
+async function loadS1Services(country, refresh, token, hadCache) {
+  const providerSelect = document.getElementById('numProviderSelect');
+  const providerValueText = document.getElementById('numProviderValueText');
+  const cacheKey = selectedNovaServerId + '_' + country;
   try {
-    numServices = await req(`/api/numbers/live-services?country=${encodeURIComponent(country)}`, 'GET', null, true);
-    if (document.getElementById('numCountrySelect').value !== country) return; // customer changed country mid-load
-    if (!Array.isArray(numServices) || !numServices.length) {
+    const fresh = await req(`/api/numbers/live-services?country=${encodeURIComponent(country)}&serverId=${encodeURIComponent(selectedNovaServerId)}${refresh ? '&refresh=1' : ''}`, 'GET', null, true);
+    if (token !== s1LoadToken) return; // customer changed country/server mid-load
+    if (!Array.isArray(fresh) || !fresh.length) {
       numServices = [];
-      providerSelect.innerHTML = '<option value="">No services in stock for this country right now</option>';
-      providerValueText.innerHTML = 'No services right now — <a href="#" onclick="onNumCountryChange();return false">tap to retry</a>';
+      providerSelect.innerHTML = '<option value="">No services on this server for this country</option>';
+      providerSelect.disabled = true;
+      providerValueText.innerHTML = 'Nothing in stock on this server for this country — try another server, or <a href="#" onclick="onNumCountryChange(true);return false">tap to refresh</a>';
+      document.getElementById('numPriceBox').style.display = 'none';
+      document.getElementById('numBuyBtn').disabled = true;
       return;
     }
-    providerSelect.innerHTML = '<option value="">Select a provider…</option>' +
-      numServices.map(s => `<option value="${esc(s.serviceId)}">${esc(s.emoji || '')} ${esc(s.provider)} — ${PRICE(s.price)}</option>`).join('');
-    providerSelect.disabled = false;
-    const ss = document.getElementById('s1ServiceSearch'); ss.disabled = false; ss.value = '';
-    providerValueText.textContent = 'Select a provider…';
+    const partial = !!fresh[0].partial;
+    if (!partial) s1CacheSet(cacheKey, fresh);
+    renderS1Services(fresh, providerSelect.value);
+    // First-time pull still paging in: pick up the rest every few seconds without disturbing the customer.
+    if (partial && s1PartialTries < 25) {
+      s1PartialTries++;
+      s1PartialTimer = setTimeout(() => { if (token === s1LoadToken) loadS1Services(country, false, token, true); }, 3000);
+    }
   } catch (e) {
+    if (token !== s1LoadToken || hadCache) return; // keep showing the saved list if the refresh fails
     numServices = [];
     providerSelect.innerHTML = '<option value="">Failed to load — try again</option>';
-    providerValueText.innerHTML = esc(e.message || 'Failed to load') + ' — <a href="#" onclick="onNumCountryChange();return false">tap to retry</a>';
+    providerValueText.innerHTML = esc(e.message || 'Failed to load') + ' — <a href="#" onclick="onNumCountryChange(true);return false">tap to retry</a>';
   }
+}
+
+async function refreshNumServices() {
+  const b = document.getElementById('numRefreshBtn'); if (b) b.textContent = 'Refreshing…';
+  await onNumCountryChange(true);
+  if (b) b.textContent = '⟳ Refresh';
 }
 
 function onNumProviderChange() {
@@ -964,6 +1083,7 @@ function clearS1Selection() {
   const pb = document.getElementById('numPriceBox'); if (pb) pb.style.display = 'none';
   const bb = document.getElementById('numBuyBtn'); if (bb) bb.disabled = true;
   numServices = [];
+  renderS1PopularChips();
 }
 let s1UserPickedCountry = false;
 // Browsers (iOS Safari especially) restore/autofill form values after load — wipe anything the customer didn't pick.
@@ -988,13 +1108,28 @@ function pickS1Country(code, silent) {
   onNumCountryChange();
   if (!silent) showToast((c ? c.name : 'Country') + ' selected');
 }
+// ── Service suggestions (logo + name): shown only AFTER server + country are chosen, built from what is
+// actually in stock there. The search box still finds every other service. ──
+const S1_POPULAR_KEYS = ['whatsapp', 'telegram', 'google', 'instagram', 'facebook', 'tiktok', 'twitter', 'snapchat', 'discord', 'linkedin', 'viber', 'microsoft', 'amazon', 'netflix', 'paypal', 'uber'];
+function renderS1PopularChips() {
+  const box = document.getElementById('s1PopularChips'); if (!box) return;
+  const picks = [];
+  S1_POPULAR_KEYS.forEach(k => {
+    const m = numServices.filter(s => String(s.provider).toLowerCase().includes(k) && !picks.includes(s))
+      .sort((a, b) => a.provider.length - b.provider.length || a.price - b.price)[0];
+    if (m) picks.push(m);
+  });
+  box.innerHTML = picks.slice(0, 10).map(s =>
+    `<button type="button" class="chip" onclick="pickS1Service('${esc(s.serviceId)}')">${svcLabelHtml({ name: s.provider, icon: s.icon, emoji: s.emoji }, 18)}</button>`).join('');
+}
 function filterS1Services() {
   const q = document.getElementById('s1ServiceSearch').value.trim().toLowerCase();
+  if (!numServices.length) { showSugg('s1ServiceSugg', '<div class="sugg-empty">Pick a server and country first.</div>'); return; }
   const list = numServices.filter(s => !q || s.provider.toLowerCase().includes(q));
   showSugg('s1ServiceSugg', list.length ? list.slice(0, 60).map(s =>
     `<button type="button" class="sugg-item" onclick="pickS1Service('${esc(s.serviceId)}')">${svcIconHtml({ icon: s.icon, emoji: s.emoji }, 24)}
        <span class="si-name">${esc(s.provider)}</span><span class="si-meta">${PRICE(s.price)}</span></button>`).join('')
-    : `<div class="sugg-empty">${numServices.length ? 'No service matches “' + esc(q) + '”.' : 'Pick a country first.'}</div>`);
+    : `<div class="sugg-empty">No service matches “${esc(q)}”.</div>`);
 }
 function pickS1Service(id) {
   hideSugg('s1ServiceSugg');
@@ -1015,29 +1150,24 @@ async function buyNumber() {
   const match = numServices.find(s => s.serviceId === serviceId);
   if (!serviceId || !country || !match) return setFb(fb, 'Please select a country and provider', 'err');
   if (!bnToken) { window.location.href = '/login'; return; }
-  if (!confirm(`Buy this number for ${PRICE(match.price)}? This will be deducted from your wallet now, and automatically refunded if no code arrives within 20 minutes.`)) return;
-
-  btn.disabled = true; btn.textContent = 'Processing…'; setFb(fb, '', '');
-  try {
-    const order = await req('/api/numbers/buy', 'POST', { country, serviceId, provider: match.provider }, true);
-    order.amountPaid = match.price || 0;
-    setFb(fb, '', '');
-    showNumWaitStep(order);
-    loadBalance();
-  } catch (e) {
-    if (/insufficient balance/i.test(e.message)) {
-      fb.innerHTML = `<svg class="icon i-x-circle" aria-hidden="true"><use href="#i-x-circle"/></svg> ${esc(e.message)} — <a href="/deposit">fund your wallet</a>`;
-      fb.className = 'fb err';
-    } else if (/no longer available/i.test(e.message)) {
- fb.innerHTML = ` ${esc(e.message)}`;
-      fb.className = 'fb err';
-      onNumCountryChange();
-    } else {
- setFb(fb, ' ' + e.message, 'err');
+  const _srv = numNovaServers.find(x => String(x.id) === String(selectedNovaServerId));
+  const _cty = numCountries.find(x => x.code === country);
+  const sname = _srv ? _srv.name : 'Server 1';
+  const outcome = await window.mnPurchase({
+    title: 'Confirm purchase',
+    rows: [['Country', _cty ? _cty.name : country], ['Service', match.provider], ['Server', sname]],
+    price: match.price, priceText: PRICE(match.price), fmt: AMT,
+    getBalance: loadBalance,
+    // The REAL purchase request. The backend re-validates the price, stock and wallet balance itself.
+    confirm: () => req('/api/numbers/buy', 'POST', { country, serviceId, provider: match.provider, serverId: Number(selectedNovaServerId), expectedPrice: match.price }, true, 90000),
+    successText: o => ({ number: o && o.phoneNumber, line: 'Opening your number…' }),
+    onSuccess: order => goToPurchasedNumber(order, 'server1'),
+    onError: e => {
+      if (/no longer available|no longer in the live|price changed|pricing changed/i.test(e.message)) onNumCountryChange();
+      loadBalance();
     }
-  } finally {
- btn.disabled = false; btn.textContent = ' Buy This Number';
-  }
+  });
+  if (outcome && outcome.status !== 'success') { /* cancelled or failed: nothing submitted/charged, selections kept */ }
 }
 
 function showNumWaitStep(order) {
@@ -1060,7 +1190,7 @@ function showNumWaitStep(order) {
   document.getElementById('numCancelBtn').style.display = 'inline-block';
   const waNote = document.getElementById('numWaNote'); if (waNote) waNote.style.display = 'none';
   renderCopySteps();
-  // The pinned WhatsApp Business panel only ever applies to Server 1 — Server 2 covers dozens of
+  // Server 2 covers dozens of
   // unrelated services, so a one-size instruction like this would be misleading there.
   renderWaInstructions(false);
   const statusNote = document.getElementById('numStatusNote');
@@ -1113,7 +1243,7 @@ async function cancelNumberOrder() {
   if (!numCurrentOrder) return;
   const statusNote = document.getElementById('numStatusNote');
   const cancelBtn = document.getElementById('numCancelBtn');
-  if (!confirm('Cancel this number and get refunded now? You will not be able to receive a code on it afterward.')) return;
+  if (!await kslConfirm('Cancel this number and get refunded now? You will not be able to receive a code on it afterward.')) return;
   cancelBtn.disabled = true; cancelBtn.textContent = 'Cancelling…';
   try {
     const r = await req(`/api/numbers/cancel/${numCurrentOrder.orderId}`, 'POST', null, true);
@@ -1284,11 +1414,12 @@ async function loadNumServerHealth() {
 // Per-server guidance shown only after the customer taps that server.
 const SERVER_GUIDE = {
   server1: {
-    title: 'Server 1 — USA/Canada Numbers',
-    notice: '<b>New:</b> Server 1 is not only for USA WhatsApp anymore — it now gives <b>USA / Canada numbers for many different services</b>, and you can choose other countries too.',
+    title: 'Server 1 — Live Numbers',
+    notice: '<b>Live numbers:</b> choose a server first, then a country and service. The price is confirmed again by the backend before your wallet is charged.',
     steps: [
       'Install and open the app you want to verify <i>before</i> buying.',
-      'Search and pick your <b>country</b> (USA and Canada are at the top).',
+      'Select the <b>server</b> that contains the service.',
+      'Search and pick the <b>country</b>.',
       'Search and pick the <b>service</b> — each one shows its icon and live price.',
       'Tap <b>Buy This Number</b> — your wallet is charged and the number is reserved for you.',
       'Your code lands automatically in <b>Active Numbers</b> — no refresh needed.',
@@ -1327,7 +1458,7 @@ function selectServer(id) {
   if (info && !info.enabled) { showToast('That server is switched off right now'); return; }
   activeNumberServer = id;
 
-  // The WhatsApp verification notice only applies to Server 1 (USA WhatsApp numbers) — Server 2
+  // The old WhatsApp-specific notice is not applicable to NovaSolution — Server 2
   // covers many other services where this doesn't apply, so it only shows here, every time
   // Server 1 is opened (not on general page load, and not for Server 2).
   if (id === 'server1' && !localStorage.getItem('kls_s1_news')) { document.getElementById('annOverlay').classList.add('show'); localStorage.setItem('kls_s1_news', '1'); }
@@ -1340,7 +1471,7 @@ function selectServer(id) {
   const bar = document.getElementById('numTopBar');
   bar.style.display = 'flex';
   document.getElementById('numTopBarTitle').textContent =
-    id === 'server2' ? 'Server 2 — All services' : 'Server 1 — USA/Canada Numbers';
+    id === 'server2' ? 'Server 2' : 'Server 1';
 
   document.getElementById('numPickStep').style.display = id === 'server1' ? 'block' : 'none';
   document.getElementById('numPickStep2').style.display = id === 'server2' ? 'block' : 'none';
@@ -1353,11 +1484,7 @@ function selectServer(id) {
   document.getElementById('numServerNotice').innerHTML = guide.notice;
   document.getElementById('numServerSteps').innerHTML = guide.steps.map(t => `<li>${t}</li>`).join('');
   document.getElementById('numServerNotifs').innerHTML = guide.notifs.map(t => `<li>${t}</li>`).join('');
-  // Server 1's WhatsApp Business instructions must be on screen at all times, so they live in a
-  // pinned panel instead of a card the customer can scroll past.
-  // Opening Server 1 always re-opens the WhatsApp Business instructions, even if the
-  // customer collapsed them on a previous visit — they must be read every single time.
-  renderWaInstructions(false);
+  renderWaInstructions();
   // Server 1's instructions live in the pinned panel below (renderWaInstructions); Server 2
   // covers dozens of unrelated services, so this WhatsApp-specific card never applies there.
   document.getElementById('numHowToCard').style.display = 'none';
@@ -1371,44 +1498,9 @@ function selectServer(id) {
   }
 }
 
-// The pinned WhatsApp Business panel. It is created once and re-attached to whichever
-// screen is showing (picker or waiting-for-code), so it survives every navigation step.
-function renderWaInstructions(show) {
-  show = false; // WhatsApp Business instructions removed from both servers
-  let panel = document.getElementById('waInstrPanel');
-  if (!show) { if (panel) panel.style.display = 'none'; return; }
-  if (!panel) {
-    panel = document.createElement('div');
-    panel.id = 'waInstrPanel';
-    panel.className = 'instr-panel';
-    panel.innerHTML = `
-      <h4>
-        <svg class="icon i-alert-triangle" aria-hidden="true"><use href="#i-alert-triangle"/></svg>
-        WhatsApp Business instructions — read every time
-        <button type="button" class="ip-toggle" onclick="toggleWaInstructions()">Hide</button>
-      </h4>
-      <div id="waInstrBody">
-        <ol>
-          <li><b>Install WhatsApp Business first</b> (not normal WhatsApp) and open it <i>before</i> you buy — the OTP only lives a few minutes.</li>
-          <li>Buy the number here, then copy it with the <b>Copy</b> buttons on the number screen.</li>
-          <li>In WhatsApp Business choose country <b>United States (+1)</b> and paste the number.</li>
-          <li>If it refuses the number, <b>turn on a VPN and set it to the United States</b>, then request the code again.</li>
-          <li>Your SMS code — and the OTP link 🔗 when WhatsApp sends one — appears on this page automatically.</li>
-          <li>One number = one registration. No code in time means an automatic full refund.</li>
-        </ol>
-      </div>`;
-  }
-  panel.style.display = 'block';
-  // Keep it pinned to the screen that is currently visible.
-  const host = document.getElementById('numWaitStep').style.display !== 'none'
-    ? document.getElementById('numWaitStep')
-    : document.getElementById('numPickStep');
-  if (host && panel.parentElement !== host) host.insertBefore(panel, host.firstChild.nextSibling || null);
-  const collapsed = localStorage.getItem('kls_wa_instr') === 'hidden';
-  const body = document.getElementById('waInstrBody');
-  if (body) body.style.display = collapsed ? 'none' : 'block';
-  const btn = panel.querySelector('.ip-toggle');
-  if (btn) btn.textContent = collapsed ? 'Show' : 'Hide';
+function renderWaInstructions() {
+  // Old WhatsApp-only instructions were removed from both servers.
+  const panel = document.getElementById('waInstrPanel'); if (panel) panel.remove();
 }
 
 function toggleWaInstructions() {
@@ -1433,17 +1525,43 @@ async function loadG2Services() {
   const sel = document.getElementById('g2ServiceSelect');
   const empty = document.getElementById('numEmptyState2');
   const form = document.getElementById('numPickerForm2');
+  // Instant start: paint the list saved on this device first, then refresh it behind the scenes.
+  let fromCache = false;
+  if (!g2Services.length) {
+    try {
+      const c = JSON.parse(localStorage.getItem('kls_g2_services') || 'null');
+      if (Array.isArray(c) && c.length) {
+        g2Services = c; fromCache = true;
+        empty.style.display = 'none'; form.style.display = 'block';
+        renderG2Services(g2Services); renderG2PopularChips();
+      }
+    } catch (e) {}
+  }
   try {
-    g2Services = await req('/api/numbers/server2/services', 'GET', null, false);
-    if (!g2Services.length) { empty.style.display = 'block'; form.style.display = 'none'; return; }
+    const fresh = await req('/api/numbers/server2/services', 'GET', null, false);
+    if (!fresh.length) { if (!fromCache) { empty.style.display = 'block'; form.style.display = 'none'; } return; }
+    try { localStorage.setItem('kls_g2_services', JSON.stringify(fresh)); } catch (e) {}
+    const changed = JSON.stringify(fresh) !== JSON.stringify(g2Services);
+    g2Services = fresh;
     empty.style.display = 'none'; form.style.display = 'block';
-    renderG2Services(g2Services);
-    renderG2PopularChips();
+    // Never disturb a service the customer has already picked.
+    if (changed && !document.getElementById('g2ServiceSelect').value) { renderG2Services(g2Services); renderG2PopularChips(); }
+    prefetchG2Popular();
   } catch (e) {
-    empty.style.display = 'block'; form.style.display = 'none';
+    if (!fromCache) { empty.style.display = 'block'; form.style.display = 'none'; }
   }
 }
 
+// Quietly pre-load the country lists of the most popular services so the first tap is instant.
+let g2Prefetched = false;
+function prefetchG2Popular() {
+  if (g2Prefetched) return; g2Prefetched = true;
+  const codes = g2Services.filter(s => s.popular).slice(0, 8).map(s => s.code);
+  codes.forEach((c, i) => setTimeout(() => {
+    if (g2CountriesCache.has(c)) return;
+    req(`/api/numbers/server2/countries?service=${encodeURIComponent(c)}`, 'GET', null, false).then(r => g2CountriesCache.set(c, r)).catch(() => {});
+  }, 600 * (i + 1)));
+}
 function g2ServiceLabel(s) { return `${s.emoji || '📱'} ${s.name}`; }
 
 // Real app logo (simple-icons CDN, served by our API as `icon`). Falls back to the
@@ -1466,7 +1584,7 @@ function renderG2Services(list) {
     document.getElementById('g2ServiceValueText').textContent = 'No match';
     return;
   }
-  const opt = s => `<option value="${esc(s.code)}">${esc(g2ServiceLabel(s))}</option>`;
+  const opt = s => `<option value="${esc(s.code)}" data-name="${esc(s.name)}" data-icon="${esc(s.icon || '')}">${esc(g2ServiceLabel(s))}</option>`;
   const popular = list.filter(s => s.popular);
   const rest = list.filter(s => !s.popular).slice().sort((a, b) => a.name.localeCompare(b.name));
   // Everything that is not "most popular" is grouped A, B, C … Z so a service is easy to find.
@@ -1754,6 +1872,9 @@ function resetG2Providers(msg) {
   document.getElementById('g2BuyBtn').disabled = true;
 }
 
+// Stored copies, like Server 1: once a service/country has been opened, it opens instantly next
+// time and the fresh numbers slot in behind it.
+const g2CountriesCache = new Map(), g2ProvidersCache = new Map();
 async function onG2ServiceChange() {
   const service = document.getElementById('g2ServiceSelect').value;
   const countrySel = document.getElementById('g2CountrySelect');
@@ -1768,20 +1889,36 @@ async function onG2ServiceChange() {
     countrySel.disabled = true; countryText.textContent = 'Select a service first';
     return;
   }
-  countrySel.innerHTML = '<option value="">Loading…</option>'; countrySel.disabled = true;
-  countryText.textContent = 'Loading…';
   const countrySearch = document.getElementById('g2CountrySearch');
-  countrySearch.value = ''; countrySearch.disabled = true;
-  try {
-    g2Countries = await req(`/api/numbers/server2/countries?service=${encodeURIComponent(service)}`, 'GET', null, false);
-    if (!g2Countries.length) {
-      countrySel.innerHTML = '<option value="">No stock for this service right now</option>';
-      countryText.textContent = 'No stock right now';
-      return;
-    }
+  countrySearch.value = '';
+  const stillCurrent = () => document.getElementById('g2ServiceSelect').value === service;
+  const cached = g2CountriesCache.get(service);
+  if (cached && cached.length) {
+    g2Countries = cached;
     renderG2Countries(sortedG2Countries());
     countrySearch.disabled = false;
+  } else {
+    countrySel.innerHTML = '<option value="">Loading…</option>'; countrySel.disabled = true;
+    countryText.textContent = 'Loading…'; countrySearch.disabled = true;
+  }
+  try {
+    const fresh = await req(`/api/numbers/server2/countries?service=${encodeURIComponent(service)}`, 'GET', null, false);
+    g2CountriesCache.set(service, fresh);
+    if (!stillCurrent()) return;
+    if (!fresh.length) {
+      g2Countries = [];
+      countrySel.innerHTML = '<option value="">No stock for this service right now</option>';
+      countrySel.disabled = true; countryText.textContent = 'No stock right now';
+      return;
+    }
+    // Don't redraw under the customer's finger if they already picked a country from the stored list.
+    if (!(cached && cached.length && countrySel.value)) {
+      g2Countries = fresh;
+      renderG2Countries(sortedG2Countries());
+    } else { g2Countries = fresh; }
+    countrySearch.disabled = false;
   } catch (e) {
+    if (cached && cached.length) return;
     countrySel.innerHTML = '<option value="">Failed to load — try again</option>';
     countryText.textContent = 'Failed to load — try again';
   }
@@ -1862,22 +1999,33 @@ async function onG2CountryChange() {
   document.getElementById('g2CountryValueText').textContent =
     cMeta ? `${cMeta.flag || '🌍'} ${cMeta.name}` : 'Select a country…';
 
-  resetG2Providers('Loading…');
   if (!country) { resetG2Providers('Select a country first'); setG2Stock('Availability updates automatically'); loadG2Operators(''); return; }
   loadG2Operators(country);
-  setG2Stock('Checking live availability…');
+  const key = service + '|' + country;
+  const stillCurrent = () => document.getElementById('g2ServiceSelect').value === service && document.getElementById('g2CountrySelect').value === country;
+  const cached = g2ProvidersCache.get(key);
+  if (cached && cached.length) {
+    g2Providers = cached; renderG2Providers(false);
+    setG2Stock('Updating live availability…'); startG2AvailabilityWatch();
+  } else { resetG2Providers('Loading…'); setG2Stock('Checking live availability…'); }
   try {
-    g2Providers = await fetchG2Providers(service, country);
-    if (!g2Providers.length) {
+    const fresh = await fetchG2Providers(service, country);
+    g2ProvidersCache.set(key, fresh);
+    if (!stillCurrent()) return;
+    g2Providers = fresh;
+    if (!fresh.length) {
       resetG2Providers('No providers in stock — pick another country');
       setG2Stock('Out of stock right now');
       return;
     }
-    renderG2Providers(false);
+    renderG2Providers(!!(cached && cached.length));
     g2LastChecked = new Date();
     setG2Stock(`${g2Providers.length} provider${g2Providers.length > 1 ? 's' : ''} in stock · checked ${g2LastChecked.toLocaleTimeString()}`);
     startG2AvailabilityWatch();
-  } catch (e) { resetG2Providers('Failed to load — try again'); setG2Stock('Could not check availability — tap to retry'); }
+  } catch (e) {
+    if (cached && cached.length) { setG2Stock('Showing saved stock — tap refresh to re-check'); return; }
+    resetG2Providers('Failed to load — try again'); setG2Stock('Could not check availability — tap to retry');
+  }
 }
 
 function onG2ProviderChange() {
@@ -1905,6 +2053,7 @@ async function buyNumberServer2() {
   // FINAL live check — never let anyone confirm payment against a stale price or a sold-out tier.
   btn.disabled = true; btn.textContent = 'Checking availability…'; setFb(fb, '', '');
   const wanted = p.maxPrice, wasPrice = p.price;
+  let priceNotice = '', verified = false;
   try {
     const fresh = await fetchG2Providers(service, country);
     g2Providers = fresh;
@@ -1920,37 +2069,34 @@ async function buyNumberServer2() {
     p = fresh[idx];
     g2LastChecked = new Date();
     setG2Stock(`Verified live · ${p.count} left · ${g2LastChecked.toLocaleTimeString()}`);
-    if (p.price !== wasPrice) {
-      if (!confirm(`Heads up — this provider's price just changed from ${PRICE(wasPrice)} to ${PRICE(p.price)}. Continue at ${PRICE(p.price)}?`)) return;
-    } else if (!confirm(`Buy this number for ${PRICE(p.price)}? ${p.count} in stock right now. It is deducted from your wallet now and automatically refunded if no code arrives in time.`)) {
-      return;
-    }
+    priceNotice = p.price !== wasPrice ? `The price just changed from ${PRICE(wasPrice)} to ${PRICE(p.price)}. You will be charged ${PRICE(p.price)}.` : '';
+    verified = true;
   } catch (e) {
     setFb(fb, 'Could not confirm live availability — nothing was charged. Please try again.', 'err');
     return;
   } finally {
     btn.disabled = false; btn.textContent = ' Buy This Number';
   }
+  if (!verified) return;
 
-  btn.disabled = true; btn.textContent = 'Processing…';
-  try {
-    const order = await req('/api/numbers/server2/buy', 'POST', { service, country, maxPrice: p.maxPrice, operator: selectedG2Operator() }, true);
-    setFb(fb, '', '');
-    showNumWaitStep(order);
-    loadBalance();
-  } catch (e) {
-    if (/insufficient balance/i.test(e.message)) {
-      fb.innerHTML = `<svg class="icon i-x-circle" aria-hidden="true"><use href="#i-x-circle"/></svg> ${esc(e.message)} — <a href="/deposit">fund your wallet</a>`;
-      fb.className = 'fb err';
-    } else if (/sold out|no longer/i.test(e.message)) {
-      setFb(fb, e.message, 'err');
-      refreshG2Availability(false); // show them a live list to pick from
-    } else {
-      setFb(fb, e.message, 'err');
+  const opName = selectedG2Operator();
+  const rows = [['Country', selText('g2CountrySelect')], ['Service', selText('g2ServiceSelect')], ['Server', 'Server 2 — All services']];
+  if (opName && opName !== 'any') rows.push(['Operator', selText('g2OperatorSelect')]);
+  rows.push(['Provider', selText('g2ProviderSelect') || 'Selected pool']);
+  const buyPrice = p.price, buyMax = p.maxPrice;
+  await window.mnPurchase({
+    title: 'Confirm purchase', rows, notice: priceNotice,
+    price: buyPrice, priceText: PRICE(buyPrice), fmt: AMT,
+    getBalance: loadBalance,
+    // The REAL purchase request. The backend re-validates price, stock and wallet balance itself.
+    confirm: () => req('/api/numbers/server2/buy', 'POST', { service, country, maxPrice: buyMax, operator: opName }, true),
+    successText: o => ({ number: o && o.phoneNumber, line: 'Opening your number…' }),
+    onSuccess: order => goToPurchasedNumber(order, 'server2'),
+    onError: e => {
+      if (/sold out|no longer/i.test(e.message)) refreshG2Availability(false); // show them a live list to pick from
+      loadBalance();
     }
-  } finally {
-    btn.disabled = false; btn.textContent = ' Buy This Number';
-  }
+  });
 }
 
 
@@ -1961,6 +2107,7 @@ function dismissAnnouncement() {
 
 (async function initBuyNumberPage() {
   loadBalance();
+  loadG2Services(); // Server 2 services start loading immediately, in parallel
   await loadNumOptions(); // countries must be loaded first — renderActiveNumbers looks up flags from numCountries
   await loadNumServers(); // decides which server tab the customer starts on
 
@@ -1988,6 +2135,7 @@ function dismissAnnouncement() {
 <script src="js/country-select.js?v=20260910a" defer></script>
 <script src="js/global-pay.js?v=20260910a" defer></script>
   <script src="js/wallet.js?v=20260910a" defer></script>
+<script src="js/dev-credit.js?v=20260910a" defer></script>
 
 <!-- ══ Standard number-shop polish: real app logos + real country flags on every picker ══
      Presentation-only layer. It never changes what is bought, priced or sent to the API —
@@ -2015,7 +2163,7 @@ function dismissAnnouncement() {
            'srcset="https://flagcdn.com/w80/' + c + '.png 2x" ' +
            'onerror="this.outerHTML=\'<span class=&quot;app-ico-fb&quot;>🌍</span>\'"/>';
   }
-  // Brand marks for Server 1 (its API returns plain provider names, no icon URL).
+  // Brand marks for services (the catalog may not include icon URLs).
   const BRAND = {
     whatsapp: 'whatsapp', telegram: 'telegram', google: 'google', gmail: 'gmail', youtube: 'youtube',
     instagram: 'instagram', facebook: 'facebook', tiktok: 'tiktok', twitter: 'x', x: 'x',
@@ -2098,6 +2246,6 @@ function dismissAnnouncement() {
 <script src="/js/mobile-features.js" defer></script>
 <script src="/js/vpn-notice.js" defer></script>
 <script src="/js/announcements.js?v=3"></script>
-<script src="js/dev-credit.js?v=20261017" defer></script>
+<script src="/welcome-popup.js?v=3" defer></script>
 </body>
 </html>

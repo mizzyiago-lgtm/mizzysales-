@@ -334,7 +334,7 @@ function startSpaceShooter(battleCode, difficulty) {
   }
 
   function hitPlayer() {
-    if (SH.shieldActive > 0) { SH.shieldActive = Math.max(0, SH.shieldActive-120); SH.player.invuln = 30; spawnParticles(SH.player.x, SH.player.y, '#4a9eff', 10); playBeep(300,0.1,'sine',0.04); return; }
+    if (SH.shieldActive > 0) { SH.shieldActive = Math.max(0, SH.shieldActive-120); SH.player.invuln = 30; spawnParticles(SH.player.x, SH.player.y, '#4ade80', 10); playBeep(300,0.1,'sine',0.04); return; }
     SH.player.hp--; SH.player.invuln = 60; SH.shake = Math.min(SH.shake+8, 16); SH.combo = 0;
     spawnParticles(SH.player.x, SH.player.y, '#ff4757', 14);
     playBeep(140,0.2,'sawtooth',0.06);
@@ -377,7 +377,7 @@ function startSpaceShooter(battleCode, difficulty) {
     if (!(SH.player.invuln > 0 && Math.floor(SH.player.invuln/4)%2===0)) {
       if (SH.shieldActive > 0) {
         ctx.save(); ctx.translate(SH.player.x, SH.player.y);
-        ctx.strokeStyle = `rgba(74,158,255,${0.4+Math.sin(SH.elapsed*0.2)*0.2})`;
+        ctx.strokeStyle = `rgba(74,222,128,${0.4+Math.sin(SH.elapsed*0.2)*0.2})`;
         ctx.lineWidth = 2.5;
         ctx.beginPath(); ctx.arc(0,0,30,0,Math.PI*2); ctx.stroke();
         ctx.restore();
@@ -411,7 +411,7 @@ function startSpaceShooter(battleCode, difficulty) {
 
   function drawPowerup(p) {
     ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
-    const colors = { spread:'#7ee8ff', rapid:'#ffd166', shield:'#4a9eff', heal:'#00d46a' };
+    const colors = { spread:'#7ee8ff', rapid:'#ffd166', shield:'#4ade80', heal:'#00d46a' };
  const icons = { spread:'S', rapid:'R', shield:'D', heal:'H' };
     ctx.fillStyle = colors[p.kind];
     ctx.globalAlpha = 0.25;
@@ -555,7 +555,7 @@ function startTurboRun(battleCode, difficulty) {
     while (blockedLanes.size < numObstacles) blockedLanes.add(Math.floor(Math.random()*LANES));
     blockedLanes.forEach(lane => {
       const type = Math.random() < 0.25 ? 'truck' : 'car';
-      TR.obstacles.push({lane, y:-100, w:type==='truck'?laneW*0.7:laneW*0.55, h:type==='truck'?100:64, type, color: type==='truck' ? '#a78bfa' : ['#ff4757','#4a9eff','#ffd166'][Math.floor(Math.random()*3)]});
+      TR.obstacles.push({lane, y:-100, w:type==='truck'?laneW*0.7:laneW*0.55, h:type==='truck'?100:64, type, color: type==='truck' ? '#a78bfa' : ['#ff4757','#4ade80','#ffd166'][Math.floor(Math.random()*3)]});
     });
     // coins/nitro in open lanes sometimes
     for (let l=0;l<LANES;l++) {
@@ -607,7 +607,7 @@ function startTurboRun(battleCode, difficulty) {
     TR.nitroPads = TR.nitroPads.filter(o => {
       const ox = laneX(o.lane);
       if (Math.abs(o.y - TR.y) < 40 && Math.abs(ox-px) < 34) {
-        TR.nitro = Math.min(100, TR.nitro + 40); spawnParticles(ox, TR.y, '#4a9eff', 14); playBeep(700,0.1,'sine',0.04);
+        TR.nitro = Math.min(100, TR.nitro + 40); spawnParticles(ox, TR.y, '#4ade80', 14); playBeep(700,0.1,'sine',0.04);
         return false;
       }
       return true;
@@ -668,12 +668,12 @@ function startTurboRun(battleCode, difficulty) {
     // player car
     const px = laneX(TR.lane);
     ctx.save(); ctx.translate(px, TR.y);
-    if (TR.nitroActive>0) { ctx.fillStyle='rgba(74,158,255,.3)'; ctx.fillRect(-TR.w/2-4,20,TR.w+8,60); }
+    if (TR.nitroActive>0) { ctx.fillStyle='rgba(74,222,128,.3)'; ctx.fillRect(-TR.w/2-4,20,TR.w+8,60); }
     ctx.fillStyle = '#f5c518';
     roundRect(ctx, -TR.w/2, -TR.h/2, TR.w, TR.h, 10); ctx.fill();
     ctx.fillStyle = '#1a1a24';
     roundRect(ctx, -TR.w/2+7, -TR.h/2+10, TR.w-14, TR.h*0.4, 5); ctx.fill();
-    ctx.fillStyle = TR.nitroActive>0 ? '#4a9eff' : '#ff8a4c';
+    ctx.fillStyle = TR.nitroActive>0 ? '#4ade80' : '#ff8a4c';
     ctx.fillRect(-8, TR.h/2-6, 16, 10+Math.random()*8);
     ctx.restore();
 
@@ -683,7 +683,7 @@ function startTurboRun(battleCode, difficulty) {
     ctx.textAlign='left'; ctx.font='13px monospace'; ctx.fillStyle='#8888a8';
     ctx.fillText('LV.' + TR.level + '  ·  SPEED ' + Math.round(TR.speed*10) + '  ·  ' + TR.diff.label.toUpperCase(), 14, 24);
     ctx.fillStyle='#333'; ctx.fillRect(W-160,14,140,14);
-    ctx.fillStyle= TR.nitro>=30 ? '#4a9eff' : '#2a5a8a'; ctx.fillRect(W-160,14,140*(TR.nitro/100),14);
+    ctx.fillStyle= TR.nitro>=30 ? '#4ade80' : '#287a4a'; ctx.fillRect(W-160,14,140*(TR.nitro/100),14);
     ctx.strokeStyle='#555'; ctx.strokeRect(W-160,14,140,14);
     ctx.fillStyle='#fff'; ctx.font='10px monospace'; ctx.textAlign='center'; ctx.fillText('NITRO', W-90, 24);
 
@@ -857,7 +857,7 @@ function startBaseDefense(battleCode, difficulty) {
     ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.setLineDash([16,10]); ctx.beginPath(); ctx.moveTo(0,PATH_Y); ctx.lineTo(W,PATH_Y); ctx.stroke(); ctx.setLineDash([]);
 
     // base
-    ctx.fillStyle = '#4a9eff';
+    ctx.fillStyle = '#4ade80';
     roundRect(ctx, BASE_X-30, PATH_Y-40, 40, 80, 8); ctx.fill();
     ctx.fillStyle='#fff'; ctx.font='bold 16px sans-serif'; ctx.textAlign='center'; ctx.fillText('BASE', BASE_X-10, PATH_Y+8);
 

@@ -120,7 +120,8 @@ async function m2Buy(id) {
     const keys = (r.keys || []).join('\n');
     document.getElementById('m2Result').innerHTML = `<div class="pc-details-wrap" style="margin-top:16px">
       <p style="color:var(--green,#2ecc71);font-weight:700;margin:0 0 8px">Purchase successful — ${P(r.amountPaid)}</p>
-      <pre id="m2Keys" class="pc-details">${esc(keys || 'Delivered')}</pre>
+      ${r.credentialsFound === false ? '<p style="color:#f5a623;margin:0 0 8px;font-size:13px">Your order was placed but the supplier has not returned the login details yet. The response below is saved in My Purchases — contact support if details do not appear shortly.</p>' : ''}
+      <pre id="m2Keys" class="pc-details">${esc(keys || 'Order placed — details are being prepared.')}</pre>
       <button class="copy-details-btn" onclick="navigator.clipboard.writeText(document.getElementById('m2Keys').textContent);showToast('Copied','ok')">Copy Details</button>
       <p style="font-size:12px;color:var(--t2);margin-top:8px">You can view this again anytime in <a href="/purchases">My Purchases</a>.</p></div>`;
     btn.style.display = 'none';

@@ -155,7 +155,7 @@ async function cancelNumberOrder() {
   if (!numCurrentOrder) return;
   const statusNote = document.getElementById('numStatusNote');
   const cancelBtn = document.getElementById('numCancelBtn');
-  if (!confirm('Cancel this number and get refunded? You will not be able to receive a code on it afterward.')) return;
+  if (!await kslConfirm('Cancel this number and get refunded? You will not be able to receive a code on it afterward.')) return;
   cancelBtn.disabled = true; cancelBtn.textContent = 'Cancelling…';
   try {
     await req(`/api/numbers/cancel/${numCurrentOrder.orderId}`, 'POST', null, true);

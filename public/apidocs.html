@@ -3,27 +3,26 @@
 <head>
 <script src="/js/auth-keeper.js?v=1"></script>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>API Documentation — Mizzy Sales</title>
-  <meta name="description" content="Integrate with the Mizzy Sales developer API — browse listings, check balance, and buy programmatically."/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>API Documentation — Mizzysales</title>
+  <meta name="description" content="Integrate with the Mizzysales developer API — browse listings, check balance, and buy programmatically."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Sora:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css?v=20260910a"/>
   <link rel="stylesheet" href="theme.css?v=20260910a"/>
   <link rel="stylesheet" href="css/layout-polish.css?v=20260910a"/>
- <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232f7bf6'/><text y='72' x='50' font-size='58' text-anchor='middle' fill='white' font-family='system-ui,sans-serif' font-weight='800'>M</text></svg>"/>
-  <meta name="theme-color" content="#00b4f8"/>
+  <meta name="theme-color" content="#0788e8"/>
   <script>
     (function(){
       try {
-        var pref = localStorage.getItem('ksl_theme');
+        var pref = 'dark'; /* dark-only brand */
         var effective = (pref === 'light' || pref === 'dark') ? pref : (function(){ var h = new Date().getHours(); return (h >= 19 || h < 7) ? 'dark' : 'light'; })();
         document.documentElement.setAttribute('data-theme', effective);
         // Follow the device / country clock: with no manual override, re-evaluate the
         // theme on a timer and whenever the tab is shown again (covers timezone changes).
         var auto = function(){
           try {
-            var p = localStorage.getItem('ksl_theme');
+            var p = 'dark'; /* dark-only brand */
             if (p === 'light' || p === 'dark') return;
             var h = new Date().getHours();
             document.documentElement.setAttribute('data-theme', (h >= 19 || h < 7) ? 'dark' : 'light');
@@ -40,10 +39,16 @@
   <!-- Brand colours/fonts from site.config.js — keep last so it can override -->
   <link rel="stylesheet" href="/brand.css"/>
   <link rel="stylesheet" href="/css/mobile-fix.css">
-  <link rel="stylesheet" href="/css/mizzy-unified.css?v=2"/>
-  <link rel="stylesheet" href="/css/dashboard-look.css?v=20261016"/>
+<script src="/kls-ui.js?v=2"></script>
+
+<link rel="stylesheet" href="/css/marvinums-brand.css?v=3">
+<script defer src="/js/marvinums-brand.js?v=3"></script>
+  <link rel="stylesheet" href="/css/marvel-nums-mobile-polish.css?v=2">
+<link rel="icon" type="image/png" sizes="128x128" href="/favicon.png?v=mz3">
+<link rel="shortcut icon" href="/favicon.ico?v=mz3">
+<link rel="apple-touch-icon" href="/favicon.png?v=mz3">
 </head>
-<body>
+<body class="mn-bg-social">
 
 <!-- Shared WhatsApp logo icon — referenced via <svg class="wa-icon"><use href="#wa-logo"/></svg> -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -132,15 +137,15 @@
   <symbol id="i-disc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></g></symbol>
 </svg>
 
-<!-- Single consolidated Support button — everything (community, channel, owner, telegram, Mizzy Sales
+<!-- Single consolidated Support button — everything (community, channel, owner, telegram, Mizzysales
      Assistant) lives behind one icon so nothing floats loose over the bottom nav on mobile. -->
 <div id="supportFab" class="support-fab">
   <div class="sfab-menu" id="sfabMenu">
-    <button type="button" class="sfab-item" onclick="toggleAiChatFab();toggleSupportFab()"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Mizzy Sales Assistant</button>
+    <button type="button" class="sfab-item" onclick="toggleAiChatFab();toggleSupportFab()"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Mizzysales Assistant</button>
     <a href="https://chat.whatsapp.com/HBqJeik773M1pqEmIjfpXr" data-link="group" target="_blank" class="sfab-item"><svg class="wa-icon" aria-hidden="true"><use href="#wa-logo"/></svg> Join Community</a>
     <a href="https://whatsapp.com/channel/0029Vb7ivq9HLHQcS4XgQu2Q" data-link="channel" target="_blank" class="sfab-item"><svg class="wa-icon" aria-hidden="true"><use href="#wa-logo"/></svg> Join Channel</a>
     <a href="https://t.me/klslogs" data-link="telegram" target="_blank" class="sfab-item"><svg class="icon i-send" aria-hidden="true"><use href="#i-send"/></svg> Telegram</a>
-    <a href="https://wa.me/2347026881419" data-link="contact" target="_blank" class="sfab-item sfab-item-primary"><svg class="wa-icon" aria-hidden="true"><use href="#wa-logo"/></svg> Contact Owner</a>
+    <a href="https://wa.me/2349065518402" data-link="contact" target="_blank" class="sfab-item sfab-item-primary"><svg class="wa-icon" aria-hidden="true"><use href="#wa-logo"/></svg> Contact Owner</a>
   </div>
   <button type="button" class="sfab-toggle" onclick="toggleSupportFab()" aria-label="Support"><svg class="icon i-headset" aria-hidden="true"><use href="#i-headset"/></svg></button>
 </div>
@@ -148,7 +153,7 @@
   <div class="modal-box" style="max-width:380px;padding:0;display:flex;flex-direction:column;height:min(560px,80vh)">
  <button class="modal-x" onclick="toggleAiChatFab()"><svg class="icon i-x" aria-hidden="true"><use href="#i-x"/></svg></button>
     <div style="padding:20px 20px 12px;border-bottom:1px solid var(--border)">
- <h3 style="margin:0"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Mizzy Sales Assistant</h3>
+ <h3 style="margin:0"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Mizzysales Assistant</h3>
       <p style="color:var(--t2);font-size:12.5px;margin:4px 0 0">Ask about deposits, purchases, refunds, and more</p>
     </div>
     <div id="aiChatFabLog" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:16px 20px"></div>
@@ -166,8 +171,8 @@
     <a class="nav-brand" href="/dashboard" style="text-decoration:none">
  <div class="brand-icon"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg></div>
       <div class="brand-words">
-        <span class="brand-ksl">Mizzy Sales</span>
-        <span class="brand-full">Mizzy Sales</span>
+        <span class="brand-ksl">Mizzysales</span>
+        <span class="brand-full">KingBadBoi Log Sale</span>
       </div>
     </a>
     <div class="nav-center" id="navCenter">
@@ -199,7 +204,7 @@
           </svg>
         </button>
       </div>
-      <a href="https://wa.me/2347026881419" data-link="contact" target="_blank" class="nav-wa-btn" title="Chat with us on WhatsApp" aria-label="WhatsApp">
+      <a href="https://wa.me/2349065518402" data-link="contact" target="_blank" class="nav-wa-btn" title="Chat with us on WhatsApp" aria-label="WhatsApp">
         <svg class="wa-icon"><use href="#wa-logo"/></svg>
       </a>
       <div class="notif-wrap">
@@ -239,14 +244,14 @@
 <div id="page-apidocs" class="page active">
   <div class="page-hero">
  <div class="ph-chip"><svg class="icon i-key" aria-hidden="true"><use href="#i-key"/></svg> Developers</div>
-    <h1>Mizzy Sales API Documentation</h1>
-    <p>Connect your own scripts and apps to your Mizzy Sales account</p>
+    <h1>Mizzysales API Documentation</h1>
+    <p>Connect your own scripts and apps to your Mizzysales account</p>
   </div>
   <div class="section-wrap terms-wrap api-docs-wrap">
 
     <div class="api-doc-section">
       <h3>Getting Started</h3>
-      <p>Every Mizzy Sales user can generate a personal <strong>API Key</strong> and <strong>API Secret</strong> from
+      <p>Every Mizzysales user can generate a personal <strong>API Key</strong> and <strong>API Secret</strong> from
  <a href="/settings">Settings <svg class="icon i-arrow-right" aria-hidden="true"><use href="#i-arrow-right"/></svg> API Access</a>. These two values authenticate every request
         you make to the API — treat them like a password. Your secret is shown <strong>once</strong> at generation time and never again,
         so save it somewhere safe immediately.</p>
@@ -273,7 +278,7 @@
         .api-test-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--border,#dde);border-radius:10px;font-size:13px}
         .api-test-row .att-name{font-weight:700;min-width:230px}
         .api-test-row .att-state{margin-left:auto;font-weight:700}
-        .att-ok{color:#16a34a}.att-bad{color:#dc2626}.att-wait{opacity:.6}
+        .att-ok{color:#0788e8}.att-bad{color:#dc2626}.att-wait{opacity:.6}
       </style>
     </div>
 
@@ -351,7 +356,7 @@ X-API-Secret: your_api_secret</div>
           <tr><td><span class="api-method post">POST</span></td><td><code>/buy/:id</code></td><td>Purchase a listing using your wallet balance. For folder listings, optionally pass <code>{ "subAccountId": "..." }</code> to pick a specific account — omit it and the cheapest available one is bought automatically</td></tr>
           <tr><td><span class="api-method post">POST</span></td><td><code>/buy-multi/:id</code></td><td>Buy several accounts from the same folder listing at once — body: <code>{ "subAccountIds": ["...", "..."] }</code>. All-or-nothing: if any account was already sold, or your balance can't cover the total, nothing is charged</td></tr>
           <tr><td><span class="api-method get">GET</span></td><td><code>/numbers/options</code></td><td>Providers/countries currently available to rent a number for, with price</td></tr>
-          <tr><td><span class="api-method post">POST</span></td><td><code>/buy-number</code></td><td>Rent a number — body: <code>provider</code>, <code>country</code></td></tr>
+          <tr><td><span class="api-method post">POST</span></td><td><code>/buy-number</code></td><td>Rent a number — body: <code>serviceId</code> + <code>serverId</code> + <code>country</code> from <code>/numbers/options</code> (or legacy <code>provider</code> + <code>country</code>, which picks the cheapest server); optional <code>expected_price</code></td></tr>
           <tr><td><span class="api-method get">GET</span></td><td><code>/get-sms</code></td><td>Poll for the OTP — query: <code>order_id</code></td></tr>
           <tr><td><span class="api-method post">POST</span></td><td><code>/cancel-number</code></td><td>Cancel before a code arrives and get refunded — body: <code>order_id</code></td></tr>
         </tbody>
@@ -674,7 +679,7 @@ while True:
         <thead><tr><th>Method</th><th>Endpoint</th><th>Input</th><th>Returns</th></tr></thead>
         <tbody>
           <tr><td><span class="api-method get">GET</span></td><td><code>/api/v1/numbers/options</code></td><td>—</td><td>Enabled providers + countries with your price each</td></tr>
-          <tr><td><span class="api-method post">POST</span></td><td><code>/api/v1/buy-number</code></td><td><code>{ provider, country }</code></td><td><code>{ order_id, number, price }</code> — wallet is debited here</td></tr>
+          <tr><td><span class="api-method post">POST</span></td><td><code>/api/v1/buy-number</code></td><td><code>{ serviceId, serverId, country, expected_price? }</code> or <code>{ provider, country }</code></td><td><code>{ order_id, number, price, expires_at }</code> — wallet is debited here</td></tr>
           <tr><td><span class="api-method get">GET</span></td><td><code>/api/v1/get-sms</code></td><td><code>order_id</code> (query)</td><td><code>{ status: "waiting" | "received" | "cancelled", sms }</code></td></tr>
           <tr><td><span class="api-method post">POST</span></td><td><code>/api/v1/cancel-number</code></td><td><code>{ order_id }</code></td><td>Refunds you if no code has arrived yet</td></tr>
         </tbody>
@@ -688,7 +693,7 @@ while True:
           <tr><td><span class="api-method get">GET</span></td><td><code>/api/numbers/options</code></td><td>—</td><td>Priced provider/country list for Server 1</td></tr>
           <tr><td><span class="api-method get">GET</span></td><td><code>/api/numbers/live-services</code></td><td><code>country</code> (optional)</td><td>Live services with stock and price</td></tr>
           <tr><td><span class="api-method get">GET</span></td><td><code>/api/numbers/live-countries</code></td><td>—</td><td>Countries currently holding stock</td></tr>
-          <tr><td><span class="api-method post">POST</span></td><td><code>/api/numbers/buy</code></td><td><code>{ provider, country }</code></td><td>Rents the number and debits the wallet</td></tr>
+          <tr><td><span class="api-method post">POST</span></td><td><code>/api/numbers/buy</code></td><td><code>{ serviceId, serverId, country, expectedPrice }</code></td><td>Rents the number and debits the wallet</td></tr>
           <tr><td><span class="api-method get">GET</span></td><td><code>/api/numbers/status/:orderId</code></td><td>—</td><td>Poll for the OTP for one order</td></tr>
           <tr><td><span class="api-method post">POST</span></td><td><code>/api/numbers/cancel/:orderId</code></td><td>—</td><td>Cancel + refund while no code has arrived</td></tr>
           <tr><td><span class="api-method get">GET</span></td><td><code>/api/numbers/my-orders</code></td><td><code>limit</code> (optional)</td><td>Your recent number orders</td></tr>
@@ -728,7 +733,9 @@ curl -X POST "$BASE/api/v1/cancel-number" \
           <tr><td><code>400</code></td><td>Out of stock for that provider/country</td><td>Re-read <code>/numbers/options</code> (or <code>/api/numbers/live-services</code>) and pick another. Nothing was charged.</td></tr>
           <tr><td><code>401</code></td><td>Unauthorized</td><td>Missing/revoked <code>X-API-Key</code> + <code>X-API-Secret</code>, or you called a <code>/api/numbers/*</code> session endpoint without being signed in.</td></tr>
           <tr><td><code>404</code></td><td>Order not found</td><td>Use the <code>order_id</code> exactly as returned by the buy call — it belongs to your account only.</td></tr>
-          <tr><td><code>502</code></td><td>Provider unreachable</td><td>Upstream hiccup. Retry the same call after a few seconds; nothing was charged.</td></tr>
+          <tr><td><code>409</code></td><td>The price changed…</td><td>You sent <code>expected_price</code> and the live price differs. Nothing was charged; re-read <code>/numbers/options</code> and retry.</td></tr>
+          <tr><td><code>502</code></td><td>Provider unreachable / rejected</td><td>Upstream hiccup. Retry after a few seconds; nothing was charged.</td></tr>
+          <tr><td><code>502</code></td><td>We could not confirm this order with the provider</td><td>The provider did not answer in time and may have issued the number. <b>Do not retry.</b> The payment is held and is either refunded or the number is released to you after review; contact support with the returned <code>orderId</code>.</td></tr>
         </tbody>
       </table>
     </div>
@@ -864,8 +871,8 @@ order = requests.post(
       <h3 id="sec-boost">Boost API — social media growth (v1)</h3>
       <div class="info-box" style="margin-bottom:12px">
         Resell followers, likes, views and subscribers from your own app. Same catalogue, same prices
-        and the same upstream panel that powers the Mizzy Sales Boost page. Every call uses your
-        <code>X-API-Key</code> / <code>X-API-Secret</code> pair, and orders are charged to your Mizzy Sales wallet in <b>NGN</b>.
+        and the same upstream panel that powers the Mizzysales Boost page. Every call uses your
+        <code>X-API-Key</code> / <code>X-API-Secret</code> pair, and orders are charged to your Mizzysales wallet in <b>NGN</b>.
         <br><br>
         <b>There are no webhooks.</b> The upstream panel does not send callbacks, so neither do we —
         poll <code>GET /api/v1/boost/order/:id</code> (it refreshes live from the provider on every call).
@@ -952,7 +959,7 @@ const HEADERS = {
   'X-API-Secret': process.env.KLS_API_SECRET,
 };
 
-async function mizzySales(path, options = {}) {
+async function kls(path, options = {}) {
   const res = await fetch(BASE + path, { ...options, headers: HEADERS });
   const text = await res.text();
   let body;
@@ -968,26 +975,26 @@ async function mizzySales(path, options = {}) {
 }
 
 async function boost(link, quantity) {
-  const { services } = await mizzySales('/api/v1/boost/services?platform=Instagram&amp;search=followers');
+  const { services } = await kls('/api/v1/boost/services?platform=Instagram&amp;search=followers');
   const service = services.find(s =&gt; quantity &gt;= s.min &amp;&amp; quantity &lt;= s.max);
   if (!service) throw new Error('No service accepts that quantity');
 
-  const quote = await mizzySales('/api/v1/boost/quote', {
+  const quote = await kls('/api/v1/boost/quote', {
     method: 'POST',
     body: JSON.stringify({ serviceId: service.serviceId, quantity }),
   });
 
-  const { balanceNgn } = await mizzySales('/api/v1/boost/balance');
-  if (balanceNgn &lt; quote.priceNgn) throw new Error('Top up your Mizzy Sales wallet first');
+  const { balanceNgn } = await kls('/api/v1/boost/balance');
+  if (balanceNgn &lt; quote.priceNgn) throw new Error('Top up your Mizzysales wallet first');
 
-  const order = await mizzySales('/api/v1/boost/order', {
+  const order = await kls('/api/v1/boost/order', {
     method: 'POST',
     body: JSON.stringify({ serviceId: service.serviceId, link, quantity }),
   });
 
   for (;;) {                                   // no webhooks upstream — poll
     await new Promise(r =&gt; setTimeout(r, 120000));
-    const { order: o } = await mizzySales(`/api/v1/boost/order/${order.orderId}`);
+    const { order: o } = await kls(`/api/v1/boost/order/${order.orderId}`);
     if (o.bucket !== 'pending') return o;
   }
 }
@@ -1074,7 +1081,7 @@ try {
           <tr><td><code>409</code></td><td>No numbers currently available for that provider/country</td><td>This is temporary stock, not a config issue — wait a few seconds and retry, or check <code>/numbers/options</code> again in case that provider/country is no longer listed at all.</td></tr>
         </tbody>
       </table>
- <div class="info-box" style="margin-top:12px"><svg class="icon i-smartphone" aria-hidden="true"><use href="#i-smartphone"/></svg> <b>Numbers specifically:</b> your money is only ever taken if a real number was actually issued — a failed <code>/buy-number</code> call never touches your balance, so it's always safe to just retry. Once you do have an order, it auto-refunds on its own if no code arrives in time — you don't have to call <code>/cancel-number</code> unless you want your balance back sooner than that.</div>
+ <div class="info-box" style="margin-top:12px"><svg class="icon i-smartphone" aria-hidden="true"><use href="#i-smartphone"/></svg> <b>Numbers specifically:</b> your money is only ever taken if a real number was actually issued — a failed <code>/buy-number</code> call never touches your balance, so it's safe to retry — <b>except</b> a 502 "could not confirm this order" response, where your payment is held for review and you should not retry. Once you do have an order, it auto-refunds on its own if no code arrives in time — you don't have to call <code>/cancel-number</code> unless you want your balance back sooner than that.</div>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
@@ -1092,20 +1099,20 @@ try {
     <div class="footer-brand">
  <span class="footer-crown"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg></span>
       <div>
-        <div class="footer-name">Mizzy Sales — Mizzy Sales</div>
+        <div class="footer-name">Mizzysales</div>
  <div class="footer-tag">Verified Social Media Account Seller <svg class="icon i-alert-triangle" aria-hidden="true"><use href="#i-alert-triangle"/></svg>‼</div>
       </div>
     </div>
     <div class="footer-links">
       <a href="https://whatsapp.com/channel/0029Vb7ivq9HLHQcS4XgQu2Q" data-link="channel" target="_blank"><svg class="wa-icon"><use href="#wa-logo"/></svg> Channel</a>
       <a href="https://chat.whatsapp.com/HBqJeik773M1pqEmIjfpXr" data-link="group" target="_blank"><svg class="wa-icon"><use href="#wa-logo"/></svg> Group</a>
-      <a href="https://wa.me/2347026881419" data-link="contact" target="_blank"><svg class="wa-icon"><use href="#wa-logo"/></svg> Contact</a>
+      <a href="https://wa.me/2349065518402" data-link="contact" target="_blank"><svg class="wa-icon"><use href="#wa-logo"/></svg> Contact</a>
  <a href="/terms"><svg class="icon i-scroll" aria-hidden="true"><use href="#i-scroll"/></svg> Terms &amp; Conditions</a>
     </div>
   </div>
   <div class="footer-bottom">
  <div class="footer-visits"><svg class="icon i-user" aria-hidden="true"><use href="#i-user"/></svg> <span id="footerVisitCount">—</span> visitors</div>
-    <div class="footer-copy">© <span id="footerYear"></span> Mizzy Sales — Mizzy Sales. All rights reserved.</div>
+    <div class="footer-copy">© <span id="footerYear"></span> Mizzysales. All rights reserved.</div>
   </div>
 </footer>
 
@@ -1240,7 +1247,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="api-doc-section">
       <div class="api-doc-section-title">🛒 Buy a Log or Tool (Single)</div>
       <div class="api-doc-method"><span class="method-badge method-post">POST</span> /api/v1/buy/:id</div>
-      <p class="api-doc-desc">Purchase one item from the marketplace. Works for logs, tools, and folder listings. Debits your Mizzy Sales wallet instantly and returns the item content (login details, tool link, download file, etc.).</p>
+      <p class="api-doc-desc">Purchase one item from the marketplace. Works for logs, tools, and folder listings. Debits your Mizzysales wallet instantly and returns the item content (login details, tool link, download file, etc.).</p>
       <table class="api-params-table">
         <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
         <tr><td>:id</td><td>string (URL)</td><td>✅</td><td>The listing ID from /marketplace or /listings</td></tr>
@@ -1417,8 +1424,8 @@ console.log('Re-fetched:', again.logDetails);</div>
 <script src="js/country-select.js?v=20260910a" defer></script>
 <script src="js/global-pay.js?v=20260910a" defer></script>
   <script src="js/wallet.js?v=20260910a" defer></script>
+<script src="js/dev-credit.js?v=20260910a" defer></script>
 <script src="/js/mobile-features.js" defer></script>
 <script src="/js/vpn-notice.js" defer></script>
-<script src="js/dev-credit.js?v=20261017" defer></script>
 </body>
 </html>

@@ -3,16 +3,15 @@
 <head>
 <script src="/js/auth-keeper.js?v=1"></script>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Virtual Account — Mizzy Sales</title>
-<meta name="description" content="Your personal Mizzy Sales virtual bank account. Send money to this account to top up your Mizzy Sales wallet instantly."/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Virtual Account — Mizzysales</title>
+<meta name="description" content="Your personal Mizzysales virtual bank account. Send money to this account to top up your Mizzysales wallet instantly."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232f7bf6'/><text y='72' x='50' font-size='58' text-anchor='middle' fill='white' font-family='system-ui,sans-serif' font-weight='800'>M</text></svg>"/>
 <script>
   (function(){
     try {
-      var pref = localStorage.getItem('ksl_theme');
+      var pref = 'dark'; /* dark-only brand */
       var effective = (pref==='light'||pref==='dark') ? pref : (new Date().getHours()>=19||new Date().getHours()<7)?'dark':'light';
       document.documentElement.setAttribute('data-theme', effective);
     } catch(e){}
@@ -26,14 +25,14 @@
   --border:#252535;--border2:#2e2e42;--border-hover:#3e3e5a;
   --t1:#eeeef5;--t2:#8888a8;--t2b:#aaaacc;
   --navbar-bg:rgba(10,10,20,.92);
-  --gold:#2f7bf6;--green:#00d46a;--red:#ff4757;--blue:#4a9eff;
+  --gold:#0788e8;--green:#00d46a;--red:#ff4757;--blue:#4ade80;
 }
 [data-theme="light"]{
   --bg:#f4f6fb;--card:#ffffff;--card2:#f7f9fc;--card3:#eef1f8;
   --border:#dde3ee;--border2:#ccd5e6;--border-hover:#b3bfd6;
   --t1:#1a2035;--t2:#636c85;--t2b:#454e66;
   --navbar-bg:rgba(255,255,255,.92);
-  --gold:#1d5fd1;--green:#00a854;--red:#e5373d;--blue:#2a7de1;
+  --gold:#0a6fd0;--green:#00a854;--red:#e5373d;--blue:#0788e8;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--t1);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;padding-bottom:60px;transition:background .25s,color .25s;font-size:12px}
@@ -42,7 +41,7 @@ a{color:var(--blue);text-decoration:none}
 /* NAV */
 .navbar{position:sticky;top:0;z-index:50;background:var(--navbar-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;transition:background .25s,border-color .25s}
 .brand{display:flex;align-items:center;gap:10px;color:var(--t1);font-weight:800;font-size:15px}
-.brand-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#4a9eff,#2f7de0);display:flex;align-items:center;justify-content:center;font-size:16px}
+.brand-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#4ade80,#0788e8);display:flex;align-items:center;justify-content:center;font-size:16px}
 .nav-right{display:flex;gap:8px}
 .back-btn{padding:8px 14px;border-radius:8px;background:var(--card2);border:1px solid var(--border);color:var(--t1);font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
 
@@ -50,18 +49,18 @@ a{color:var(--blue);text-decoration:none}
 .wrap{max-width:520px;margin:0 auto;padding:24px 16px}
 
 /* HERO CHIP */
-.chip{display:inline-block;background:rgba(47,123,246,.12);color:var(--gold);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:10px;border:1px solid rgba(47,123,246,.2)}
+.chip{display:inline-block;background:rgba(7,136,232,.12);color:var(--gold);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:10px;border:1px solid rgba(7,136,232,.2)}
 
 /* BALANCE CARD */
-.bal-card{background:linear-gradient(135deg,rgba(47,123,246,.18),rgba(124,58,237,.12));border:1px solid rgba(47,123,246,.3);border-radius:16px;padding:18px 20px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}
+.bal-card{background:linear-gradient(135deg,rgba(7,136,232,.18),rgba(124,58,237,.12));border:1px solid rgba(7,136,232,.3);border-radius:16px;padding:18px 20px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}
 .bal-lbl{font-size:11px;color:var(--t2);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
 .bal-amt{font-size:26px;font-weight:800;color:var(--t1)}
-.bal-refresh{background:rgba(47,123,246,.15);border:1px solid rgba(47,123,246,.35);color:var(--gold);font-size:12px;font-weight:700;padding:8px 14px;border-radius:9px;cursor:pointer;font-family:inherit;transition:background .2s}
-.bal-refresh:hover{background:rgba(47,123,246,.25)}
+.bal-refresh{background:rgba(7,136,232,.15);border:1px solid rgba(7,136,232,.35);color:var(--gold);font-size:12px;font-weight:700;padding:8px 14px;border-radius:9px;cursor:pointer;font-family:inherit;transition:background .2s}
+.bal-refresh:hover{background:rgba(7,136,232,.25)}
 
 /* MAIN VA CARD */
 .va-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:18px}
-.va-card-header{background:linear-gradient(135deg,#2f7bf6 0%,#7c3aed 100%);padding:22px 22px 18px;color:#fff}
+.va-card-header{background:linear-gradient(135deg,#0788e8 0%,#7c3aed 100%);padding:22px 22px 18px;color:#fff}
 .va-card-header h2{font-size:1.05rem;font-weight:800;margin-bottom:4px}
 .va-card-header p{font-size:.8rem;opacity:.88;line-height:1.45}
 .va-body{padding:22px}
@@ -71,8 +70,8 @@ a{color:var(--blue);text-decoration:none}
 .acc-label{font-size:11px;color:var(--t2);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
 .acc-value{font-size:1.05rem;font-weight:800;color:var(--t1);letter-spacing:.3px}
 .acc-num{font-size:1.3rem;letter-spacing:2px}
-.copy-btn{background:rgba(47,123,246,.12);border:1px solid rgba(47,123,246,.25);color:var(--gold);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;transition:background .2s;white-space:nowrap;flex-shrink:0}
-.copy-btn:hover{background:rgba(47,123,246,.22)}
+.copy-btn{background:rgba(7,136,232,.12);border:1px solid rgba(7,136,232,.25);color:var(--gold);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;transition:background .2s;white-space:nowrap;flex-shrink:0}
+.copy-btn:hover{background:rgba(7,136,232,.22)}
 .copy-btn.copied{background:rgba(0,212,106,.12);border-color:rgba(0,212,106,.3);color:var(--green)}
 
 /* STATUS BADGE */
@@ -102,7 +101,7 @@ a{color:var(--blue);text-decoration:none}
 .how-card h3{font-size:.9rem;font-weight:700;margin-bottom:14px;color:var(--t1)}
 .how-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
 .how-step:last-child{margin-bottom:0}
-.step-num{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#2f7bf6,#7c3aed);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-num{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#0788e8,#7c3aed);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .step-body{flex:1}
 .step-title{font-size:.85rem;font-weight:700;color:var(--t1);margin-bottom:2px}
 .step-sub{font-size:.78rem;color:var(--t2);line-height:1.5}
@@ -128,10 +127,16 @@ a{color:var(--blue);text-decoration:none}
   <!-- Brand colours/fonts from site.config.js — keep last so it can override -->
   <link rel="stylesheet" href="/brand.css"/>
   <link rel="stylesheet" href="/css/mobile-fix.css">
-  <link rel="stylesheet" href="/css/mizzy-unified.css?v=2"/>
-  <link rel="stylesheet" href="/css/dashboard-look.css?v=20261016"/>
+<script src="/kls-ui.js?v=2"></script>
+
+<link rel="icon" type="image/png" sizes="128x128" href="/favicon.png?v=mz3">
+<link rel="shortcut icon" href="/favicon.ico?v=mz3">
+<link rel="stylesheet" href="/css/marvinums-brand.css">
+<script defer src="/js/marvinums-brand.js"></script>
+  <link rel="stylesheet" href="/css/marvel-nums-mobile-polish.css?v=2">
+  <link rel="stylesheet" href="/css/glass-ui.css?v=1">
 </head>
-<body>
+<body class="mn-bg-social">
 <!-- Shared UI icon sprite (replaces emoji site-wide) — referenced via <svg class="icon i-NAME"><use href="#i-NAME"/></svg> -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-check-circle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></g></symbol>
@@ -216,7 +221,7 @@ a{color:var(--blue);text-decoration:none}
 
 
 <nav class="navbar">
- <a href="/dashboard" class="brand"><span class="brand-icon"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg></span> Mizzy Sales Virtual Account</a>
+ <a href="/dashboard" class="brand"><span class="brand-icon"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg></span> Mizzysales Virtual Account</a>
   <div class="nav-right">
  <button class="back-btn" onclick="window.location.href='/deposit'"><svg class="icon i-credit-card" aria-hidden="true"><use href="#i-credit-card"/></svg> Deposit</button>
  <button class="back-btn" onclick="window.location.href='/dashboard'"><svg class="icon i-arrow-left" aria-hidden="true"><use href="#i-arrow-left"/></svg> Home</button>
@@ -226,8 +231,8 @@ a{color:var(--blue);text-decoration:none}
 <div class="wrap">
   <div style="text-align:center;margin-bottom:20px;padding-top:12px">
  <div class="chip"><svg class="icon i-bank" aria-hidden="true"><use href="#i-bank"/></svg> Virtual Bank Account</div>
-    <h1 style="font-size:clamp(22px,5vw,32px);font-weight:800;margin:10px 0 8px">Your Mizzy Sales Virtual Account</h1>
-    <p style="color:var(--t2);font-size:.88rem;line-height:1.55;max-width:400px;margin:0 auto">Send money to this account number from any bank app — your Mizzy Sales wallet is credited automatically within seconds.</p>
+    <h1 style="font-size:clamp(22px,5vw,32px);font-weight:800;margin:10px 0 8px">Your Mizzysales Virtual Account</h1>
+    <p style="color:var(--t2);font-size:.88rem;line-height:1.55;max-width:400px;margin:0 auto">Send money to this account number from any bank app — your Mizzysales wallet is credited automatically within seconds.</p>
   </div>
 
   <!-- Balance -->
@@ -243,7 +248,7 @@ a{color:var(--blue);text-decoration:none}
   <div class="va-card" id="vaCard">
     <div class="va-card-header">
  <h2><svg class="icon i-bank" aria-hidden="true"><use href="#i-bank"/></svg> Your Dedicated Account</h2>
-      <p>This account is permanently assigned to you. Transfers here credit your Mizzy Sales wallet automatically.</p>
+      <p>This account is permanently assigned to you. Transfers here credit your Mizzysales wallet automatically.</p>
     </div>
     <div class="va-body" id="vaBody">
       <div class="spin"></div>
@@ -278,7 +283,7 @@ a{color:var(--blue);text-decoration:none}
       <div class="step-num">4</div>
       <div class="step-body">
         <div class="step-title">Wallet credited automatically</div>
-        <div class="step-sub">Your Mizzy Sales wallet is credited within seconds of the transfer confirming — no need to take a screenshot or contact support.</div>
+        <div class="step-sub">Your Mizzysales wallet is credited within seconds of the transfer confirming — no need to take a screenshot or contact support.</div>
       </div>
     </div>
     <div class="how-step">
@@ -390,8 +395,8 @@ async function loadVA() {
           <div class="not-enabled">
             <div class="big-icon"><svg class="icon i-bank" aria-hidden="true"><use href="#i-bank"/></svg></div>
             <h3>Get Your Virtual Account</h3>
-            <p>Generate a permanent bank account number tied to your Mizzy Sales wallet — takes a few seconds, no admin needed.</p>
-            <button class="wa-btn" id="genVaBtn" onclick="generateVA()" style="background:linear-gradient(135deg,#2f7bf6,#7c3aed);border:none;cursor:pointer;font-family:inherit;font-size:.9rem">
+            <p>Generate a permanent bank account number tied to your Mizzysales wallet — takes a few seconds, no admin needed.</p>
+            <button class="wa-btn" id="genVaBtn" onclick="generateVA()" style="background:linear-gradient(135deg,#0788e8,#7c3aed);border:none;cursor:pointer;font-family:inherit;font-size:.9rem">
  Generate Virtual Account
             </button>
             <div id="genVaFeedback" style="margin-top:12px;font-size:.8rem"></div>
@@ -409,14 +414,14 @@ async function loadVA() {
         <span style="font-size:.75rem;color:var(--t2)">Created ${fmtDate(va.createdAt)}</span>
       </div>
 
-      <div class="acc-detail" style="background:linear-gradient(135deg,rgba(47,123,246,.12),rgba(124,58,237,.08));border:1px solid rgba(47,123,246,.25)">
+      <div class="acc-detail" style="background:linear-gradient(135deg,rgba(7,136,232,.12),rgba(124,58,237,.08));border:1px solid rgba(7,136,232,.25)">
         <div>
-          <div class="acc-label">Your Mizzy Sales Wallet Balance</div>
-          <div class="acc-value" style="font-size:1.4rem;color:var(--gold,#2f7bf6)">₦${(va.balance||0).toLocaleString('en-NG')}</div>
+          <div class="acc-label">Your Mizzysales Wallet Balance</div>
+          <div class="acc-value" style="font-size:1.4rem;color:var(--gold,#0788e8)">₦${(va.balance||0).toLocaleString('en-NG')}</div>
         </div>
       </div>
 
-      <div style="font-size:.78rem;color:var(--t2);margin:2px 0 14px;padding:0 2px">This is <b>Mizzy Sales — ${esc(va.userName||'')}</b>'s deposit account. Transfers here credit your wallet above automatically.</div>
+      <div style="font-size:.78rem;color:var(--t2);margin:2px 0 14px;padding:0 2px">This is <b>Mizzysales — ${esc(va.userName||'')}</b>'s deposit account. Transfers here credit your wallet above automatically.</div>
 
       <div class="acc-detail">
         <div>
@@ -447,7 +452,7 @@ async function loadVA() {
       <div class="info-box" style="margin-top:16px">
         <div class="info-row"><span class="info-icon"><svg class="icon i-zap" aria-hidden="true"><use href="#i-zap"/></svg></span> Instant credit — transfers are detected and credited in seconds.</div>
         <div class="info-row"><span class="info-icon"><svg class="icon i-refresh" aria-hidden="true"><use href="#i-refresh"/></svg></span> This account is permanent — use it any time, no expiry.</div>
-        <div class="info-row"><span class="info-icon"><svg class="icon i-lock" aria-hidden="true"><use href="#i-lock"/></svg></span> Secured by Flutterwave — Mizzy Sales never sees your bank credentials.</div>
+        <div class="info-row"><span class="info-icon"><svg class="icon i-lock" aria-hidden="true"><use href="#i-lock"/></svg></span> Secured by Flutterwave — Mizzysales never sees your bank credentials.</div>
         <div class="info-row"><span class="info-icon"><svg class="icon i-alert-triangle" aria-hidden="true"><use href="#i-alert-triangle"/></svg></span> Only send NGN — foreign currencies are not accepted.</div>
       </div>`;
 
@@ -494,8 +499,8 @@ loadVA();
 <script src="js/country-select.js?v=20260910a" defer></script>
 <script src="js/global-pay.js?v=20260910a" defer></script>
   <script src="js/wallet.js?v=20260910a" defer></script>
+<script src="js/dev-credit.js?v=20260910a" defer></script>
 <script src="/js/mobile-features.js" defer></script>
 <script src="/js/vpn-notice.js" defer></script>
-<script src="js/dev-credit.js?v=20261017" defer></script>
 </body>
 </html>

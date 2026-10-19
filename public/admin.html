@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Mizzy Sales Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Mizzysales Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="/css/marketplace-standard.css?v=1"/>
 <style>
@@ -11,12 +11,12 @@
 .icon{width:1em;height:1em;flex-shrink:0;vertical-align:-0.15em;display:inline-block;color:currentColor}
 .sc-icon .icon{width:24px;height:24px}
 :root{
-  --gold:#2f7bf6;--gold2:#1f5fd1;
+  --gold:#16a34a;--gold2:#15803d;
   --bg:#08080f;--bg2:#0d0d18;--bg3:#13131e;--bg4:#1a1a28;
   --card:#111120;--card2:#181828;
   --border:#222234;--border2:#2c2c44;
   --t1:#f5f5fa;--t2:#a8a8cc;--t3:#6a6a8e;
-  --green:#00d46a;--red:#ff4757;--blue:#4a9eff;--purple:#a78bfa;
+  --green:#00d46a;--red:#ff4757;--blue:#4ade80;--purple:#a78bfa;
   --r8:8px;--r12:12px;--r16:16px;
 }
 *{box-sizing:border-box}
@@ -29,7 +29,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 body,button,input,select,textarea{word-break:normal;overflow-wrap:normal}
 a{color:var(--gold);text-decoration:none}
 input,textarea,select{width:100%;background:var(--bg4);border:1.5px solid var(--border2);border-radius:var(--r8);color:var(--t1);padding:10px 13px;font-size:13px;font-family:inherit;outline:none;transition:border-color .18s}
-input:focus,textarea:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(47,123,246,.08)}
+input:focus,textarea:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(22,163,74,.08)}
 input::placeholder,textarea::placeholder{color:var(--t3)}
 textarea{resize:vertical;min-height:70px}
 label{display:block;margin-bottom:5px;font-size:12px;color:var(--t2);font-weight:600}
@@ -40,7 +40,7 @@ label{display:block;margin-bottom:5px;font-size:12px;color:var(--t2);font-weight
 .dt-current img{max-width:100px;border-radius:6px;margin:4px 6px 4px 0}
 .dt-current video{max-width:220px;border-radius:6px;display:block;margin-bottom:8px}
 /* LOCK */
-#lockScreen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg);background-image:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(47,123,246,.1),transparent)}
+#lockScreen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg);background-image:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(22,163,74,.1),transparent)}
 .lock-box{background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:44px 36px;width:100%;max-width:360px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.6)}
 .lock-role-tabs{display:flex;gap:6px;background:var(--bg4);border-radius:10px;padding:4px;margin:16px 0}
 .lock-role-tab{flex:1;padding:8px;border:none;background:none;color:var(--t2);border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:700;font-family:inherit}
@@ -56,7 +56,7 @@ label{display:block;margin-bottom:5px;font-size:12px;color:var(--t2);font-weight
 .tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
 .tb-logo{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .tb-name{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--gold);font-size:16px;white-space:nowrap}
-.tb-badge{background:rgba(47,123,246,.12);border:1px solid rgba(47,123,246,.2);color:var(--gold);padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;margin-left:8px;white-space:nowrap;flex-shrink:0}
+.tb-badge{background:rgba(22,163,74,.12);border:1px solid rgba(22,163,74,.2);color:var(--gold);padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;margin-left:8px;white-space:nowrap;flex-shrink:0}
 .tb-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
 @media(max-width:480px){.tb-name{font-size:13px}.tb-badge{margin-left:0;font-size:10px;padding:3px 8px}}
 .btn-sm{background:var(--bg4);border:1px solid var(--border2);color:var(--t2);padding:7px 14px;border-radius:var(--r8);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
@@ -74,7 +74,7 @@ label{display:block;margin-bottom:5px;font-size:12px;color:var(--t2);font-weight
 .sb-label{font-size:9.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:1.3px;padding:6px 8px 4px;display:block}
 .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r8);color:var(--t2);font-size:12.5px;font-weight:600;cursor:pointer;transition:background .15s,color .15s;border-left:3px solid transparent;user-select:none;line-height:1.25}
 .sb-item:hover{background:var(--bg4);color:var(--t1)}
-.sb-item.active{background:rgba(47,123,246,.12);color:var(--gold);border-left-color:var(--gold)}
+.sb-item.active{background:rgba(22,163,74,.12);color:var(--gold);border-left-color:var(--gold)}
 .sb-item .sb-chev{margin-left:auto;opacity:.35;font-size:12px}
 .sb-item.accent{border:1px solid rgba(99,102,241,.45);background:rgba(99,102,241,.08)}
 .sb-item.accent-green{border:1px solid rgba(37,211,102,.3);background:rgba(37,211,102,.07)}
@@ -85,7 +85,7 @@ label{display:block;margin-bottom:5px;font-size:12px;color:var(--t2);font-weight
 /* STAT ROW */
 .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:22px}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r16);padding:18px 14px;text-align:center;transition:border-color .2s}
-.stat-card:hover{border-color:rgba(47,123,246,.3)}
+.stat-card:hover{border-color:rgba(22,163,74,.3)}
 .sc-icon{font-size:24px;margin-bottom:7px}
 .sc-val{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:var(--gold)}
 .sc-lbl{font-size:11px;color:var(--t2);margin-top:3px}
@@ -136,15 +136,15 @@ tr:hover td{background:rgba(255,255,255,.035)}
 .badge{display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap}
 .b-green{background:rgba(0,212,106,.12);color:var(--green)}
 .b-red{background:rgba(255,71,87,.12);color:var(--red)}
-.b-gold{background:rgba(47,123,246,.12);color:var(--gold)}
-.b-blue{background:rgba(74,158,255,.12);color:var(--blue)}
+.b-gold{background:rgba(22,163,74,.12);color:var(--gold)}
+.b-blue{background:rgba(74,222,128,.12);color:var(--blue)}
 .b-purple{background:rgba(167,139,250,.12);color:var(--purple)}
 .user-avatar-thumb{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0}
 .user-avatar-fallback{display:flex;align-items:center;justify-content:center;background:var(--bg4);color:var(--t2);font-weight:700;font-size:12px}
 /* ACTION BUTTONS */
 .act{display:flex;gap:5px;flex-wrap:wrap}
-.btn-edit{background:rgba(74,158,255,.1);border:1px solid rgba(74,158,255,.2);color:var(--blue);padding:5px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
-.btn-edit:hover{background:rgba(74,158,255,.2)}
+.btn-edit{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);color:var(--blue);padding:5px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-edit:hover{background:rgba(74,222,128,.2)}
 .btn-del{background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.2);color:var(--red);padding:5px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
 .btn-del:hover{background:rgba(255,71,87,.2)}
 .btn-cred{background:rgba(0,212,106,.1);border:1px solid rgba(0,212,106,.2);color:var(--green);padding:5px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
@@ -169,12 +169,12 @@ tr:hover td{background:rgba(255,255,255,.035)}
 .spin{width:22px;height:22px;border:2.5px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:sp .8s linear infinite;display:inline-block}
 @keyframes sp{to{transform:rotate(360deg)}}
 /* INFO BOX */
-.info-box{background:rgba(74,158,255,.06);border:1px solid rgba(74,158,255,.15);border-radius:8px;padding:11px 14px;font-size:13px;color:var(--blue);margin-bottom:14px}
+.info-box{background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.15);border-radius:8px;padding:11px 14px;font-size:13px;color:var(--blue);margin-bottom:14px}
 .info-box.purple{background:rgba(167,139,250,.06);border-color:rgba(167,139,250,.2);color:var(--purple)}
 .info-box.green{background:rgba(0,212,106,.06);border-color:rgba(0,212,106,.2);color:var(--green)}
 .info-box.red{background:rgba(255,71,87,.08);border-color:rgba(255,71,87,.25);color:var(--red)}
 /* USER RESULT BOX */
-.user-found-box{background:linear-gradient(135deg,rgba(0,212,106,.06),rgba(47,123,246,.04));border:1px solid rgba(0,212,106,.2);border-radius:var(--r12);padding:14px 16px;margin-bottom:14px;display:none}
+.user-found-box{background:linear-gradient(135deg,rgba(0,212,106,.06),rgba(22,163,74,.04));border:1px solid rgba(0,212,106,.2);border-radius:var(--r12);padding:14px 16px;margin-bottom:14px;display:none}
 .ufb-name{font-size:15px;font-weight:700}
 .ufb-email{font-size:12px;color:var(--t2);margin-top:2px}
 .ufb-bal{font-size:13px;color:var(--gold);font-weight:700;margin-top:5px}
@@ -183,8 +183,8 @@ tr:hover td{background:rgba(255,255,255,.035)}
 /* TOOL LINK DISPLAY */
 .link-cell{display:flex;align-items:center;gap:6px;max-width:220px}
 .link-text{font-size:12px;color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-.link-copy-btn{background:rgba(74,158,255,.1);border:1px solid rgba(74,158,255,.2);color:var(--blue);padding:3px 8px;border-radius:5px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0}
-.link-copy-btn:hover{background:rgba(74,158,255,.2)}
+.link-copy-btn{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);color:var(--blue);padding:3px 8px;border-radius:5px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.link-copy-btn:hover{background:rgba(74,222,128,.2)}
 /* MOBILE NAV TABS */
 .adm-hamburger{display:none;align-items:center;gap:7px;background:var(--bg4);border:1px solid var(--border2);color:var(--t1);padding:8px 12px;border-radius:var(--r8);font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
 @media(max-width:900px){.adm-hamburger{display:inline-flex}}
@@ -219,10 +219,16 @@ tr:hover td{background:rgba(255,255,255,.035)}
   <!-- Brand colours/fonts from site.config.js — keep last so it can override -->
   <link rel="stylesheet" href="/brand.css"/>
   <link rel="stylesheet" href="/css/mobile-fix.css">
-  <link rel="stylesheet" href="/css/mizzy-unified.css?v=2"/>
-  <link rel="stylesheet" href="/css/dashboard-look.css?v=20261016"/>
+<script src="/kls-ui.js?v=2"></script>
+
+<link rel="stylesheet" href="/css/marvinums-brand.css">
+<script defer src="/js/marvinums-brand.js"></script>
+  <link rel="stylesheet" href="/css/marvel-nums-mobile-polish.css?v=2">
+  <link rel="stylesheet" href="/css/glass-ui.css?v=1">
+<link rel="icon" type="image/png" sizes="128x128" href="/favicon.png?v=mz3">
+<link rel="shortcut icon" href="/favicon.ico?v=mz3">
 </head>
-<body>
+<body class="mn-bg-hero">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-check-circle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></g></symbol>
     <symbol id="i-arrow-right" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M13 5l7 7-7 7"/></g></symbol>
@@ -308,7 +314,7 @@ tr:hover td{background:rgba(255,255,255,.035)}
 <div id="lockScreen">
   <div class="lock-box">
  <span class="lock-crown"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg></span>
-    <h2>Mizzy Sales Admin</h2>
+    <h2>Mizzysales Admin</h2>
     <div class="lock-role-tabs">
  <button class="lock-role-tab active" id="roleTabSuper" onclick="setLockRole('super')"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg> Owner</button>
  <button class="lock-role-tab" id="roleTabStaff" onclick="setLockRole('staff')"><svg class="icon i-headphones" aria-hidden="true"><use href="#i-headphones"/></svg> Support Staff</button>
@@ -331,7 +337,7 @@ tr:hover td{background:rgba(255,255,255,.035)}
   <div class="tb-left">
  <button class="adm-hamburger" onclick="openAdminDrawer()" aria-label="Open admin menu"><svg class="icon i-menu" aria-hidden="true"><use href="#i-menu"/></svg> Menu</button>
  <div class="tb-logo"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg></div>
-    <span class="tb-name">Mizzy Sales Admin</span>
+    <span class="tb-name">Mizzysales Admin</span>
     <span id="adminBuildBadge" data-build="2026-08-14-admin-v14" style="font-size:10px;color:var(--t3);margin-left:4px" title="If this doesn't match the build you just uploaded, your server is still running an older file">build 2026-08-14-admin-v14</span>
     <span class="tb-badge" id="tbRoleBadge">ADMIN</span>
   </div>
@@ -352,7 +358,7 @@ tr:hover td{background:rgba(255,255,255,.035)}
 <aside class="adm-drawer" id="admDrawer" aria-label="Admin sections">
   <div class="adm-drawer-head">
     <div class="tb-logo"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg></div>
-    <span class="tb-name">Mizzy Sales Admin</span>
+    <span class="tb-name">Mizzysales Admin</span>
     <button class="adm-drawer-close" onclick="closeAdminDrawer()" aria-label="Close menu">&times;</button>
   </div>
   <div class="adm-drawer-body">
@@ -397,6 +403,7 @@ tr:hover td{background:rgba(255,255,255,.035)}
         <div class="sec-title">Marketplace &amp; Server 2 settings</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button type="button" class="btn-primary" onclick="switchTab('logs2')">Logs 2 (Marketplace 2) — switches &amp; prices</button>
+          <button type="button" class="btn-primary" onclick="switchTab('logs3')">Logs 3 (Marketplace 3) — switch &amp; prices</button>
           <button type="button" class="btn-primary" onclick="switchTab('numbers2')">Server 2 — low SMS rate pools</button>
         </div>
       </div>
@@ -565,7 +572,7 @@ tr:hover td{background:rgba(255,255,255,.035)}
         <div class="form-row">
           <div class="fg"><label>Marketplace (manual logs)</label>
             <button class="btn-primary" type="button" id="m2Btn1" onclick="m2Toggle('market1Enabled')" style="width:100%">…</button></div>
-          <div class="fg"><label>Marketplace 2 (RakibSocials)</label>
+          <div class="fg"><label>Marketplace 2 (NovaSolution)</label>
             <button class="btn-primary" type="button" id="m2Btn2" onclick="m2Toggle('market2Enabled')" style="width:100%">…</button></div>
         </div>
         <div class="form-row">
@@ -579,10 +586,10 @@ tr:hover td{background:rgba(255,255,255,.035)}
         <div class="info-box" id="m2Balance">Loading supplier balance…</div>
       </div>
       <div class="sec">
-        <div class="sec-title"><svg class="icon i-package" aria-hidden="true"><use href="#i-package"/></svg> Logs 2 — all RakibSocials products</div>
+        <div class="sec-title"><svg class="icon i-package" aria-hidden="true"><use href="#i-package"/></svg> Logs 2 — all NovaSolution products</div>
         <div class="info-box"><svg class="icon i-pin" aria-hidden="true"><use href="#i-pin"/></svg>
           Every product from the API shows here, including new ones. A product is only shown to customers after you set your selling price (0 = hidden).
-          "API cost" is what RakibSocials charges you; profit = your price − API cost.</div>
+          "API cost" is what NovaSolution charges you; profit = your price − API cost.</div>
         <div class="form-row">
           <div class="fg"><input type="text" id="m2Search" placeholder="Search products…" oninput="m2Render()"/></div>
           <div class="fg"><select id="m2Filter" onchange="m2Render()"><option value="">All products</option><option value="priced">Live (priced)</option><option value="unpriced">Not priced yet</option><option value="instock">In stock</option></select></div>
@@ -593,6 +600,132 @@ tr:hover td{background:rgba(255,255,255,.035)}
       <div class="sec">
         <div class="sec-title"><svg class="icon i-bar-chart" aria-hidden="true"><use href="#i-bar-chart"/></svg> Marketplace 2 sales &amp; profit</div>
         <div id="m2Orders">Loading…</div>
+      </div>
+    </div>
+    <div id="tab-logs3" class="tab-panel">
+      <div class="sec">
+        <div class="sec-title"><svg class="icon i-settings" aria-hidden="true"><use href="#i-settings"/></svg> Marketplace 3 switch</div>
+        <div class="info-box"><svg class="icon i-pin" aria-hidden="true"><use href="#i-pin"/></svg>
+          Marketplace 3 is powered by RakibSocials. When it is disabled, customers see a maintenance screen and cannot buy.</div>
+        <div class="form-row">
+          <div class="fg"><label>Marketplace 3 (RakibSocials)</label>
+            <button class="btn-gold" type="button" id="m3Btn" onclick="m3Toggle()" style="width:100%">…</button></div>
+        </div>
+        <div class="form-row">
+          <div class="fg" style="flex:2"><label>Maintenance message</label><input type="text" id="m3Msg"/></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Email me when supplier balance is below (₦)</label><input type="number" id="m3Low" min="0"/></div>
+          <div class="fg"><label>Alert email</label><input type="email" id="m3Email" placeholder="you@example.com"/></div>
+          <div class="fg"><label>&nbsp;</label><button class="btn-gold" type="button" onclick="m3SaveConfig()" style="width:100%">Save</button></div>
+        </div>
+        <div class="info-box" id="m3Balance">Loading supplier balance…</div>
+      </div>
+      <div class="sec" id="m3AttentionSec" style="display:none;border-color:var(--red)">
+        <div class="sec-title" style="color:var(--red)"><svg class="icon i-alert-triangle" aria-hidden="true"><use href="#i-alert-triangle"/></svg> Needs attention</div>
+        <div class="info-box">These customers have paid but their order did not finish cleanly. Open your RakibSocials order history, then either <b>deliver the keys</b> to the customer or <b>refund</b> them. Nothing here is lost.</div>
+        <div id="m3Attention" style="overflow-x:auto"></div>
+      </div>
+      <div class="sec">
+        <div class="sec-title"><svg class="icon i-package" aria-hidden="true"><use href="#i-package"/></svg> Logs 3 — all RakibSocials products</div>
+        <div class="info-box"><svg class="icon i-pin" aria-hidden="true"><use href="#i-pin"/></svg>
+          Every product from the API shows here, including new ones. A product is only shown to customers after you set your selling price (0 = hidden).
+          "API cost" is what RakibSocials charges you; profit = your price − API cost.</div>
+        <div class="form-row">
+          <div class="fg"><input type="text" id="m3Search" placeholder="Search products…" oninput="m3Render()"/></div>
+          <div class="fg"><select id="m3Filter" onchange="m3Render()"><option value="">All products</option><option value="priced">Live (priced)</option><option value="unpriced">Not priced yet</option><option value="instock">In stock</option></select></div>
+          <div class="fg"><button class="btn-sm" type="button" onclick="m3LoadProducts(true)">Refresh from API</button></div>
+        </div>
+        <div id="m3Products" style="overflow-x:auto">Loading…</div>
+      </div>
+      <div class="sec">
+        <div class="sec-title"><svg class="icon i-bar-chart" aria-hidden="true"><use href="#i-bar-chart"/></svg> Marketplace 3 sales &amp; profit</div>
+        <div id="m3Orders">Loading…</div>
+      </div>
+    </div>
+    <div id="tab-welcomepopup" class="tab-panel">
+      <div class="sec">
+        <div class="sec-title"><svg class="icon i-zap" aria-hidden="true"><use href="#i-zap"/></svg> Welcome Popup Settings</div>
+        <div class="info-box"><svg class="icon i-pin" aria-hidden="true"><use href="#i-pin"/></svg>
+          A popup that invites visitors to join your WhatsApp channel. Changes here apply to customers within about a minute &mdash; no redeploy needed.
+          How often it appears is remembered in each visitor's browser, so &ldquo;first visit only&rdquo; means first visit per browser.</div>
+        <div class="form-row">
+          <div class="fg"><label>Popup status</label>
+            <button class="btn-gold" type="button" id="wpToggle" onclick="wpToggle()" style="width:100%">…</button></div>
+        </div>
+        <div class="form-row">
+          <div class="fg" style="flex:2"><label>WhatsApp Channel URL</label>
+            <input type="url" id="wpUrl" maxlength="300" placeholder="https://whatsapp.com/channel/…" autocomplete="off"/>
+            <div id="wpUrlErr" style="color:var(--red);font-size:12px;margin-top:4px;display:none"></div></div>
+        </div>
+        <div class="form-row"><div class="fg" style="flex:2"><label>Popup heading</label><input type="text" id="wpHeading" maxlength="120"/></div></div>
+        <div class="form-row"><div class="fg" style="flex:2"><label>Welcome subtitle</label><input type="text" id="wpSubtitle" maxlength="160"/></div></div>
+        <div class="form-row"><div class="fg" style="flex:2"><label>Description</label><textarea id="wpDesc" rows="3" maxlength="500"></textarea></div></div>
+        <div class="form-row"><div class="fg" style="flex:2"><label>Additional message</label><textarea id="wpMore" rows="3" maxlength="500"></textarea></div></div>
+        <div class="form-row">
+          <div class="fg"><label>WhatsApp button text</label><input type="text" id="wpWaText" maxlength="60"/></div>
+          <div class="fg"><label>Secondary button text</label><input type="text" id="wpLaterText" maxlength="60"/></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>How often to show it</label>
+            <select id="wpFreq">
+              <option value="first">First visit only</option>
+              <option value="7d">Once every 7 days</option>
+              <option value="15d">Once every 15 days</option>
+              <option value="30d">Once every 30 days</option>
+              <option value="every">Every visit (once per browsing session)</option>
+            </select></div>
+          <div class="fg"><label>Delay before showing</label>
+            <select id="wpDelay">
+              <option value="0">Immediately after the page loads</option>
+              <option value="1000">After 1 second</option>
+              <option value="3000">After 3 seconds</option>
+              <option value="5000">After 5 seconds</option>
+            </select></div>
+        </div>
+        <div class="fg"><label>Where it appears</label>
+          <label style="display:flex;gap:8px;align-items:center;margin:4px 0;font-size:14px"><input type="checkbox" class="wpPage" value="dashboard" style="width:auto"/> Customer dashboard</label>
+          <label style="display:flex;gap:8px;align-items:center;margin:4px 0;font-size:14px"><input type="checkbox" class="wpPage" value="home" style="width:auto"/> Homepage</label>
+          <label style="display:flex;gap:8px;align-items:center;margin:4px 0;font-size:14px"><input type="checkbox" class="wpPage" value="marketplace" style="width:auto"/> Marketplace (all three)</label>
+          <label style="display:flex;gap:8px;align-items:center;margin:4px 0;font-size:14px"><input type="checkbox" class="wpPage" value="all" style="width:auto"/> All customer pages (overrides the above)</label>
+          <div style="font-size:12px;color:var(--t2);margin-top:4px">It never appears on login, registration, password-reset or admin pages.</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-gold" type="button" onclick="wpSave()" style="width:auto">Save Settings</button>
+          <button class="btn-sm" type="button" onclick="wpPreview()">Preview Popup</button>
+          <button class="btn-sm" type="button" style="background:var(--red)" onclick="wpReset()">Reset to Defaults</button>
+          <button class="btn-sm" type="button" onclick="wpClearMemory()">Show it again in this browser</button>
+        </div>
+        <div id="wpMeta" style="font-size:12px;color:var(--t2);margin-top:12px"></div>
+      </div>
+    </div>
+    <div id="tab-tutorialsadmin" class="tab-panel">
+      <div class="sec">
+        <div class="sec-title"><svg class="icon i-video" aria-hidden="true"><use href="#i-video"/></svg> <span id="tutFormTitle">Add a tutorial</span></div>
+        <div class="info-box"><svg class="icon i-pin" aria-hidden="true"><use href="#i-pin"/></svg>
+          Add as many tutorial videos as you like. Customers see them on the <b>Tutorials</b> page (/tutorials) the moment you save &mdash; no redeploy needed.
+          Upload a video file (up to <span id="tutMaxMb">100</span> MB), or paste a YouTube / Vimeo / direct video link for longer videos.</div>
+        <div id="tutStorageWarn" class="info-box red" style="display:none"></div>
+        <div class="fg"><label>Title *</label><input type="text" id="tutTitle" maxlength="150" placeholder="e.g. How to log in a TikTok account" autocomplete="off"/></div>
+        <div class="fg"><label>Sub-heading</label><input type="text" id="tutSub" maxlength="200" placeholder="e.g. Step-by-step guide for new buyers" autocomplete="off"/></div>
+        <div class="fg"><label>Discussion / description</label><textarea id="tutDesc" rows="5" maxlength="5000" placeholder="Explain what the video covers, tips, warnings, steps…"></textarea></div>
+        <div class="form-row">
+          <div class="fg"><label id="tutFileLabel">Video file</label><input type="file" id="tutFile" accept="video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm"/></div>
+          <div class="fg"><label>&hellip;or video link</label><input type="url" id="tutLink" maxlength="500" placeholder="https://youtu.be/… or https://vimeo.com/…" autocomplete="off"/></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Show to customers?</label>
+            <select id="tutPublished"><option value="true">Yes &mdash; visible</option><option value="false">No &mdash; hidden (draft)</option></select></div>
+          <div class="fg"><label>Position (optional, 1 = first)</label><input type="number" id="tutOrder" placeholder="Leave empty to add at the end"/></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-gold" type="button" id="tutSaveBtn" onclick="tutSave()" style="width:auto">Add tutorial</button>
+          <button class="btn-sm" type="button" id="tutCancelBtn" onclick="tutResetForm()" style="display:none">Cancel editing</button>
+        </div>
+        <div id="tutFb" style="font-size:13px;margin-top:10px"></div>
+      </div>
+      <div class="sec">
+        <div class="sec-title"><svg class="icon i-book-open" aria-hidden="true"><use href="#i-book-open"/></svg> Your tutorials <span id="tutCount" style="color:var(--t2);font-weight:500"></span></div>
+        <div id="tutList">Loading…</div>
       </div>
     </div>
     <div id="tab-tools" class="tab-panel">
@@ -779,6 +912,38 @@ tr:hover td{background:rgba(255,255,255,.035)}
           </div>
           <p style="font-size:.8rem;color:var(--t2);margin:6px 0 0">When OFF — the Bank Transfer card on the Deposit page is greyed out and disabled instantly.</p>
           <div id="pmFeedbackVirtualAccount" class="form-feedback"></div>
+        </div>
+        <div class="pm-row" id="pmRowGateways" style="margin-bottom:14px">
+          <div class="pm-row-head">
+            <span class="pm-row-title">Payment Gateways (Payment Link checkout)</span>
+          </div>
+          <p style="font-size:.8rem;color:var(--t2);margin:6px 0 10px">Turn each gateway on or off at any time. <b>Both on</b> = customers pick one. <b>One on</b> = everyone uses it. <b>Both off</b> = Payment Link is unavailable. Both gateways can issue Virtual Accounts (bank transfer) — switching a gateway off stops new accounts for it and hides it from customers. Payments already made are always still credited.</p>
+          <div class="pm-row" style="margin-bottom:10px">
+            <div class="pm-row-head">
+              <span class="pm-row-title">Flutterwave <small id="gwStatusFlutterwave" style="font-weight:500;color:var(--t2)"></small></span>
+              <label class="pm-switch">
+                <input type="checkbox" id="gwToggleFlutterwave" onchange="toggleGateway('flutterwave', this.checked)"/>
+                <span class="pm-slider"></span>
+              </label>
+            </div>
+            <div class="fg"><label>Message shown to users when off</label><input type="text" id="gwMsgFlutterwave" placeholder="e.g. Flutterwave is under maintenance — please use Paystack."/></div>
+            <button class="btn-secondary" onclick="saveGatewayMessage('flutterwave')">Save Message</button>
+            <div id="gwFeedbackFlutterwave" class="form-feedback"></div>
+            <p style="font-size:.74rem;color:var(--t2);margin:6px 0 0">Webhook URL: <code id="gwHookFlutterwave"></code></p>
+          </div>
+          <div class="pm-row">
+            <div class="pm-row-head">
+              <span class="pm-row-title">Paystack <small id="gwStatusPaystack" style="font-weight:500;color:var(--t2)"></small></span>
+              <label class="pm-switch">
+                <input type="checkbox" id="gwTogglePaystack" onchange="toggleGateway('paystack', this.checked)"/>
+                <span class="pm-slider"></span>
+              </label>
+            </div>
+            <div class="fg"><label>Message shown to users when off</label><input type="text" id="gwMsgPaystack" placeholder="e.g. Paystack is under maintenance — please use Flutterwave."/></div>
+            <button class="btn-secondary" onclick="saveGatewayMessage('paystack')">Save Message</button>
+            <div id="gwFeedbackPaystack" class="form-feedback"></div>
+            <p style="font-size:.74rem;color:var(--t2);margin:6px 0 0">Webhook URL (paste in Paystack dashboard → Settings → API Keys &amp; Webhooks): <code id="gwHookPaystack"></code></p>
+          </div>
         </div>
         <div class="pm-row" id="pmRowPaymentlink">
           <div class="pm-row-head">
@@ -979,11 +1144,11 @@ tr:hover td{background:rgba(255,255,255,.035)}
       <div class="sec">
         <div class="sec-title"><svg class="icon i-plug" aria-hidden="true"><use href="#i-plug"/></svg> Number Servers &amp; Profit Settings</div>
         <div class="info-box"><svg class="icon i-pin" aria-hidden="true"><use href="#i-pin"/></svg>
-          Server 1 = USA WhatsApp (otpsuite, priced from the sheet below). Server 2 = GrizzlySMS — every service and country,
+          Server 1 = NovaSolution — live catalog, server-linked services, and editable profit ladder. Server 2 = GrizzlySMS — every service and country,
           priced automatically: cost in $ is converted to ₦ at your rate, then your profit ladder is added on top.
         </div>
         <div class="form-row">
-          <div class="fg"><label>Server 1 (USA WhatsApp)</label>
+          <div class="fg"><label>Server 1 (NovaSolution)</label>
             <select id="nscServer1"><option value="true">Enabled</option><option value="false">Disabled</option></select>
           </div>
           <div class="fg"><label>Server 2 (Grizzly — all services)</label>
@@ -1037,7 +1202,7 @@ tr:hover td{background:rgba(255,255,255,.035)}
       <!-- Live health of both number servers -->
       <div class="sec">
         <div class="sec-title"><svg class="icon i-globe" aria-hidden="true"><use href="#i-globe"/></svg> Server Health</div>
-        <div class="info-box">Checks Server 1 (otpsuite) and Server 2 (GrizzlySMS) directly. Red means the provider is unreachable right now — customers see the same indicator on the buy page.</div>
+        <div class="info-box">Checks Server 1 (NovaSolution) and Server 2 (GrizzlySMS) directly. Red means the provider is unreachable right now — customers see the same indicator on the buy page.</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap" id="admHealthBox">
           <div style="flex:1 1 220px;border:1px solid var(--border2,#2a2a40);border-radius:12px;padding:12px">Not checked yet</div>
         </div>
@@ -1092,31 +1257,17 @@ tr:hover td{background:rgba(255,255,255,.035)}
       </div>
 
       <div class="sec">
- <div class="sec-title"><svg class="icon i-plug" aria-hidden="true"><use href="#i-plug"/></svg> Live Provider Status (otpsuite)</div>
- <div class="info-box"><svg class="icon i-pin" aria-hidden="true"><use href="#i-pin"/></svg> Checks your otpsuite.com account directly — useful before setting live prices, so you know your balance and cost per number.</div>
-        <div id="otpBalanceBox" style="font-size:15px;font-weight:700;margin-bottom:10px">Checking balance…</div>
- <button class="btn-secondary" onclick="loadOtpsuiteBalance()"><svg class="icon i-refresh" aria-hidden="true"><use href="#i-refresh"/></svg> Refresh Balance</button>
-      </div>
-      <div class="sec">
-        <div class="sec-title"><svg class="icon i-banknote" aria-hidden="true"><use href="#i-banknote"/></svg> Price Sheet — per Provider + Country</div>
- <div class="info-box"><svg class="icon i-pin" aria-hidden="true"><use href="#i-pin"/></svg> Every number is bought live from otpsuite the moment someone pays — pick the country and service below, then set the ₦ price your customers pay on the site. You can change any price at any time.</div>
-        <div class="form-row">
-          <div class="fg"><label>otpsuite Country</label>
-            <select id="npOtpCountry" onchange="onNpOtpCountryChange()"><option value="">Loading…</option></select>
-          </div>
-          <div class="fg"><label>otpsuite Service</label>
-            <select id="npOtpService" onchange="onNpOtpServiceChange()"><option value="">Select a country first</option></select>
-          </div>
+        <div class="sec-title"><svg class="icon i-plug" aria-hidden="true"><use href="#i-plug"/></svg> NovaSolution Provider Status</div>
+        <div class="info-box">The customer number picker reads the live NovaSolution catalog. Server 1 prices use the profit ladder above; server, country and service availability are revalidated before every order.</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div id="novaBalanceBox" style="font-size:15px;font-weight:700">NovaSolution balance not loaded yet</div>
+          <button class="btn-secondary" type="button" onclick="loadNovaBalance()">Refresh NovaSolution balance</button>
+          <button class="btn-secondary" type="button" onclick="loadNovaCatalogSummary()">Check live catalog</button>
+          <button class="btn-secondary" type="button" id="novaSyncBtn" onclick="startNovaSync()">⟳ Sync all services to the website</button>
         </div>
-        <div id="npOtpCostHint" style="font-size:12.5px;color:var(--t2);margin-bottom:10px"></div>
-        <div id="npSelectedSummary" style="font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:12px"></div>
-        <div class="form-row">
-          <div class="fg"><label>Site Price (₦) — what site users pay</label><input type="number" id="npPrice" placeholder="1100"/></div>
-          <div class="fg"><label>API Price (₦, optional) — leave blank to not offer via API</label><input type="number" id="npApiPrice" placeholder="1500"/></div>
-        </div>
- <button class="btn-primary" onclick="saveNumberPrice()"><svg class="icon i-save" aria-hidden="true"><use href="#i-save"/></svg> Save Price</button>
-        <div id="npFeedback" class="form-feedback"></div>
-        <div id="npList" style="margin-top:16px"></div>
+        <div id="novaCatalogSummary" style="font-size:12.5px;color:var(--t2);margin-top:8px">—</div>
+        <div id="novaSyncStatus" style="font-size:12.5px;color:var(--t2);margin-top:6px">Customers see the saved list. Tap Sync to pull every server, country and service from the provider and save it. Old data is kept if the provider fails.</div>
+        <div id="novaAdminFeedback" class="form-feedback"></div>
       </div>
       <div class="sec">
  <div class="sec-title"><svg class="icon i-user" aria-hidden="true"><use href="#i-user"/></svg> Per-User Pricing (overrides)</div>
@@ -1145,7 +1296,7 @@ tr:hover td{background:rgba(255,255,255,.035)}
       </div>
       <div class="sec">
  <div class="sec-title"><svg class="icon i-clipboard" aria-hidden="true"><use href="#i-clipboard"/></svg> Orders</div>
- <div class="info-box"><svg class="icon i-pin" aria-hidden="true"><use href="#i-pin"/></svg> Every number rented so far, live from otpsuite — filter by status to see what's pending, delivered, expired, or cancelled.</div>
+ <div class="info-box"><svg class="icon i-pin" aria-hidden="true"><use href="#i-pin"/></svg> Every number rented so far, live from NovaSolution — filter by status to see what's pending, delivered, expired, or cancelled.</div>
         <div class="form-row">
           <div class="fg"><label>Filter by status</label>
             <select id="nsStatusFilter" onchange="loadNumberStock()">
@@ -1216,10 +1367,10 @@ tr:hover td{background:rgba(255,255,255,.035)}
       </div>
     </div>
     <div id="tab-virtualaccounts" class="tab-panel">
-      <div class="sec" style="border-left:3px solid #2f7bf6">
+      <div class="sec" style="border-left:3px solid #16a34a">
  <div class="sec-title"><svg class="icon i-book-open" aria-hidden="true"><use href="#i-book-open"/></svg> Virtual Account Setup Tutorial</div>
         <div class="info-box" style="margin-bottom:12px">
-          <b>How this works:</b> Each user can be assigned a permanent Nigerian virtual bank account number (powered by Flutterwave). When anyone sends money to that account number, the user's Mizzy Sales wallet is credited automatically — no screenshot needed, no manual approval.
+          <b>How this works:</b> Each user can be assigned a permanent Nigerian virtual bank account number (powered by Flutterwave). When anyone sends money to that account number, the user's Mizzysales wallet is credited automatically — no screenshot needed, no manual approval.
         </div>
         <div style="font-size:13px;color:var(--t2);line-height:1.8">
           <b style="color:var(--t1)">Step 1 — Environment Variables (set once in Render/Railway):</b><br>
@@ -1278,7 +1429,7 @@ tr:hover td{background:rgba(255,255,255,.035)}
           <input type="checkbox" id="bAdmEnabled"/> <b>Boosting is live</b>
         </label>
         <div class="form-row">
-          <label>Provider API key <span class="muted">(Really Simple Social)</span></label>
+          <label>Provider API key <span class="muted">(Boost 1 — current provider)</span></label>
           <input id="bAdmKey" placeholder="Leave blank to keep the saved key"/>
         </div>
         <div class="form-row">
@@ -1356,6 +1507,8 @@ tr:hover td{background:rgba(255,255,255,.035)}
       </div>
     </div>
 
+      <div class="card"><h3>Boost 2 — Nova Solution pricing</h3><p class="muted">This catalogue uses only NovaSolution GET /catalog/smm and POST /orders with type=smm. Configure a markup or a specific selling price per service. API credentials are read server-side from NOVA_API_KEY.</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"><input id="novaBoostSearch" placeholder="Search Nova Solution services…" oninput="novaBoostRender()"/><button class="btn-sm" onclick="novaBoostSync()">⟳ Sync services from provider</button><span id="novaBoostSyncMsg" class="muted"></span></div><div class="table-wrap"><table class="tbl"><thead><tr><th>Service</th><th>Provider cost / 1000</th><th>Price mode</th><th>Specific price</th><th>Markup</th><th>Enabled</th><th></th></tr></thead><tbody id="novaBoostRows"><tr><td colspan="7">Load catalogue to begin.</td></tr></tbody></table></div></div>
+    </div>
     <div id="tab-badges" class="tab-panel">
       <div class="sec">
  <div class="sec-title"><svg class="icon i-medal" aria-hidden="true"><use href="#i-medal"/></svg> Create a Badge</div>
@@ -1406,8 +1559,8 @@ tr:hover td{background:rgba(255,255,255,.035)}
           <div style="font-size:.82rem;color:var(--t2);margin-bottom:12px">This is the number users contact for support. Used in all WhatsApp chat links (wa.me/...). Enter digits only — no +, spaces, or dashes.</div>
           <div class="form-row" style="margin-bottom:10px">
             <div class="fg">
-              <label>WhatsApp Contact Number <span style="color:var(--red)">*</span></label>
-              <input type="text" id="slNumber" placeholder="e.g. 2348012345678" maxlength="15"
+              <label>Home Page WhatsApp Number <span style="color:var(--red)">*</span></label>
+              <input type="text" id="slNumber" placeholder="e.g. 2349065518402" maxlength="15"
                 style="font-size:1.05rem;letter-spacing:1px"
                 oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
             </div>
@@ -1419,12 +1572,29 @@ tr:hover td{background:rgba(255,255,255,.035)}
           <div id="slNumberFb" class="fb" style="margin-top:8px"></div>
         </div>
         <div style="background:var(--card2,#1a1a2e);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px">
+ <div style="font-weight:700;font-size:.95rem;margin-bottom:4px;color:var(--accent)"><svg class="icon i-phone" aria-hidden="true"><use href="#i-phone"/></svg> Terms &amp; Conditions Number</div>
+          <div style="font-size:.82rem;color:var(--t2);margin-bottom:12px">The WhatsApp number shown in the Contact section of the Terms &amp; Conditions page. You can set any number you like here (it is separate from the Home page number above). Leave it empty and press Save to use the Home page number instead. Digits only.</div>
+          <div class="form-row" style="margin-bottom:10px">
+            <div class="fg">
+              <label>Terms Page Number</label>
+              <input type="text" id="slTermsNumber" placeholder="e.g. 2349065518402 (empty = Home number)" maxlength="15"
+                style="font-size:1.05rem;letter-spacing:1px"
+                oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+ <button class="btn-primary" onclick="saveSiteLinksField('termsnumber')" style="min-width:160px"><svg class="icon i-save" aria-hidden="true"><use href="#i-save"/></svg> Save Terms Number</button>
+            <span id="slTermsNumberPreview" style="font-size:.82rem;color:var(--t2)"></span>
+          </div>
+          <div id="slTermsNumberFb" class="fb" style="margin-top:8px"></div>
+        </div>
+        <div style="background:var(--card2,#1a1a2e);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px">
  <div style="font-weight:700;font-size:.95rem;margin-bottom:4px;color:var(--accent)"><svg class="icon i-smartphone" aria-hidden="true"><use href="#i-smartphone"/></svg> Admin Contact Phone (Support Page)</div>
           <div style="font-size:.82rem;color:var(--t2);margin-bottom:12px">Separate from the WhatsApp community number above. This is the direct admin contact shown on the Support &amp; Contact page. Digits only — no +, spaces, or dashes. <b>Cannot be removed, only changed.</b></div>
           <div class="form-row" style="margin-bottom:10px">
             <div class="fg">
               <label>Admin Contact Number <span style="color:var(--red)">*</span></label>
-              <input type="text" id="slAdminPhone" placeholder="e.g. 2348012345678" maxlength="15"
+              <input type="text" id="slAdminPhone" placeholder="e.g. 2349065518402" maxlength="15"
                 style="font-size:1.05rem;letter-spacing:1px"
                 oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
             </div>
@@ -1473,7 +1643,11 @@ tr:hover td{background:rgba(255,255,255,.035)}
             <div class="fg"><label>Telegram link (auto-filled — edit only for a custom link)</label><input type="url" id="slTelegramLink" placeholder="https://t.me/klslogs" oninput="klsTelegramLinkDirty=true"/></div>
           </div>
           <div class="form-row" style="margin-bottom:10px">
-            <div class="fg"><label>WhatsApp chat link (leave blank to use the number above)</label><input type="url" id="slWaChatLink" placeholder="https://wa.me/2347026881419"/></div>
+            <div class="fg"><label>Telegram Join Channel link</label><input type="url" id="slTelegramChannelLink" placeholder="https://t.me/your_channel"/></div>
+            <div class="fg"><label>Telegram Join Community link</label><input type="url" id="slTelegramCommunityLink" placeholder="https://t.me/your_community"/></div>
+          </div>
+          <div class="form-row" style="margin-bottom:10px">
+            <div class="fg"><label>WhatsApp chat link (leave blank to use the number above)</label><input type="url" id="slWaChatLink" placeholder="https://wa.me/2349065518402"/></div>
             <div class="fg"><label>Support hours (shown to buyers)</label><input type="text" id="slSupportHours" placeholder="9:00 AM – 11:00 PM (WAT), every day"/></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -1488,53 +1662,10 @@ tr:hover td{background:rgba(255,255,255,.035)}
         </div>
       </div>
     </div>
-    <div id="tab-chatadmin" class="tab-panel">
-      <div class="sec">
- <div class="sec-title"><svg class="icon i-plus" aria-hidden="true"><use href="#i-plus"/></svg> Create Group</div>
- <div class="info-box"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Groups appear in the Group Chat page for all logged-in users. Every member can post in every active group.</div>
-        <div class="fg"><label>Group Name *</label><input type="text" id="cgName" placeholder="e.g. General Chat, Buy/Sell Help, Game Lobby"/></div>
-        <div class="fg"><label>Description (optional)</label><input type="text" id="cgDesc" placeholder="What this group is for"/></div>
- <button class="btn-gold" onclick="createChatGroup()"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Create Group</button>
-        <div id="cgFb" class="fb"></div>
-      </div>
-      <div class="sec">
- <div class="sec-title"><svg class="icon i-clipboard" aria-hidden="true"><use href="#i-clipboard"/></svg> All Groups (<span id="cgCount">0</span>)</div>
-        <div class="tbl-wrap">
-          <table>
-            <thead><tr><th>Name</th><th>Description</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
-            <tbody id="cgBody"><tr><td colspan="5" style="text-align:center;padding:24px"><div class="spin" style="margin:0 auto"></div></td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div id="tab-gamesadmin" class="tab-panel">
-      <div class="sec">
- <div class="sec-title"><svg class="icon i-gamepad" aria-hidden="true"><use href="#i-gamepad"/></svg> Arcade Overview</div>
-        <div class="info-box purple">3 games are live for all logged-in users: Void Interceptor, Turbo Run, and Base Defense. Every user has a permanent Game ID assigned automatically. This tab is read-only monitoring — game content itself is managed in code.</div>
-        <div class="stat-row">
-          <div class="stat-card"><div class="sc-icon"><svg class="icon i-gamepad" aria-hidden="true"><use href="#i-gamepad"/></svg></div><div class="sc-val" id="gTotalPlays">—</div><div class="sc-lbl">Total Plays (selected game)</div></div>
- <div class="stat-card"><div class="sc-icon"><svg class="icon i-trophy" aria-hidden="true"><use href="#i-trophy"/></svg></div><div class="sc-val" id="gTopScore">—</div><div class="sc-lbl">All-Time High Score</div></div>
-        </div>
-      </div>
-      <div class="sec">
- <div class="sec-title"><svg class="icon i-trophy" aria-hidden="true"><use href="#i-trophy"/></svg> Top 10 Leaderboard</div>
-        <div class="lb-game-tabs" id="adminLbGameTabs" style="margin-bottom:16px">
- <button class="lb-game-tab active" onclick="switchAdminLeaderboard('space-shooter',this)"><svg class="icon i-rocket" aria-hidden="true"><use href="#i-rocket"/></svg> Void Interceptor</button>
- <button class="lb-game-tab" onclick="switchAdminLeaderboard('turbo-run',this)"><svg class="icon i-car" aria-hidden="true"><use href="#i-car"/></svg> Turbo Run</button>
- <button class="lb-game-tab" onclick="switchAdminLeaderboard('base-defense',this)"><svg class="icon i-shield" aria-hidden="true"><use href="#i-shield"/></svg> Base Defense</button>
-        </div>
-        <div class="tbl-wrap">
-          <table>
-            <thead><tr><th>Rank</th><th>Player</th><th>Game ID</th><th>Best Score</th><th>Games Played</th></tr></thead>
-            <tbody id="gLbBody"><tr><td colspan="5" style="text-align:center;padding:24px"><div class="spin" style="margin:0 auto"></div></td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
     <div id="tab-staffadmin" class="tab-panel">
       <div class="sec">
  <div class="sec-title"><svg class="icon i-plus" aria-hidden="true"><use href="#i-plus"/></svg> Create Sub-Admin</div>
- <div class="info-box purple"><svg class="icon i-headphones" aria-hidden="true"><use href="#i-headphones"/></svg> Sub-admins log in separately (email + password, not your passcode). They can access <strong>Dashboard</strong>, <strong>Receipts</strong> (approve/reject deposits), and <strong>Support</strong> only — they cannot manage users, logs, tools, ads, or chat groups.</div>
+ <div class="info-box purple"><svg class="icon i-headphones" aria-hidden="true"><use href="#i-headphones"/></svg> Sub-admins log in separately (email + password, not your passcode). They can access <strong>Dashboard</strong>, <strong>Receipts</strong> (approve/reject deposits), and <strong>Support</strong> only — they cannot manage users, logs, tools or ads.</div>
         <div class="fg"><label>Full Name *</label><input type="text" id="staffName" placeholder="e.g. Amaka"/></div>
         <div class="fg"><label>Email *</label><input type="email" id="staffNewEmail" placeholder="staff@example.com"/></div>
         <div class="fg"><label>Password *</label><input type="password" id="staffNewPass" placeholder="At least 6 characters"/></div>
@@ -1556,7 +1687,7 @@ tr:hover td{background:rgba(255,255,255,.035)}
  <div class="sec-title"><svg class="icon i-plus" aria-hidden="true"><use href="#i-plus"/></svg> Post New Ad</div>
  <div class="info-box"><svg class="icon i-megaphone" aria-hidden="true"><use href="#i-megaphone"/></svg> Ads appear as a banner on the Home, Marketplace, and Tools pages — not in Chat or Games. Users can dismiss an ad for their current visit; it reappears next time they open the site. Add an image for best results (optional).</div>
         <div class="fg"><label>Ad Title (optional caption)</label><input type="text" id="adTitle" placeholder="e.g. 50% Off All Twitter Logs This Week!"/></div>
-        <div class="fg"><label>Destination Link * (where the ad takes users when clicked)</label><input type="url" id="adLink" placeholder="https://wa.me/2347026881419 or any URL"/></div>
+        <div class="fg"><label>Destination Link * (where the ad takes users when clicked)</label><input type="url" id="adLink" placeholder="https://wa.me/2349065518402 or any URL"/></div>
         <div class="fg"><label>Ad Image (optional)</label><input type="file" id="adImage" accept="image/*"/></div>
  <button class="btn-gold" onclick="addAd()"><svg class="icon i-megaphone" aria-hidden="true"><use href="#i-megaphone"/></svg> Post Ad</button>
         <div id="addAdFb" class="fb"></div>
@@ -1663,41 +1794,6 @@ tr:hover td{background:rgba(255,255,255,.035)}
           </table>
         </div>
         <button class="btn-sm" type="button" style="margin-top:10px" onclick="nbAnalytics()">Refresh analytics</button>
-      </div>
-    </div>
-    <div id="tab-giveaways" class="tab-panel">
-      <div class="sec">
- <div class="sec-title"><svg class="icon i-gift" aria-hidden="true"><use href="#i-gift"/></svg> Post New Giveaway</div>
- <div class="info-box"><svg class="icon i-trophy" aria-hidden="true"><use href="#i-trophy"/></svg> Giveaways show up on the public Giveaways page for logged-in users. The first person to tap "Claim & Win" gets the credentials revealed immediately and is recorded as the winner — everyone else sees their name and profile picture as proof, but never the credentials.</div>
-        <div class="fg"><label>Title *</label><input type="text" id="gwTitle" placeholder="e.g. Free Premium Gmail Account"/></div>
-        <div class="fg"><label>Description (optional)</label><textarea id="gwDesc" rows="2" placeholder="e.g. Aged 2019 Gmail, fully verified, no recovery needed"></textarea></div>
-        <div class="fg"><label>Category (optional label)</label><input type="text" id="gwCategory" placeholder="e.g. Gmail, Netflix, VPN & Proxy"/></div>
-        <div class="fg"><label>Credentials * (only shown to the winner, once)</label><textarea id="gwCredentials" rows="3" placeholder="Login email / username / password / recovery info..."></textarea></div>
-        <div class="fg"><label>Starts Claiming In (optional — leave blank or 0 to open immediately)</label>
-          <select id="gwStartsIn">
-            <option value="0">Immediately</option>
-            <option value="1">In 1 minute</option>
-            <option value="5">In 5 minutes</option>
-            <option value="15">In 15 minutes</option>
-            <option value="30">In 30 minutes</option>
-            <option value="60">In 1 hour</option>
-            <option value="180">In 3 hours</option>
-            <option value="360">In 6 hours</option>
-            <option value="1440">In 24 hours</option>
-          </select>
-        </div>
-        <div class="fg"><label>Image (optional)</label><input type="file" id="gwImage" accept="image/*"/></div>
- <button class="btn-gold" onclick="addGiveaway()"><svg class="icon i-gift" aria-hidden="true"><use href="#i-gift"/></svg> Post Giveaway</button>
-        <div id="addGiveawayFb" class="fb"></div>
-      </div>
-      <div class="sec">
- <div class="sec-title"><svg class="icon i-clipboard" aria-hidden="true"><use href="#i-clipboard"/></svg> All Giveaways (<span id="giveawaysCount">0</span>)</div>
-        <div class="tbl-wrap">
-          <table>
-            <thead><tr><th>Img</th><th>Title</th><th>Status</th><th>Winner</th><th>Posted</th><th>Actions</th></tr></thead>
-            <tbody id="giveawaysBody"><tr><td colspan="6" style="text-align:center;padding:24px"><div class="spin" style="margin:0 auto"></div></td></tr></tbody>
-          </table>
-        </div>
       </div>
     </div>
     <div id="tab-weeklyreward" class="tab-panel">
@@ -1952,7 +2048,8 @@ const ADMIN_NAV = [
     { tab:'selfcheck', icon:'i-check-circle', label:'Deployment self-check', run:'runBoostSelfCheck' },
   ]},
   { group:'Marketplace settings', owner:true, items:[
-    { tab:'logs2', icon:'i-plug', label:'Logs 2 (Marketplace 2)', owner:true, keywords:'rakib marketplace manual switch prices stock' },
+    { tab:'logs2', icon:'i-plug', label:'Logs 2 (Marketplace 2)', owner:true, keywords:'nova novasolution marketplace manual switch prices stock' },
+    { tab:'logs3', icon:'i-plug', label:'Logs 3 (Marketplace 3)', owner:true, keywords:'rakib rakibsocials marketplace three switch prices stock orders' },
     { tab:'numbers2', icon:'i-smartphone', label:'Server 2 — low SMS rate pools', owner:true },
   ]},
   { group:'Boost', items:[
@@ -1981,12 +2078,11 @@ const ADMIN_NAV = [
     { tab:'emaildelivery', icon:'i-mail',      label:'Email delivery', owner:true },
     { tab:'campaigns',     icon:'i-megaphone', label:'Campaigns',      owner:true },
     { tab:'ads',           icon:'i-megaphone', label:'Ads',            owner:true },
-    { tab:'giveaways',     icon:'i-gift',      label:'Giveaways',      owner:true },
     { tab:'weeklyreward',  icon:'i-trophy',    label:'Weekly reward',  owner:true },
+    { tab:'welcomepopup', icon:'i-zap',       label:'Welcome popup',  owner:true, keywords:'welcome popup whatsapp channel announcement' },
   ]},
   { group:'Community', owner:true, items:[
-    { tab:'chatadmin',  icon:'i-message-circle', label:'Chat groups', owner:true },
-    { tab:'gamesadmin', icon:'i-gamepad',        label:'Games',       owner:true },
+    { tab:'tutorialsadmin', icon:'i-video',      label:'Tutorials',   owner:true, keywords:'tutorial tutorials video guide how to learn' },
   ]},
   { group:'System', items:[
     { tab:'notifbar',   icon:'i-bell',           label:'Notifications bar (post, edit, delete)', owner:true,
@@ -2084,6 +2180,9 @@ function switchTab(name,el) {
   if(name==='logs')         { loadLogs(); loadCategories(); loadCategoriesIntoSelects(); loadRestockDemand(); }
   if(name==='tools')        loadTools();
   if(name==='logs2')        { m2LoadConfig(); m2LoadProducts(false); m2LoadBalance(); m2LoadOrders(); }
+  if(name==='logs3')        { m3LoadConfig(); m3LoadProducts(false); m3LoadBalance(); m3LoadOrders(); }
+  if(name==='welcomepopup') { wpLoad(); }
+  if(name==='tutorialsadmin') { tutLoad(); }
   if(name==='users')        { loadUsers(); loadActiveUsersAdmin(); }
   if(name==='credit')       { loadAllUsersFor('qcBody'); refreshCreditUsers(); }
   if(name==='transactions') loadTxns();
@@ -2094,7 +2193,7 @@ function switchTab(name,el) {
 
   if(name==='receipts')     loadReceipts();
   if(name==='deptutorials') loadDepositTutorialsAdmin();
-  if(name==='numbers')      { loadNumberPricing(); loadNumberStock(); loadOtpsuiteBalance(); loadOtpCountriesDropdown(); loadUserNumberPrices(); loadNumberServerConfig(); loadGrizzlyBalance(); loadNumberProfit(); loadAdminHealth(); loadAdminNumberOrders(); }
+  if(name==='numbers')      { try{pollNovaSync();}catch(e){} loadNumberStock(); loadNovaBalance(); loadNovaCatalogSummary(); loadUserNumberPrices(); loadNumberServerConfig(); loadGrizzlyBalance(); loadNumberProfit(); loadAdminHealth(); loadAdminNumberOrders(); }
   if(name==='numbers2')     { initNumbers2(); loadN2AlertSettings(); loadProviderAnalytics(); }
   if(name==='finance')      { finLoadSettings(); finSearch(); finLoadWebhooks(); }
   if(name==='virtualaccounts') { loadVASettings(); loadVAList(); loadVADeposits(); }
@@ -2102,11 +2201,8 @@ function switchTab(name,el) {
   if(name==='badges')       loadBadgesAdmin();
   if(name==='fraud')        { loadSuspiciousEmails(); loadReferralClusters(); }
   if(name==='ads')          loadAds();
-  if(name==='giveaways')    loadGiveaways();
   if(name==='notifbar')     nbLoad();
   if(name==='weeklyreward') initWeeklyReward();
-  if(name==='chatadmin')    loadChatGroups();
-  if(name==='gamesadmin')   loadGamesAdmin();
   if(name==='sitelinks')    loadSiteLinksAdmin();
   if(name==='staffadmin')   loadStaffList();
 }
@@ -2255,7 +2351,7 @@ async function finExport(kind){
     const blob = await r.blob();
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'mizzy-sales-deposits-'+Date.now()+'.'+kind;
+    a.download = 'kls-deposits-'+Date.now()+'.'+kind;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
   } catch(e){ alert(e.message); }
@@ -3850,7 +3946,47 @@ async function loadPaymentMethodsAdmin() {
     if (plMsg)    plMsg.value = plSettings.disabledMessage || '';
     const vaToggle = document.getElementById('pmToggleVirtualAccount');
     if (vaToggle) vaToggle.checked = !!vaData.globalEnabled;
+    loadGatewaysAdmin();
   } catch(e) { console.error('Failed to load payment method settings', e); }
+}
+async function loadGatewaysAdmin() {
+  try {
+    const g = await aFetch('/api/admin/payment-gateways');
+    [['flutterwave','Flutterwave'],['paystack','Paystack']].forEach(([key, name]) => {
+      const st = g[key] || {};
+      const toggle = document.getElementById('gwToggle' + name);
+      const msg = document.getElementById('gwMsg' + name);
+      const status = document.getElementById('gwStatus' + name);
+      const hook = document.getElementById('gwHook' + name);
+      if (toggle) toggle.checked = !!st.enabled;
+      if (msg) msg.value = st.disabledMessage || '';
+      if (status) status.textContent = !st.configured ? '— API keys NOT set on server' : (st.enabled ? '— ON' : '— OFF');
+      if (hook) hook.textContent = (g.webhookUrls && g.webhookUrls[key]) || ('/api/webhooks/' + key);
+    });
+  } catch (e) { console.error('Failed to load payment gateways', e); }
+}
+async function toggleGateway(gateway, enabled) {
+  const name = gateway === 'paystack' ? 'Paystack' : 'Flutterwave';
+  const fb = document.getElementById('gwFeedback' + name);
+  setFb(fb, 'Saving...', '');
+  try {
+    await aFetch('/api/admin/payment-gateways/' + gateway, 'POST', { enabled });
+    setFb(fb, enabled ? name + ' is ON — customers can pay with it now.' : name + ' is OFF — hidden from customers.', 'ok');
+    loadGatewaysAdmin();
+  } catch (e) {
+    setFb(fb, e.message, 'err');
+    const t = document.getElementById('gwToggle' + name);
+    if (t) t.checked = !enabled;
+  }
+}
+async function saveGatewayMessage(gateway) {
+  const name = gateway === 'paystack' ? 'Paystack' : 'Flutterwave';
+  const fb = document.getElementById('gwFeedback' + name);
+  setFb(fb, 'Saving...', '');
+  try {
+    await aFetch('/api/admin/payment-gateways/' + gateway, 'POST', { disabledMessage: gv('gwMsg' + name) });
+    setFb(fb, 'Message saved.', 'ok');
+  } catch (e) { setFb(fb, e.message, 'err'); }
 }
 async function toggleVirtualAccountGlobal(enabled) {
   const fb = document.getElementById('pmFeedbackVirtualAccount');
@@ -4252,200 +4388,29 @@ async function loadNumberProfit() {
   } catch (e) { box.textContent = 'Could not load profit report: ' + e.message; }
 }
 
-// ── otpsuite live provider helpers ──────────────────────────────────────────────────────────
-let otpCountriesCache = null;
-async function loadOtpsuiteBalance() {
-  const box = document.getElementById('otpBalanceBox');
-  box.textContent = 'Checking balance…';
+// ── NovaSolution admin helpers ───────────────────────────────────────────────
+async function loadNovaBalance() {
+  const box = document.getElementById('novaBalanceBox'); if (!box) return;
+  box.textContent = 'Checking NovaSolution balance…';
   try {
-    const r = await aFetch('/api/admin/numbers/otpsuite-balance');
- box.textContent = ` ₦${Number(r.balance).toLocaleString('en-NG')} available on otpsuite`;
-  } catch (e) { box.innerHTML = `<span style="color:var(--red)">Could not reach otpsuite: ${esc(e.message)}</span>`; }
+    const r = await aFetch('/api/admin/numbers/nova-balance');
+    const ngn = r.balance_ngn !== undefined ? Number(r.balance_ngn) : null;
+    const minor = r.balance_minor !== undefined ? Number(r.balance_minor) / 100 : null;
+    box.textContent = `NovaSolution balance: ${ngn !== null && Number.isFinite(ngn) ? '₦' + ngn.toLocaleString('en-NG') : minor !== null && Number.isFinite(minor) ? minor.toLocaleString() + ' ' + (r.currency || '') : 'Available'}${r.mode ? ' · ' + r.mode : ''}`;
+  } catch (e) { box.innerHTML = `<span style="color:var(--red)">Could not reach NovaSolution: ${esc(e.message)}</span>`; }
 }
-function onNpModeChange() {} // kept as a no-op so any stray old references don't error; mode is always 'live' now
-async function loadOtpCountriesDropdown() {
-  const sel = document.getElementById('npOtpCountry');
-  sel.innerHTML = '<option value="">Loading…</option>';
+async function loadNovaCatalogSummary() {
+  const box = document.getElementById('novaCatalogSummary'); if (!box) return;
+  box.textContent = 'Checking live NovaSolution catalog…';
   try {
-    const r = await aFetch('/api/admin/numbers/otpsuite-countries');
-    otpCountriesCache = r.countries || [];
-    sel.innerHTML = '<option value="">Select a country…</option>' +
-      otpCountriesCache.map(c => `<option value="${esc(c.country_code)}">${esc(c.country_name)} (${esc(c.country_code)})</option>`).join('');
-  } catch (e) { sel.innerHTML = '<option value="">Failed to load — try again</option>'; }
-}
-// No typed fields at all — the service/country shown to buyers is derived entirely from what's
-// picked in the two dropdowns above, straight from otpsuite's own API response. These two
-// variables ARE that derived state; nothing else feeds saveNumberPrice().
-let npSelectedProvider = '';
-let npSelectedCountry = '';
-function npUpdateSummary() {
-  const box = document.getElementById('npSelectedSummary');
-  box.textContent = (npSelectedProvider && npSelectedCountry) ? `Will be listed as: ${npSelectedProvider} — ${npSelectedCountry}` : '';
-}
-let npOtpCountryRequestToken = 0;
-async function onNpOtpCountryChange() {
-  const country = document.getElementById('npOtpCountry').value;
-  const serviceSel = document.getElementById('npOtpService');
-  const hint = document.getElementById('npOtpCostHint');
-  hint.textContent = '';
-  npSelectedCountry = ''; npSelectedProvider = ''; npUpdateSummary();
-  const myToken = ++npOtpCountryRequestToken; // bump on every call — a response only applies if it's still the latest
-  if (!country) { serviceSel.innerHTML = '<option value="">Select a country first</option>'; return; }
-  const countryEntry = (otpCountriesCache || []).find(c => c.country_code === country);
-  npSelectedCountry = countryEntry ? countryEntry.country_name : country;
-  serviceSel.innerHTML = '<option value="">Loading…</option>';
-  try {
-    const r = await aFetch(`/api/admin/numbers/otpsuite-services?country=${encodeURIComponent(country)}`);
-    if (myToken !== npOtpCountryRequestToken) return; // admin already switched countries again — this response is stale, discard it
-    const services = r.services || [];
-    serviceSel.dataset.services = JSON.stringify(services);
-    serviceSel.innerHTML = '<option value="">Select a service…</option>' +
-      services.map(s => `<option value="${esc(s.service_id)}">${esc(s.service_name)} — your cost ₦${Number(s.your_price).toLocaleString('en-NG')}</option>`).join('');
-  } catch (e) {
-    if (myToken !== npOtpCountryRequestToken) return; // stale error too — don't clobber a newer, still-in-flight selection
-    serviceSel.innerHTML = '<option value="">Failed to load — try again</option>';
-  }
-}
-// Turns otpsuite's raw service name (often all-lowercase, e.g. "whatsapp") into the properly
-// cased brand name shown to buyers, so the site never displays a mismatched or malformed name.
-const KNOWN_SERVICE_NAMES = {
-  whatsapp: 'WhatsApp', telegram: 'Telegram', google: 'Google', gmail: 'Gmail', facebook: 'Facebook',
-  instagram: 'Instagram', tiktok: 'TikTok', twitter: 'Twitter/X', x: 'Twitter/X', discord: 'Discord',
-  snapchat: 'Snapchat', linkedin: 'LinkedIn', microsoft: 'Microsoft', apple: 'Apple', amazon: 'Amazon',
-  paypal: 'PayPal', uber: 'Uber', netflix: 'Netflix', spotify: 'Spotify', tinder: 'Tinder',
-  yahoo: 'Yahoo', ebay: 'eBay', airbnb: 'Airbnb', viber: 'Viber', line: 'LINE', wechat: 'WeChat'
-};
-function prettifyServiceName(raw) {
-  const key = String(raw || '').trim().toLowerCase();
-  if (KNOWN_SERVICE_NAMES[key]) return KNOWN_SERVICE_NAMES[key];
-  return String(raw || '').replace(/\b\w/g, c => c.toUpperCase());
-}
-function onNpOtpServiceChange() {
-  const serviceSel = document.getElementById('npOtpService');
-  const hint = document.getElementById('npOtpCostHint');
-  const services = JSON.parse(serviceSel.dataset.services || '[]');
-  const match = services.find(s => s.service_id === serviceSel.value);
-  npSelectedProvider = match ? prettifyServiceName(match.service_name) : '';
-  npUpdateSummary();
-  if (!match) { hint.textContent = ''; return; }
-  hint.textContent = `Your cost per number: ₦${Number(match.your_price).toLocaleString('en-NG')} — set your Price above higher than this to make a profit.`;
-}
-async function loadNumberPricing() {
-  const list = document.getElementById('npList');
-  try {
-    const rows = await aFetch('/api/admin/number-pricing');
-    if (!rows.length) { list.innerHTML = '<p style="color:var(--t2);font-size:13px">No prices set yet.</p>'; return; }
-    // Cards instead of a wide table — a table's rightmost column (Enable/Delete) was getting cut
-    // off the edge of the screen on mobile with no visible way to scroll to it. Cards stack instead.
-    list.innerHTML = rows.map(r => `
-      <div class="sec" style="margin:8px 0;padding:14px;border:1px solid var(--bd)">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
-          <div>
-            <div style="font-weight:700;font-size:14.5px">${textCellHtml(r._id, 'provider', r.provider)} — ${textCellHtml(r._id, 'country', r.country)}</div>
-            <div style="font-size:12px;color:var(--t2);margin-top:2px">${r.enabled ? '<svg class="icon i-check-circle" aria-hidden="true"><use href="#i-check-circle"/></svg> Enabled' : '<svg class="icon i-ban" aria-hidden="true"><use href="#i-ban"/></svg> Disabled'}</div>
-          </div>
-          <div style="display:flex;gap:6px">
-            <button class="btn-secondary" style="padding:6px 12px;font-size:12px" onclick="toggleNumberPrice('${r._id}')">${r.enabled ? '<svg class="icon i-ban" aria-hidden="true"><use href="#i-ban"/></svg> Disable' : '<svg class="icon i-check-circle" aria-hidden="true"><use href="#i-check-circle"/></svg> Enable'}</button>
-            <button class="btn-secondary" style="padding:6px 12px;font-size:12px;color:var(--red);border-color:var(--red)" onclick="deleteNumberPrice('${r._id}')"><svg class="icon i-trash" aria-hidden="true"><use href="#i-trash"/></svg> Delete</button>
-          </div>
-        </div>
-        <div style="display:flex;gap:20px;margin-top:10px;flex-wrap:wrap">
-          <div><div style="font-size:11px;color:var(--t2)">SITE PRICE</div>${priceCellHtml(r._id, 'price', r.price)}</div>
-          <div><div style="font-size:11px;color:var(--t2)">API PRICE</div>${priceCellHtml(r._id, 'apiPrice', r.apiPrice)}</div>
-        </div>
-      </div>
-    `).join('');
-  } catch(e) { list.innerHTML = '<p style="color:var(--red);font-size:13px">Failed to load price sheet</p>'; }
-}
-// Same click-to-edit idea as priceCellHtml below, but for plain text fields (the Service/Country
-// display labels) — editing here only renames the label; it does NOT touch the underlying
-// otpsuite country code / service id that actually drives the live purchase. Delete + re-add via
-// the form above if those need to change.
-function textCellHtml(id, field, value) {
-  const display = esc(value || '—');
-  return `<span id="tc-${field}-${id}-view" onclick="editTextCell('${id}','${field}')" style="cursor:pointer;border-bottom:1px dashed var(--t2)" title="Click to edit">${display} <svg class="icon i-edit" aria-hidden="true"><use href="#i-edit"/></svg></span>
-    <span id="tc-${field}-${id}-edit" style="display:none">
-      <input type="text" id="tc-${field}-${id}-input" value="${esc(value || '')}" style="width:120px;padding:4px 6px;font-size:13px" onkeydown="if(event.key==='Enter')saveTextCell('${id}','${field}')"/>
-      <button class="btn-secondary" style="padding:3px 8px;font-size:11px" onclick="saveTextCell('${id}','${field}')"><svg class="icon i-check" aria-hidden="true"><use href="#i-check"/></svg></button>
-      <button class="btn-secondary" style="padding:3px 8px;font-size:11px" onclick="cancelTextCell('${id}','${field}')"><svg class="icon i-x" aria-hidden="true"><use href="#i-x"/></svg></button>
-    </span>`;
-}
-function editTextCell(id, field) {
-  document.getElementById(`tc-${field}-${id}-view`).style.display = 'none';
-  document.getElementById(`tc-${field}-${id}-edit`).style.display = 'inline';
-  document.getElementById(`tc-${field}-${id}-input`).focus();
-  document.getElementById(`tc-${field}-${id}-input`).select();
-}
-function cancelTextCell(id, field) {
-  document.getElementById(`tc-${field}-${id}-view`).style.display = 'inline';
-  document.getElementById(`tc-${field}-${id}-edit`).style.display = 'none';
-}
-async function saveTextCell(id, field) {
-  const value = document.getElementById(`tc-${field}-${id}-input`).value.trim();
-  if (!value) return alert('This field can\'t be empty');
-  try {
-    await aFetch(`/api/admin/number-pricing/${id}`, 'PUT', { [field]: value });
-    loadNumberPricing();
-  } catch (e) { alert('Failed to save: ' + e.message); }
-}
-// Renders a price as a click-to-edit cell: shows "₦1,100 " normally; clicking swaps it for a
-// number input pre-filled with the CURRENT price, so admin only ever types the new amount — never
-// re-picks the country/service just to change a number.
-function priceCellHtml(id, field, value) {
-  const display = value ? '₦' + Number(value).toLocaleString('en-NG') : (field === 'apiPrice' ? '— (not on API)' : '₦0');
-  return `<span id="pc-${field}-${id}-view" onclick="editPriceCell('${id}','${field}')" style="cursor:pointer;border-bottom:1px dashed var(--t2)" title="Click to edit">${display} <svg class="icon i-edit" aria-hidden="true"><use href="#i-edit"/></svg></span>
-    <span id="pc-${field}-${id}-edit" style="display:none">
-      <input type="number" id="pc-${field}-${id}-input" value="${value || ''}" style="width:90px;padding:4px 6px;font-size:13px" onkeydown="if(event.key==='Enter')savePriceCell('${id}','${field}')"/>
-      <button class="btn-secondary" style="padding:3px 8px;font-size:11px" onclick="savePriceCell('${id}','${field}')"><svg class="icon i-check" aria-hidden="true"><use href="#i-check"/></svg></button>
-      <button class="btn-secondary" style="padding:3px 8px;font-size:11px" onclick="cancelPriceCell('${id}','${field}')"><svg class="icon i-x" aria-hidden="true"><use href="#i-x"/></svg></button>
-    </span>`;
-}
-function editPriceCell(id, field) {
-  document.getElementById(`pc-${field}-${id}-view`).style.display = 'none';
-  document.getElementById(`pc-${field}-${id}-edit`).style.display = 'inline';
-  document.getElementById(`pc-${field}-${id}-input`).focus();
-  document.getElementById(`pc-${field}-${id}-input`).select();
-}
-function cancelPriceCell(id, field) {
-  document.getElementById(`pc-${field}-${id}-view`).style.display = 'inline';
-  document.getElementById(`pc-${field}-${id}-edit`).style.display = 'none';
-}
-async function savePriceCell(id, field) {
-  const value = document.getElementById(`pc-${field}-${id}-input`).value;
-  try {
-    await aFetch(`/api/admin/number-pricing/${id}/price`, 'PUT', { [field]: Number(value) || 0 });
-    loadNumberPricing();
-  } catch (e) { alert('Failed to save: ' + e.message); }
-}
-async function saveNumberPrice() {
-  const fb = document.getElementById('npFeedback');
-  const provider = npSelectedProvider, country = npSelectedCountry, price = gv('npPrice');
-  const apiPrice = gv('npApiPrice');
-  const otpsuiteCountryCode = document.getElementById('npOtpCountry')?.value || '';
-  const otpsuiteServiceId = document.getElementById('npOtpService')?.value || '';
-  if (!otpsuiteCountryCode || !otpsuiteServiceId) return setFb(fb, 'Pick an otpsuite country and service first', 'err');
-  if (!provider || !country || !price) return setFb(fb, 'Fill in the price', 'err');
-  setFb(fb, 'Saving...', '');
-  try {
-    await aFetch('/api/admin/number-pricing', 'POST', {
-      provider, country, price: Number(price), mode: 'live', otpsuiteCountryCode, otpsuiteServiceId,
-      apiPrice: apiPrice ? Number(apiPrice) : 0
-    });
- setFb(fb, ' Price saved', 'ok');
-    document.getElementById('npPrice').value = ''; document.getElementById('npApiPrice').value = '';
-    document.getElementById('npOtpCountry').value = ''; document.getElementById('npOtpService').innerHTML = '<option value="">Select a country first</option>'; document.getElementById('npOtpCostHint').textContent = '';
-    npSelectedProvider = ''; npSelectedCountry = ''; npUpdateSummary();
-    loadNumberPricing();
- } catch(e) { setFb(fb, ' ' + e.message, 'err'); }
-}
-async function toggleNumberPrice(id) {
-  try { await aFetch(`/api/admin/number-pricing/${id}/toggle`, 'PUT'); loadNumberPricing(); }
-  catch(e) { alert('Error: ' + e.message); }
-}
-async function deleteNumberPrice(id) {
-  if (!confirm('Delete this price entry?')) return;
-  try { await aFetch(`/api/admin/number-pricing/${id}`, 'DELETE'); loadNumberPricing(); }
-  catch(e) { alert('Error: ' + e.message); }
+    const r = await aFetch('/api/admin/numbers/nova-catalog?scope=usa');
+    const d = r.data && typeof r.data === 'object' ? r.data : r;
+    const servers = Array.isArray(d.servers) ? d.servers : [];
+    const countries = Array.isArray(d.countries) ? d.countries : [];
+    const services = Array.isArray(d.services) ? d.services : [];
+    box.textContent = `Catalog reachable · ${servers.length} server(s), ${countries.length} country(ies), ${services.length} service(s) in USA scope. Pool-specific choices are only available if NovaSolution exposes them in its catalog/API.`;
+    const fb = document.getElementById('novaAdminFeedback'); if (fb) fb.textContent = 'Last catalog check: ' + new Date().toLocaleString();
+  } catch (e) { box.textContent = 'Catalog check failed: ' + e.message; }
 }
 // ── PER-USER NUMBER PRICE OVERRIDES ──────────────────────────
 let unpPriceSheetCache = []; // this admin's standard Price Sheet rows — used to populate the Provider/Country pickers below
@@ -4727,62 +4692,6 @@ async function deleteCluster(idx) {
     loadReferralClusters();
   } catch(e) { alert('Error: ' + e.message); }
 }
-// ── GIVEAWAYS (owner only) ────────────────────────────────────────
-async function loadGiveaways() {
-  const tbody=document.getElementById('giveawaysBody');
-  if(!tbody) return;
-  try {
-    const gws=await aFetch('/api/admin/giveaways');
-    document.getElementById('giveawaysCount').textContent=gws.length;
-    if(!gws.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--t2);padding:24px">No giveaways posted yet</td></tr>';return;}
-    tbody.innerHTML=gws.map(g=>{
-      const notYetOpen = g.status==='active' && new Date(g.startsAt) > new Date();
-      const statusBadge = notYetOpen
-        ? `<span class="badge b-gold">⏳ Opens ${new Date(g.startsAt).toLocaleString('en-NG',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span>`
-        : `<span class="badge ${g.status==='active'?'b-green':'b-red'}">${g.status==='active'?'<svg class="icon i-dot" aria-hidden="true"><use href="#i-dot"/></svg> Active':'<svg class="icon i-flag" aria-hidden="true"><use href="#i-flag"/></svg> Claimed'}</span>`;
-      return `<tr>
-      <td>${g.imageUrl?`<img src="${g.imageUrl}" class="thumb"/>`:`<div class="thumb"><svg class="icon i-gift" aria-hidden="true"><use href="#i-gift"/></svg></div>`}</td>
-      <td><strong>${esc(g.title)}</strong>${g.category?`<div style="font-size:11.5px;color:var(--t2)">${esc(g.category)}</div>`:''}</td>
-      <td>${statusBadge}</td>
-      <td>${g.winnerName?`<div style="display:flex;align-items:center;gap:6px">${g.winnerProfilePicture?`<img src="${g.winnerProfilePicture}" style="width:22px;height:22px;border-radius:50%;object-fit:cover"/>`:'<svg class="icon i-user" aria-hidden="true"><use href="#i-user"/></svg>'} ${esc(g.winnerName)}</div>`:'<span style="color:var(--t2)">—</span>'}</td>
-      <td style="color:var(--t2);font-size:12px">${new Date(g.createdAt).toLocaleDateString('en-NG')}</td>
-      <td><div class="act">
-        <button class="btn-del" onclick="deleteGiveaway('${g._id}')"><svg class="icon i-trash" aria-hidden="true"><use href="#i-trash"/></svg> Delete</button>
-      </div></td>
-    </tr>`;}).join('');
-  } catch(e){tbody.innerHTML=`<tr><td colspan="6" style="color:var(--red);padding:16px">${e.message}</td></tr>`;}
-}
-async function addGiveaway() {
-  const fb=document.getElementById('addGiveawayFb');
-  const title=gv('gwTitle'),description=gv('gwDesc'),category=gv('gwCategory'),credentials=gv('gwCredentials');
-  const startsInMinutes=gv('gwStartsIn')||'0';
-  const img=document.getElementById('gwImage').files[0];
-  if(!title) return setFb(fb,'Title is required','err');
-  if(!credentials) return setFb(fb,'Credentials are required','err');
-  const fd=new FormData();
-  fd.append('title',title);fd.append('description',description);fd.append('category',category);fd.append('credentials',credentials);fd.append('startsInMinutes',startsInMinutes);
-  if(img) fd.append('image',img);
-  const pbarGw = progressBarFor(fb);
-  setFb(fb,'Uploading... 0%','');
-  pbarGw.show();
-  try {
-    await aFetchUpload('/api/admin/giveaways','POST',fd,(pct)=>{ pbarGw.set(pct); setFb(fb, pct<100?`Uploading... ${pct}%`:'Processing...',''); });
-    pbarGw.hide();
- setFb(fb,' Giveaway posted! It will now show on the public Giveaways page.','ok');
-    document.getElementById('gwTitle').value='';
-    document.getElementById('gwDesc').value='';
-    document.getElementById('gwCategory').value='';
-    document.getElementById('gwCredentials').value='';
-    document.getElementById('gwStartsIn').value='0';
-    document.getElementById('gwImage').value='';
-    loadGiveaways();
- } catch(e){pbarGw.hide();setFb(fb,' '+e.message,'err');}
-}
-async function deleteGiveaway(id) {
-  if(!confirm('Permanently delete this giveaway? This cannot be undone.')) return;
-  try { await aFetch(`/api/admin/giveaways/${id}`,'DELETE'); loadGiveaways(); }
-  catch(e){ alert('Error: '+e.message); }
-}
 // ── WEEKLY TOP-BUYER REWARD (owner only) ──────────────────────
 // Populates the week dropdown with recent Mondays (this week + the last 7), then loads whichever
 // week is selected. "Week" always means Monday–Sunday to match the server's getWeekBounds().
@@ -4900,7 +4809,6 @@ async function resetStaffPassword(id,name) {
   try { const data=await aFetch(`/api/admin/staff/${id}/reset-password`,'POST',{newPassword}); showAdminToast(data.message); }
   catch(e){ alert('Error: '+e.message); }
 }
-// ── CHAT GROUPS ───────────────────────────────────────────────
 // ── PROVIDER PERFORMANCE ANALYTICS (BuyNumber 2 tab) ─────────────────────────
 async function loadProviderAnalytics() {
   const sum = document.getElementById('paSummary');
@@ -4956,6 +4864,10 @@ async function loadSiteLinksAdmin() {
     const grp = links.whatsappGroupLink || '';
     const chn = links.whatsappChannelLink || '';
     document.getElementById('slNumber').value = num;
+    const termsEl = document.getElementById('slTermsNumber');
+    if (termsEl) termsEl.value = links.termsNumber || '';
+    const prevTerms = document.getElementById('slTermsNumberPreview');
+    if (prevTerms) prevTerms.textContent = (links.termsNumber || num) ? ` wa.me/${links.termsNumber || num}` : '';
     document.getElementById('slGroupLink').value = grp;
     document.getElementById('slChannelLink').value = chn;
     // Admin Phone
@@ -4975,7 +4887,7 @@ async function loadSiteLinksAdmin() {
 }
 // Save a single field without requiring all three to be filled
 async function saveSiteLinksField(field) {
-  const fbIds = { number: 'slNumberFb', group: 'slGroupFb', channel: 'slChannelFb', adminphone: 'slAdminPhoneFb' };
+  const fbIds = { number: 'slNumberFb', group: 'slGroupFb', channel: 'slChannelFb', adminphone: 'slAdminPhoneFb', termsnumber: 'slTermsNumberFb' };
   const fb = document.getElementById(fbIds[field]);
   try {
     let payload = {};
@@ -4998,6 +4910,12 @@ async function saveSiteLinksField(field) {
       payload.whatsappChannelLink = val;
       const btn = document.getElementById('slChannelPreviewBtn');
       if (btn) { btn.href = val; btn.style.display = 'inline'; }
+    } else if (field === 'termsnumber') {
+      const val = document.getElementById('slTermsNumber').value.replace(/[^0-9]/g, '');
+      if (val && val.length < 10) return setFb(fb, ' Enter a valid number (digits only, min 10 digits) or leave empty', 'err');
+      payload.termsNumber = val;
+      const prev = document.getElementById('slTermsNumberPreview');
+      if (prev) prev.textContent = val ? ` wa.me/${val}` : ' (using the Home page number)';
     } else if (field === 'adminphone') {
       const val = document.getElementById('slAdminPhone').value.replace(/[^0-9]/g, '');
  if (!val || val.length < 10) return setFb(fb, ' Enter a valid number (digits only, min 10 digits)', 'err');
@@ -5010,11 +4928,12 @@ async function saveSiteLinksField(field) {
     const merged = {
       whatsappNumber:      current.whatsappNumber      || '',
       adminPhone:          current.adminPhone          || current.whatsappNumber || '',
+      termsNumber:         current.termsNumber         || '',
       whatsappGroupLink:   current.whatsappGroupLink   || '',
       whatsappChannelLink: current.whatsappChannelLink || '',
       ...payload
     };
-    await aFetch('/api/admin/site-links', 'POST', merged); try{localStorage.setItem('ms_links_updated',String(Date.now()))}catch(e){}
+    await aFetch('/api/admin/site-links', 'POST', merged);
  setFb(fb, ' Saved — live across the site immediately', 'ok');
     setTimeout(() => setFb(fb, '', ''), 4000);
  } catch (e) { setFb(fb, ' ' + e.message, 'err'); }
@@ -5038,6 +4957,8 @@ async function loadContactLinksAdmin() {
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
     set('slTelegramUser', links.telegramUsername || 'klslogs');
     set('slTelegramLink', links.telegramLink || 'https://t.me/klslogs');
+    set('slTelegramChannelLink', links.telegramChannelLink || '');
+    set('slTelegramCommunityLink', links.telegramCommunityLink || '');
     klsTelegramLinkDirty = false; // freshly loaded from the server — back in sync
     set('slWaChatLink', links.whatsappChatLink || '');
     set('slSupportHours', links.supportHours || '');
@@ -5051,10 +4972,13 @@ async function saveContactLinks() {
   let telegramLink = document.getElementById('slTelegramLink').value.trim();
   const whatsappChatLink = document.getElementById('slWaChatLink').value.trim();
   const supportHours = document.getElementById('slSupportHours').value.trim();
+  const telegramChannelLink = document.getElementById('slTelegramChannelLink').value.trim();
+  const telegramCommunityLink = document.getElementById('slTelegramCommunityLink').value.trim();
+  for (const [label, link] of [['Telegram channel', telegramChannelLink], ['Telegram community', telegramCommunityLink]]) if (link && !link.startsWith('https://')) return setFb(fb, label + ' link must start with https://', 'err');
   if (!telegramUsername && !telegramLink) return setFb(fb, 'Enter a Telegram username or link', 'err');
   if (telegramUsername && !telegramLink) telegramLink = 'https://t.me/' + telegramUsername;
   try {
-    await aFetch('/api/admin/site-links', 'POST', { telegramUsername, telegramLink, whatsappChatLink, supportHours }); try{localStorage.setItem('ms_links_updated',String(Date.now()))}catch(e){}
+    await aFetch('/api/admin/site-links', 'POST', { telegramUsername, telegramLink, telegramChannelLink, telegramCommunityLink, whatsappChatLink, supportHours });
     klsTelegramLinkDirty = false;
     setFb(fb, 'Saved — live across the site immediately', 'ok');
     const prev = document.getElementById('slTgPreviewBtn'); if (prev) prev.href = telegramLink;
@@ -5073,7 +4997,7 @@ async function saveSiteLinks() {
   if (!whatsappGroupLink.startsWith('https://') || !whatsappChannelLink.startsWith('https://'))
  return setFb(fb, ' Links must start with https://', 'err');
   try {
-    await aFetch('/api/admin/site-links', 'POST', { whatsappNumber, whatsappGroupLink, whatsappChannelLink }); try{localStorage.setItem('ms_links_updated',String(Date.now()))}catch(e){}
+    await aFetch('/api/admin/site-links', 'POST', { whatsappNumber, whatsappGroupLink, whatsappChannelLink });
  setFb(fb, ' All three saved — live across the site immediately', 'ok');
     // Update previews
     const pNum = document.getElementById('slNumberPreview');
@@ -5084,73 +5008,6 @@ async function saveSiteLinks() {
     if (pChn) { pChn.href = whatsappChannelLink; pChn.style.display = 'inline'; }
     setTimeout(() => setFb(fb, '', ''), 5000);
  } catch (e) { setFb(fb, ' ' + e.message, 'err'); }
-}
-async function loadChatGroups() {
-  const tbody=document.getElementById('cgBody');
-  if(!tbody) return;
-  try {
-    const groups=await aFetch('/api/admin/chat/groups');
-    document.getElementById('cgCount').textContent=groups.length;
-    if(!groups.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t2);padding:24px">No groups yet — create one above</td></tr>';return;}
-    tbody.innerHTML=groups.map(g=>`<tr>
-      <td><strong>${esc(g.name)}</strong></td>
-      <td style="color:var(--t2)">${esc(g.description||'—')}</td>
-      <td><span class="badge ${g.active?'b-green':'b-red'}">${g.active?'Active':'Closed'}</span></td>
-      <td style="color:var(--t2);font-size:12px">${new Date(g.createdAt).toLocaleDateString('en-NG')}</td>
-      <td><div class="act">
-        ${g.active?`<button class="btn-del" onclick="toggleChatGroup('${g._id}',false)"><svg class="icon i-ban" aria-hidden="true"><use href="#i-ban"/></svg> Close</button>`:`<button class="btn-cred" onclick="toggleChatGroup('${g._id}',true)"><svg class="icon i-check-circle" aria-hidden="true"><use href="#i-check-circle"/></svg> Reopen</button>`}
-        <button class="btn-del" onclick="deleteChatGroup('${g._id}')"><svg class="icon i-trash" aria-hidden="true"><use href="#i-trash"/></svg> Delete</button>
-      </div></td>
-    </tr>`).join('');
-  } catch(e){tbody.innerHTML=`<tr><td colspan="5" style="color:var(--red);padding:16px">${e.message}</td></tr>`;}
-}
-async function createChatGroup() {
-  const fb=document.getElementById('cgFb');
-  const name=gv('cgName'), description=gv('cgDesc');
- if(!name) return setFb(fb,' Group name is required','err');
-  setFb(fb,'Creating...','');
-  try {
-    await aFetch('/api/admin/chat/groups','POST',{name,description});
- setFb(fb,' Group created! It now shows in Group Chat for all users.','ok');
-    document.getElementById('cgName').value='';
-    document.getElementById('cgDesc').value='';
-    loadChatGroups();
- } catch(e){ setFb(fb,' '+e.message,'err'); }
-}
-async function toggleChatGroup(id,active) {
-  try { await aFetch(`/api/admin/chat/groups/${id}`,'PUT',{active}); loadChatGroups(); }
-  catch(e){ alert('Error: '+e.message); }
-}
-async function deleteChatGroup(id) {
-  if(!confirm('Permanently delete this group and all its messages?')) return;
-  try { await aFetch(`/api/admin/chat/groups/${id}`,'DELETE'); loadChatGroups(); }
-  catch(e){ alert('Error: '+e.message); }
-}
-// ── GAMES (admin monitoring) ────────────────────────────────────
-let currentAdminGame = 'space-shooter';
-function switchAdminLeaderboard(gameKey, btn) {
-  currentAdminGame = gameKey;
-  document.querySelectorAll('#adminLbGameTabs .lb-game-tab').forEach(b=>b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  loadGamesAdmin();
-}
-async function loadGamesAdmin() {
-  const tbody=document.getElementById('gLbBody');
-  if(!tbody) return;
-  try {
-    const top=await aFetch(`/api/admin/games/leaderboard?game=${currentAdminGame}`);
-    document.getElementById('gTopScore').textContent=top.length?fmt(top[0].bestScore):'—';
-    const totalPlays=top.reduce((s,r)=>s+(r.gamesPlayed||0),0);
-    document.getElementById('gTotalPlays').textContent=totalPlays||'0';
-    if(!top.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t2);padding:24px">No games played yet</td></tr>';return;}
-    tbody.innerHTML=top.map((r,i)=>`<tr>
-      <td><strong>#${i+1}</strong></td>
-      <td>${esc(r.name)}</td>
-      <td style="font-family:monospace;color:var(--t2)">${esc(r.gameId||'—')}</td>
-      <td style="font-weight:700;color:var(--gold)">${fmt(r.bestScore)}</td>
-      <td>${r.gamesPlayed}</td>
-    </tr>`).join('');
-  } catch(e){tbody.innerHTML=`<tr><td colspan="5" style="color:var(--red);padding:16px">${e.message}</td></tr>`;}
 }
 // ── USERS ───────────────────────────────────────────────────────
 // "Active Now" = any user whose account made an authenticated request in the last 24 hours.
@@ -5726,7 +5583,7 @@ async function toggleVAUser(userId) {
  } catch(e) { showToast(' ' + e.message, 'err'); }
 }
 async function deleteVAUser(userId, name) {
-  if (!confirm(`Remove the virtual account record for "${name}"? This only removes it from Mizzy Sales — the Flutterwave static account itself cannot be deleted.`)) return;
+  if (!confirm(`Remove the virtual account record for "${name}"? This only removes it from Mizzysales — the Flutterwave static account itself cannot be deleted.`)) return;
   try {
     await aFetch(`/api/admin/virtual-accounts/${userId}`, 'DELETE');
     showToast('Virtual account removed from user', 'ok');
@@ -6200,8 +6057,8 @@ async function m2SaveConfig(){
 }
 async function m2LoadBalance(){
   const el=document.getElementById('m2Balance');
-  try { const b=await aFetch('/api/admin/market2/balance'); el.innerHTML=`Supplier (RakibSocials) balance: <b>${m2N(b.balance)}</b> · alert below ${m2N(b.threshold)}`; el.style.color = b.balance < b.threshold ? 'var(--red)' : ''; }
-  catch(e){ el.textContent='Balance check failed: '+e.message+' — check RAKIB_API_KEY in your .env'; el.style.color='var(--red)'; }
+  try { const b=await aFetch('/api/admin/market2/balance'); el.innerHTML=`Supplier (NovaSolution) balance: <b>${m2N(b.balance)}</b> · alert below ${m2N(b.threshold)}`; el.style.color = b.balance < b.threshold ? 'var(--red)' : ''; }
+  catch(e){ el.textContent='Balance check failed: '+e.message+' — check NOVA_API_KEY in your server environment'; el.style.color='var(--red)'; }
 }
 async function m2LoadProducts(refresh){
   const el=document.getElementById('m2Products'); el.textContent='Loading…';
@@ -6237,6 +6094,275 @@ async function m2LoadOrders(){
       (d.orders.length?`<table class="data-table" style="width:100%"><thead><tr><th>Date</th><th>User</th><th>Product</th><th>Qty</th><th>Paid</th><th>Cost</th><th>Profit</th></tr></thead><tbody>`+d.orders.map(o=>`<tr><td>${new Date(o.createdAt).toLocaleString()}</td><td>${esc(o.userEmail)}</td><td>${esc(o.productName)}</td><td>${o.quantity}</td><td>${m2N(o.sellTotal)}</td><td>${m2N(o.costTotal)}</td><td>${m2N(o.profit)}</td></tr>`).join('')+'</tbody></table>':'<div class="no-items">No sales yet</div>');
   } catch(e){ el.textContent=e.message; }
 }
+
+
+// ── Logs 3 / Marketplace 3 (RakibSocials) ──
+let m3Cfg={}, m3List=[];
+function m3Btn(){
+  const b=document.getElementById('m3Btn'); if(!b) return;
+  b.textContent = m3Cfg.market3Enabled ? 'Marketplace 3 is ON — tap to disable' : 'Marketplace 3 is OFF (maintenance) — tap to enable';
+  b.style.background = m3Cfg.market3Enabled ? '' : 'var(--red)';
+}
+async function m3LoadConfig(){
+  try { m3Cfg = await aFetch('/api/admin/market3/config'); m3Btn();
+    document.getElementById('m3Msg').value=m3Cfg.maintenanceMessage||'';
+    document.getElementById('m3Low').value=m3Cfg.lowBalanceNgn||0;
+    document.getElementById('m3Email').value=m3Cfg.alertEmail||'';
+  } catch(e){ document.getElementById('m3Balance').textContent='Could not load Marketplace 3 settings: '+e.message; }
+}
+async function m3Toggle(){
+  try { await aFetch('/api/admin/market3/config','PUT',{market3Enabled: !m3Cfg.market3Enabled}); m3Cfg.market3Enabled=!m3Cfg.market3Enabled; m3Btn(); } catch(e){ alert(e.message); }
+}
+async function m3SaveConfig(){
+  try { await aFetch('/api/admin/market3/config','PUT',{ maintenanceMessage: document.getElementById('m3Msg').value, lowBalanceNgn: Number(document.getElementById('m3Low').value||0), alertEmail: document.getElementById('m3Email').value }); alert('Saved'); } catch(e){ alert(e.message); }
+}
+async function m3LoadBalance(){
+  const el=document.getElementById('m3Balance');
+  try { const b=await aFetch('/api/admin/market3/balance'); el.innerHTML=`Supplier (RakibSocials) balance: <b>${m2N(b.balance)}</b> · alert below ${m2N(b.threshold)}`; el.style.color = b.balance < b.threshold ? 'var(--red)' : ''; }
+  catch(e){ el.textContent='Balance check failed: '+e.message+' — check RAKIB_API_KEY in your server environment'; el.style.color='var(--red)'; }
+}
+async function m3LoadProducts(refresh){
+  const el=document.getElementById('m3Products'); el.textContent='Loading…';
+  try { m3List = await aFetch('/api/admin/market3/products'+(refresh?'?refresh=1':'')); m3Render(); }
+  catch(e){ el.innerHTML=`<span style="color:var(--red)">${esc(e.message)}</span>`; }
+}
+function m3Render(){
+  const q=(document.getElementById('m3Search').value||'').toLowerCase(), f=document.getElementById('m3Filter').value;
+  let rows=m3List.filter(p=>!q||`${p.name} ${p.category} ${p.customTitle}`.toLowerCase().includes(q));
+  if(f==='priced') rows=rows.filter(p=>p.priced); if(f==='unpriced') rows=rows.filter(p=>!p.priced); if(f==='instock') rows=rows.filter(p=>p.inStock);
+  document.getElementById('m3Products').innerHTML = rows.length ? `<table class="data-table" style="width:100%"><thead><tr><th>Product</th><th>Category</th><th>Stock</th><th>API cost</th><th>Your price</th><th>Profit</th><th>Show</th><th></th></tr></thead><tbody>`+
+    rows.map(p=>`<tr><td><b>${esc(p.name)}</b><br/><input type="text" id="m3t_${p.id}" value="${esc(p.customTitle)}" placeholder="Custom title (optional)" style="margin-top:4px;width:100%"/><input type="text" id="m3d_${p.id}" value="${esc(p.description)}" placeholder="Description (optional)" style="margin-top:4px;width:100%"/><input type="text" id="m3i_${p.id}" value="${esc(p.picture&&!String(p.picture).startsWith('data:')?p.picture:'')}" placeholder="Picture URL (optional)" style="margin-top:4px;width:100%"/></td>
+      <td>${esc(p.category)}</td><td style="color:${p.inStock?'var(--green,#2ecc71)':'var(--red)'}">${p.inStock?p.stock+' available':'Out of stock'}</td>
+      <td>${m2N(p.cost)}</td><td><input type="number" min="0" id="m3p_${p.id}" value="${p.sellPrice||''}" placeholder="0 = hidden" style="width:110px" oninput="m3Profit(${p.id},${p.cost})"/></td>
+      <td id="m3pr_${p.id}" style="color:${p.profit>0?'var(--green,#2ecc71)':'var(--red)'}">${p.priced?m2N(p.profit):'—'}</td>
+      <td><input type="checkbox" id="m3e_${p.id}" ${p.enabled?'checked':''}/></td>
+      <td><button class="btn-sm" type="button" onclick="m3Save(${p.id},${p.cost})">Save</button></td></tr>`).join('')+'</tbody></table>'
+    : '<div class="no-items">No products</div>';
+}
+function m3Profit(id,cost){ const v=Number(document.getElementById('m3p_'+id).value||0), el=document.getElementById('m3pr_'+id); el.textContent=v?m2N(v-cost):'—'; el.style.color=v>cost?'var(--green,#2ecc71)':'var(--red)'; }
+async function m3Save(id,cost){
+  const price=Number(document.getElementById('m3p_'+id).value||0);
+  if(price>0 && price<=cost && !confirm('Your price is not above the API cost — you would lose money. Save anyway? (customers cannot buy it until the price is above cost)')) return;
+  try { await aFetch('/api/admin/market3/products/'+id,'PUT',{ sellPrice: price, enabled: document.getElementById('m3e_'+id).checked, customTitle: document.getElementById('m3t_'+id).value, description: document.getElementById('m3d_'+id).value, picture: document.getElementById('m3i_'+id).value });
+    const p=m3List.find(x=>x.id===id); if(p){ p.sellPrice=price; p.priced=price>0; p.profit=price?price-cost:0; p.enabled=document.getElementById('m3e_'+id).checked; }
+    alert(price>0 && document.getElementById('m3e_'+id).checked ? 'Saved — visible to customers when in stock' : 'Saved — hidden from customers');
+  } catch(e){ alert(e.message); }
+}
+async function m3LoadOrders(){
+  const el=document.getElementById('m3Orders');
+  try { const d=await aFetch('/api/admin/market3/orders'); const t=d.totals;
+    m3RenderAttention(d.attention||[]);
+    const badge=s=>`<span style="color:${s==='delivered'?'var(--green,#2ecc71)':(s==='failed'||s==='refunded')?'var(--red)':'var(--gold)'};font-weight:700">${esc(s)}</span>`;
+    el.innerHTML=`<div class="info-box">Orders: <b>${t.count}</b> · Sales: <b>${m2N(t.sales)}</b> · API cost: <b>${m2N(t.cost)}</b> · Profit: <b style="color:var(--green,#2ecc71)">${m2N(t.profit)}</b></div>`+
+      (d.orders.length?`<table class="data-table" style="width:100%"><thead><tr><th>Date</th><th>User</th><th>Product</th><th>Qty</th><th>Paid</th><th>Cost</th><th>Profit</th><th>Status</th><th></th></tr></thead><tbody>`+d.orders.map(o=>`<tr><td>${new Date(o.createdAt).toLocaleString()}</td><td>${esc(o.userEmail)}</td><td>${esc(o.productName)}</td><td>${o.quantity}</td><td>${m2N(o.sellTotal)}</td><td>${m2N(o.costTotal)}</td><td>${m2N(o.profit)}</td><td>${badge(o.status)}</td><td>${(o.status==='delivered'||o.status==='partial')?`<button class="btn-sm" type="button" onclick="m3ShowKeys('${o._id}')">Keys</button>`:''}</td></tr>`).join('')+'</tbody></table>':'<div class="no-items">No sales yet</div>');
+  } catch(e){ el.textContent=e.message; }
+}
+function m3RenderAttention(list){
+  const sec=document.getElementById('m3AttentionSec'), el=document.getElementById('m3Attention');
+  if(!list.length){ sec.style.display='none'; el.innerHTML=''; return; }
+  sec.style.display='';
+  el.innerHTML=`<table class="data-table" style="width:100%"><thead><tr><th>Date</th><th>Customer</th><th>Product</th><th>Paid</th><th>Status</th><th>What happened</th><th>Fix</th></tr></thead><tbody>`+
+    list.map(o=>`<tr><td>${new Date(o.createdAt).toLocaleString()}</td><td>${esc(o.userEmail)}</td><td>${esc(o.title)}</td><td>${m2N(o.sellTotal)}</td><td><b>${esc(o.status)}</b></td><td style="max-width:260px">${esc(o.note||'Waiting to finish…')}</td>
+      <td style="min-width:240px">${o.status==='review'||o.status==='pending'?`<textarea id="m3k_${o._id}" rows="3" placeholder="Paste the keys from RakibSocials, one per line" style="width:100%"></textarea>
+        <button class="btn-sm" type="button" onclick="m3Deliver('${o._id}')">Deliver keys</button>
+        <button class="btn-sm" type="button" style="background:var(--red)" onclick="m3Refund('${o._id}')">Refund customer</button>`
+        :`<button class="btn-sm" type="button" onclick="m3Resync('${o._id}')">Re-send to customer</button>`}</td></tr>`).join('')+'</tbody></table>';
+}
+async function m3Deliver(id){
+  const keys=(document.getElementById('m3k_'+id).value||'').trim();
+  if(!keys){ alert('Paste the keys first (one per line).'); return; }
+  if(!confirm('Deliver these keys to the customer now?')) return;
+  try { await aFetch('/api/admin/market3/orders/'+id+'/deliver','POST',{keys}); alert('Delivered to the customer'); m3LoadOrders(); } catch(e){ alert(e.message); }
+}
+async function m3Refund(id){
+  if(!confirm('Refund this customer the full amount? Only do this if the order was NOT delivered by RakibSocials.')) return;
+  try { await aFetch('/api/admin/market3/orders/'+id+'/refund','POST',{}); alert('Customer refunded'); m3LoadOrders(); } catch(e){ alert(e.message); }
+}
+async function m3Resync(id){
+  try { const r=await aFetch('/api/admin/market3/orders/'+id+'/resync','POST',{}); alert(r.ok?'Sent to the customer’s purchases':'Nothing to send'); m3LoadOrders(); } catch(e){ alert(e.message); }
+}
+async function m3ShowKeys(id){
+  try { const r=await aFetch('/api/admin/market3/orders/'+id+'/keys'); alert((r.userEmail||'')+'\n\n'+((r.keys||[]).join('\n')||'(no keys stored)')); } catch(e){ alert(e.message); }
+}
+
+
+// ── Tutorials (videos shown to customers on /tutorials) ──
+let tutItems=[], tutEditId=null;
+const tutEl=id=>document.getElementById(id);
+function tutMsg(t,ok){ const f=tutEl('tutFb'); f.textContent=t||''; f.style.color= ok ? 'var(--green)' : 'var(--red)'; }
+function tutResetForm(){
+  tutEditId=null;
+  ['tutTitle','tutSub','tutDesc','tutLink','tutOrder'].forEach(i=>{ tutEl(i).value=''; });
+  tutEl('tutFile').value=''; tutEl('tutPublished').value='true';
+  tutEl('tutFormTitle').textContent='Add a tutorial'; tutEl('tutSaveBtn').textContent='Add tutorial';
+  tutEl('tutCancelBtn').style.display='none'; tutEl('tutFileLabel').textContent='Video file'; tutMsg('');
+}
+function tutEdit(id){
+  const t=tutItems.find(x=>x.id===id); if(!t) return;
+  tutEditId=id;
+  tutEl('tutTitle').value=t.title; tutEl('tutSub').value=t.subheading; tutEl('tutDesc').value=t.description;
+  tutEl('tutLink').value= t.videoSource==='link' ? t.videoUrl : ''; tutEl('tutFile').value='';
+  tutEl('tutPublished').value=String(t.published); tutEl('tutOrder').value=t.order||'';
+  tutEl('tutFormTitle').textContent='Edit tutorial'; tutEl('tutSaveBtn').textContent='Save changes';
+  tutEl('tutCancelBtn').style.display=''; tutEl('tutFileLabel').textContent='Replace video (leave empty to keep the current one)';
+  tutMsg(''); tutEl('tutTitle').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function tutRender(){
+  const box=tutEl('tutList'); tutEl('tutCount').textContent = tutItems.length ? '('+tutItems.length+')' : '';
+  if(!tutItems.length){ box.innerHTML='<div style="color:var(--t2);font-size:13px">No tutorials yet. Add your first one above.</div>'; return; }
+  box.innerHTML = tutItems.map((t,i)=>
+    '<div style="border:1px solid var(--border);border-radius:var(--r12);padding:12px 14px;margin-bottom:10px;background:var(--bg4)">'+
+      '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start">'+
+        '<div style="min-width:0;flex:1"><div style="font-weight:700;font-size:14px;color:var(--t1)">'+(i+1)+'. '+esc(t.title)+'</div>'+
+        (t.subheading?'<div style="font-size:12.5px;color:var(--t2);margin-top:2px">'+esc(t.subheading)+'</div>':'')+
+        '<div style="font-size:11.5px;color:var(--t3);margin-top:6px">'+
+          (t.videoSource==='link'?'Video link':'Uploaded video')+' &middot; '+
+          (t.published?'<span style="color:var(--green)">Visible</span>':'<span style="color:var(--red)">Hidden</span>')+
+        '</div></div>'+
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+          '<button class="btn-sm" type="button" onclick="tutMove(\''+t.id+'\',-1)"'+(i===0?' disabled':'')+'>&uarr;</button>'+
+          '<button class="btn-sm" type="button" onclick="tutMove(\''+t.id+'\',1)"'+(i===tutItems.length-1?' disabled':'')+'>&darr;</button>'+
+          '<button class="btn-sm" type="button" onclick="tutEdit(\''+t.id+'\')">Edit</button>'+
+          '<button class="btn-sm" type="button" onclick="tutToggle(\''+t.id+'\')">'+(t.published?'Hide':'Show')+'</button>'+
+          '<button class="btn-sm" type="button" onclick="tutDelete(\''+t.id+'\')">Delete</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>').join('');
+}
+async function tutLoad(){
+  try{
+    const d=await aFetch('/api/admin/tutorials'); tutItems=d.tutorials||[]; tutRender();
+    if(d.storage){
+      tutEl('tutMaxMb').textContent=d.storage.maxUploadMB;
+      const w=tutEl('tutStorageWarn');
+      if(!d.storage.cloudinary){ w.style.display=''; w.textContent='Cloudinary is not connected, so uploaded video files are saved on the server disk and will disappear when Render restarts. Either set the CLOUDINARY_* variables, or use YouTube/Vimeo video links (those never disappear).'; }
+      else w.style.display='none';
+    }
+  }catch(e){ tutEl('tutList').textContent='Could not load tutorials: '+e.message; }
+}
+async function tutSave(){
+  const title=tutEl('tutTitle').value.trim();
+  if(!title){ tutMsg('Please enter a title.'); tutEl('tutTitle').focus(); return; }
+  const file=tutEl('tutFile').files[0], link=tutEl('tutLink').value.trim();
+  if(!tutEditId && !file && !link){ tutMsg('Please choose a video file or paste a video link.'); return; }
+  if(file && link){ tutMsg('Use either a video file or a link, not both.'); return; }
+  const fd=new FormData();
+  fd.append('title',title); fd.append('subheading',tutEl('tutSub').value); fd.append('description',tutEl('tutDesc').value);
+  fd.append('published',tutEl('tutPublished').value);
+  const ord=tutEl('tutOrder').value.trim(); if(ord!=='') fd.append('order',ord);
+  if(link) fd.append('videoUrl',link);
+  if(file) fd.append('video',file);   // the file must be appended last so the text fields arrive first
+  const btn=tutEl('tutSaveBtn'), fb=tutEl('tutFb'), bar=progressBarFor(fb);
+  btn.disabled=true; tutMsg(file?'Uploading video…':'Saving…',true); if(file) bar.show();
+  try{
+    await aFetchUpload(tutEditId?'/api/admin/tutorials/'+tutEditId:'/api/admin/tutorials', tutEditId?'PUT':'POST', fd, p=>{ bar.set(p); if(p>=100) tutMsg('Processing video, please wait…',true); });
+    bar.hide(); const wasEdit=!!tutEditId; tutResetForm(); tutMsg(wasEdit?'Saved.':'Tutorial added.',true); await tutLoad();
+  }catch(e){ bar.hide(); tutMsg('Not saved: '+e.message); }
+  finally{ btn.disabled=false; }
+}
+async function tutToggle(id){
+  const t=tutItems.find(x=>x.id===id); if(!t) return;
+  try{ await aFetch('/api/admin/tutorials/'+id,'PUT',{published:!t.published}); await tutLoad(); }catch(e){ alert(e.message); }
+}
+async function tutDelete(id){
+  const t=tutItems.find(x=>x.id===id); if(!t) return;
+  if(!confirm('Delete "'+t.title+'"? The video will be removed too. This cannot be undone.')) return;
+  try{ await aFetch('/api/admin/tutorials/'+id,'DELETE'); if(tutEditId===id) tutResetForm(); await tutLoad(); }catch(e){ alert(e.message); }
+}
+async function tutMove(id,dir){
+  const i=tutItems.findIndex(x=>x.id===id), j=i+dir;
+  if(i<0||j<0||j>=tutItems.length) return;
+  const arr=tutItems.slice(); const tmp=arr[i]; arr[i]=arr[j]; arr[j]=tmp;
+  try{
+    // Renumber 1..n so the new order is unambiguous, only sending the ones that changed.
+    for(let k=0;k<arr.length;k++){ if(arr[k].order!==k+1) await aFetch('/api/admin/tutorials/'+arr[k].id,'PUT',{order:k+1}); }
+    await tutLoad();
+  }catch(e){ alert(e.message); }
+}
+
+// ── Welcome popup settings ──
+let wpToggleOn=false;
+const wpEl=id=>document.getElementById(id);
+function wpRenderToggle(){ const b=wpEl('wpToggle'); b.textContent = wpToggleOn ? 'Popup is ON — tap to disable' : 'Popup is OFF — tap to enable'; b.style.background = wpToggleOn ? '' : 'var(--red)'; }
+function wpToggle(){ wpToggleOn=!wpToggleOn; wpRenderToggle(); }
+function wpFill(s){
+  wpToggleOn=!!s.enabled; wpRenderToggle();
+  wpEl('wpUrl').value=s.channelUrl||''; wpEl('wpHeading').value=s.heading||''; wpEl('wpSubtitle').value=s.subtitle||'';
+  wpEl('wpDesc').value=s.description||''; wpEl('wpMore').value=s.additionalMessage||'';
+  wpEl('wpWaText').value=s.whatsappButtonText||''; wpEl('wpLaterText').value=s.dismissButtonText||'';
+  wpEl('wpFreq').value=s.displayFrequency||'first'; wpEl('wpDelay').value=String(s.displayDelay==null?1000:s.displayDelay);
+  document.querySelectorAll('.wpPage').forEach(c=>{ c.checked=(s.eligiblePages||[]).includes(c.value); });
+  wpEl('wpUrlErr').style.display='none';
+}
+function wpCollect(){
+  return {
+    enabled: wpToggleOn, channelUrl: wpEl('wpUrl').value.trim(), heading: wpEl('wpHeading').value, subtitle: wpEl('wpSubtitle').value,
+    description: wpEl('wpDesc').value, additionalMessage: wpEl('wpMore').value, whatsappButtonText: wpEl('wpWaText').value, dismissButtonText: wpEl('wpLaterText').value,
+    displayFrequency: wpEl('wpFreq').value, displayDelay: Number(wpEl('wpDelay').value),
+    eligiblePages: Array.from(document.querySelectorAll('.wpPage')).filter(c=>c.checked).map(c=>c.value)
+  };
+}
+function wpUrlOk(u){ return !u || /^https:\/\/(www\.)?whatsapp\.com\/channel\/[A-Za-z0-9_-]{6,80}\/?$/.test(u); }
+function wpMeta(d){ wpEl('wpMeta').textContent = d && d.updatedAt ? 'Last saved '+new Date(d.updatedAt).toLocaleString()+(d.updatedBy?' by '+d.updatedBy:'') : 'Using the default settings (nothing saved yet).'; }
+async function wpLoad(){
+  try { const d=await aFetch('/api/admin/welcome-popup'); wpFill(d.settings); wpMeta(d); }
+  catch(e){ wpEl('wpMeta').textContent='Could not load the popup settings: '+e.message; }
+}
+async function wpSave(){
+  const body=wpCollect(), err=wpEl('wpUrlErr');
+  if(!wpUrlOk(body.channelUrl)){ err.textContent='Enter a valid WhatsApp channel link, like https://whatsapp.com/channel/XXXXXXXX (https only).'; err.style.display='block'; wpEl('wpUrl').focus(); return; }
+  err.style.display='none';
+  try {
+    const d=await aFetch('/api/admin/welcome-popup','PUT',body);
+    wpFill(d.settings); wpMeta(d);
+    alert('Settings saved.'+(d.warning?'\n\nNote: '+d.warning:''));
+  } catch(e){ if(/WhatsApp/i.test(e.message)){ err.textContent=e.message; err.style.display='block'; } alert('Not saved: '+e.message); }
+}
+function wpPreview(){
+  const body=wpCollect();
+  if(!wpUrlOk(body.channelUrl)){ alert('The WhatsApp link is not valid, so the preview would show it as not set up.'); }
+  if(!window.KSHWelcomePopup){ alert('The preview is still loading — try again in a moment.'); return; }
+  window.KSHWelcomePopup.preview(body);
+}
+async function wpReset(){
+  if(!confirm('Reset the welcome popup to its default text and settings? This clears the saved WhatsApp link too. Nothing else on the site is affected.')) return;
+  try { const d=await aFetch('/api/admin/welcome-popup/reset','POST',{}); wpFill(d.settings); wpMeta(d); alert('Reset to defaults.'); } catch(e){ alert(e.message); }
+}
+function wpClearMemory(){ if(window.KSHWelcomePopup){ window.KSHWelcomePopup.clearBrowserMemory(); alert('Done. The popup can show again in this browser (if it is enabled and the frequency allows).'); } }
+
+// ── Saved-catalogue sync (numbers + Boost 2) ─────────────────────────────────
+let _novaSyncTimer = null;
+async function pollNovaSync() {
+  const box = document.getElementById('novaSyncStatus'), btn = document.getElementById('novaSyncBtn');
+  try {
+    const s = await aFetch('/api/admin/numbers/sync-status');
+    if (s.running) {
+      if (box) box.textContent = `Syncing… ${s.done}/${s.total}${s.current ? ' (' + s.current + ')' : ''}`;
+      if (btn) btn.disabled = true;
+      _novaSyncTimer = setTimeout(pollNovaSync, 2000);
+    } else {
+      if (btn) btn.disabled = false;
+      if (box) box.textContent = (s.message || 'Idle.') + (s.lastSyncedAt ? ' Last saved: ' + new Date(s.lastSyncedAt).toLocaleString() + '.' : '');
+    }
+  } catch (e) { if (box) box.textContent = 'Could not read sync status: ' + e.message; if (btn) btn.disabled = false; }
+}
+async function startNovaSync() {
+  const box = document.getElementById('novaSyncStatus');
+  try { if (box) box.textContent = 'Starting sync…'; await aFetch('/api/admin/numbers/sync', 'POST', {}); clearTimeout(_novaSyncTimer); pollNovaSync(); }
+  catch (e) { if (box) box.textContent = 'Sync could not start: ' + e.message; }
+}
+async function novaBoostSync() {
+  const m = document.getElementById('novaBoostSyncMsg'); if (m) m.textContent = ' Syncing…';
+  try { const r = await aFetch('/api/admin/boost2/sync', 'POST', {}); if (m) m.textContent = ' ' + (r.message || 'Done.'); await novaBoostLoad(); }
+  catch (e) { if (m) m.textContent = ' ' + e.message; }
+}
+let novaBoostList=[];
+async function novaBoostLoad(){const el=document.getElementById('novaBoostRows');if(!el)return;el.innerHTML='<tr><td colspan="7">Loading Nova Solution catalogue…</td></tr>';try{novaBoostList=await aFetch('/api/admin/boost2/services');novaBoostRender()}catch(e){el.innerHTML='<tr><td colspan="7">'+esc(e.message)+'</td></tr>'}}
+function novaBoostRender(){const el=document.getElementById('novaBoostRows');if(!el)return;const q=(document.getElementById('novaBoostSearch')?.value||'').toLowerCase();const rows=novaBoostList.filter(s=>s.name.toLowerCase().includes(q)||s.category.toLowerCase().includes(q));el.innerHTML=rows.map(s=>`<tr><td>${esc(s.name)}<br><small>${esc(s.category)} · ID ${s.id}</small></td><td>${m2N(s.cost)}</td><td><select id="nbm${s.id}"><option value="markup" ${s.price===s.cost?'selected':''}>Markup</option><option value="specific">Specific price</option></select></td><td><input id="nbs${s.id}" type="number" min="0" step="0.01" value="${s.price}" style="width:110px"></td><td><input id="nbk${s.id}" type="number" min="0" step="0.01" value="${Math.max(0,s.price-s.cost)}" style="width:100px"></td><td><input id="nbe${s.id}" type="checkbox" ${s.enabled?'checked':''}></td><td><button class="btn-sm" onclick="novaBoostSave(${s.id})">Save</button></td></tr>`).join('')||'<tr><td colspan="7">No matching services.</td></tr>'}
+async function novaBoostSave(id){try{const mode=document.getElementById('nbm'+id).value;await aFetch('/api/admin/boost2/services/'+id,'PUT',{mode,sellPrice:Number(document.getElementById('nbs'+id).value||0),markup:Number(document.getElementById('nbk'+id).value||0),enabled:document.getElementById('nbe'+id).checked});alert('Boost 2 price saved');await novaBoostLoad()}catch(e){alert(e.message)}}
+
 </script>
+<script>window.KSH_NO_WELCOME_AUTOSTART=true;</script>
+<script src="/welcome-popup.js?v=3" defer></script>
 </body>
 </html>

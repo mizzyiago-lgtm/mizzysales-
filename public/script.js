@@ -1,6 +1,7 @@
+(function(){try{if(window.__kslBackLoader)return;window.__kslBackLoader=true;var s=document.createElement('script');s.src='/js/back-button.js?v=1';s.defer=true;document.head.appendChild(s);}catch(e){}})();
 // ── CONFIG ─────────────────────────────────────────────────────
 const API = '';
-let WA_NUMBER = '2347026881419'; // overwritten on load by applySiteLinks() from admin-configured value
+let WA_NUMBER = '2349065518402'; // overwritten on load by applySiteLinks() from admin-configured value
 const DEFAULT_AVATAR_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231c1c2a'/%3E%3Ctext x='50' y='65' font-size='50' text-anchor='middle' fill='%232f7bf6'%3E%F0%9F%91%A4%3C/text%3E%3C/svg%3E";
 let token = localStorage.getItem('ksl_token');
 let currentUser = JSON.parse(localStorage.getItem('ksl_user') || 'null');
@@ -15,18 +16,18 @@ window.addEventListener('pageshow', function(e){ if (e.persisted) window.locatio
 // The chat page is split into two routes even though 'chat' remains the internal page name;
 // the actual group-vs-DM view is chosen via switchChatMode() before/after routing.
 const PAGE_TO_PATH = {
-  home: '/', market: '/marketplace', market2: '/marketplace2', tools: '/tools', deposit: '/deposit', wallet: '/wallet',
+  home: '/', market: '/marketplace', market2: '/marketplace2', market3: '/marketplace3', tools: '/tools', deposit: '/deposit', wallet: '/wallet',
   purchases: '/purchases', transactions: '/transactions', support: '/support',
   settings: '/settings', login: '/login', register: '/register', terms: '/terms',
-  apidocs: '/api-docs', games: '/games', groups: '/groups', dm: '/messages', referrals: '/referrals',
+  games: '/games', groups: '/groups', dm: '/messages', referrals: '/referrals',
   notifications: '/notifications', numberhistory: '/number-history', orderstatus: '/order-status',
   // Standalone pages that ship their own HTML file. These MUST be listed here, otherwise
   // pageForPath() returns null, the router falls back to 'home', #page-home does not exist
   // in that file and every .page div stays hidden -> completely blank page.
-  boost: '/boost', 'boost-history': '/boost-history'
+  boost: '/boost', boost1: '/boost1', boost2: '/boost2', 'boost-services': '/boost-services', 'boost-history': '/boost-history'
 };
 const PATH_TO_PAGE = Object.fromEntries(Object.entries(PAGE_TO_PATH).map(([k,v]) => [v,k]));
-// '/marketplace' etc. are absolute site paths per Mizzy Sales's domain convention
+// '/marketplace' etc. are absolute site paths per Mizzysales's domain convention
 // (e.g. https://klslogs.com/marketplace).
 function pathForPage(p) { return PAGE_TO_PATH[p] || '/'; }
 function pageForPath(path) {
@@ -42,12 +43,14 @@ async function applySiteLinks() {
     const links = await req('/api/public/site-links', 'GET', null, false, false, true);
     if (links.whatsappNumber) WA_NUMBER = links.whatsappNumber;
     const adminPhone = links.adminPhone || WA_NUMBER;
-    if (links.whatsappGroupLink)   document.querySelectorAll('a[data-link="group"]').forEach(a => a.href = links.whatsappGroupLink);
-    if (links.whatsappChannelLink) document.querySelectorAll('a[data-link="channel"]').forEach(a => a.href = links.whatsappChannelLink);
+    if (links.telegramCommunityLink || links.whatsappGroupLink) document.querySelectorAll('a[data-link="group"]').forEach(a => a.href = links.telegramCommunityLink || links.whatsappGroupLink);
+    if (links.telegramChannelLink || links.whatsappChannelLink) document.querySelectorAll('a[data-link="channel"]').forEach(a => a.href = links.telegramChannelLink || links.whatsappChannelLink);
     document.querySelectorAll('a[data-link="contact"]').forEach(a => { a.href = `https://wa.me/${WA_NUMBER}`; });
     document.querySelectorAll('a[data-link="adminphone"]').forEach(a => { a.href = `https://wa.me/${adminPhone}`; });
+    // Terms & Conditions page uses its own admin-set number (Admin → Site Links); blank = the Home page number
+    const termsNum = links.termsNumber || WA_NUMBER;
     const textLink = document.getElementById('termsWaTextLink');
-    if (textLink) { textLink.href = `https://wa.me/${WA_NUMBER}`; textLink.textContent = `wa.me/${WA_NUMBER}`; }
+    if (textLink) { textLink.href = `https://wa.me/${termsNum}`; textLink.textContent = `wa.me/${termsNum}`; }
     document.querySelectorAll('.ksl-admin-phone-text').forEach(el => el.textContent = `+${adminPhone}`);
     document.querySelectorAll('.ksl-wa-number-text').forEach(el => el.textContent = `+${WA_NUMBER}`);
     // Telegram support (admin-editable in Admin → Site Links). Defaults to t.me/klslogs.
@@ -101,11 +104,16 @@ document.addEventListener('DOMContentLoaded', () => {
   applySiteLinks();
   updateNav();
   initTheme();
-  const initialPage = pageForPath(window.location.pathname) || (token ? 'home' : 'login');
+  // Standalone pages (e.g. /boost1) ship their own .page div. If the path is not in the router
+  // map we must NOT fall back to 'home' (that sent logged-in users to /dashboard). Keep the page.
+  const _mapped = pageForPath(window.location.pathname);
+  const _standalone = !_mapped && window.location.pathname !== '/' && !document.getElementById('page-home') && document.querySelector('.page');
+  const initialPage = _standalone ? (_standalone.id || '').replace(/^page-/, '') || 'home' : (_mapped || (token ? 'home' : 'login'));
+  if (_standalone) { _standalone.classList.add('active'); }
   // A returning logged-in user landing on '/' used to see this SPA's old marketing/home
   // section — send them straight to the real dashboard instead.
-  if (token && initialPage === 'home') { window.location.replace('/dashboard'); return; }
-  showPage(initialPage, { replace: true });
+  if (token && initialPage === 'home' && !_standalone) { window.location.replace('/dashboard'); return; }
+  if (!_standalone) showPage(initialPage, { replace: true });
   handleGoogleRedirectResult();
   trackVisit();
   loadAds();
@@ -166,7 +174,7 @@ function startBalanceSSE() {
           const bannerWrap = document.querySelector('.va-confirm-banner');
           if (bannerWrap) {
             const subEl = bannerWrap.querySelector('.va-confirm-sub');
-            if (subEl) subEl.textContent = `${P2(added)} credited to your Mizzy Sales wallet automatically.`;
+            if (subEl) subEl.textContent = `${P2(added)} credited to your Mizzysales wallet automatically.`;
             bannerWrap.style.display = 'flex';
             setTimeout(() => { if (bannerWrap) bannerWrap.style.display = 'none'; }, 12000);
           }
@@ -202,7 +210,7 @@ function startBalanceSSE() {
         const bannerWrap = document.querySelector('.va-confirm-banner');
         if (bannerWrap && creditAmount) {
           const subEl = bannerWrap.querySelector('.va-confirm-sub');
-          if (subEl) subEl.textContent = `${P2(creditAmount)} credited to your Mizzy Sales wallet automatically.`;
+          if (subEl) subEl.textContent = `${P2(creditAmount)} credited to your Mizzysales wallet automatically.`;
           bannerWrap.style.display = 'flex';
           setTimeout(() => { if (bannerWrap) bannerWrap.style.display = 'none'; }, 12000);
         }
@@ -910,9 +918,7 @@ function timeBasedTheme() {
   return (hour >= 19 || hour < 7) ? 'dark' : 'light'; // 7pm–7am = dark, 7am–7pm = light
 }
 function getThemePref() {
-  const saved = localStorage.getItem('ksl_theme');
-  if (saved === 'light' || saved === 'dark') return saved; // explicit manual choice — always respected
-  return timeBasedTheme(); // no explicit choice yet (or legacy 'system'/'off' values) — follow the clock
+  return 'dark'; // Mizzysales is dark-only (matches the neon artwork + polish styles)
 }
 function getEffectiveTheme(pref) { return pref === 'light' ? 'light' : 'dark'; }
 function applyTheme(pref) {
@@ -931,6 +937,7 @@ function applyTheme(pref) {
     : '<svg class="icon i-zap" aria-hidden="true"><use href="#i-zap"/></svg>'; // sun stand-in — reuses existing icon set
 }
 function toggleThemeSimple() {
+  return; // dark-only: toggle disabled
   const next = getThemePref() === 'light' ? 'dark' : 'light';
   localStorage.setItem('ksl_theme', next); // an explicit manual choice from here on — time-based auto-switching stops applying
   applyTheme(next);
@@ -1035,7 +1042,7 @@ function showPageReal(p, opts) {
   // 'groups' and 'dm' are routed as separate URLs but both render the shared #page-chat markup;
   // switchChatMode() flips which half of that markup is visible.
   const isChatSubPage = (p === 'groups' || p === 'dm');
-  const domPage = isChatSubPage ? 'chat' : (p === 'market2' ? 'market' : p);
+  const domPage = isChatSubPage ? 'chat' : ((p === 'market2' || p === 'market3') ? 'market' : p);
   const el = document.getElementById('page-' + domPage);
   if (!el) {
     // SAFETY NET: never blank the screen. Standalone HTML files only contain their own
@@ -1048,9 +1055,9 @@ function showPageReal(p, opts) {
   }
   document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
   // Pages that require a logged-in account to view (browsing listings requires login/signup)
-  const requiresAuth = ['home','market','market2','tools','deposit','wallet','purchases','transactions','settings','chat','games','groups','dm','referrals','notifications','numberhistory'];
+  const requiresAuth = ['home','market','market2','market3','tools','deposit','wallet','purchases','transactions','settings','chat','games','groups','dm','referrals','notifications','numberhistory'];
   if (requiresAuth.includes(p) && !token) {
-    showToast('Please login or create an account to browse Mizzy Sales','err');
+    showToast('Please login or create an account to browse Mizzysales','err');
     const welcomeEl = document.getElementById('page-welcome');
     if (welcomeEl) welcomeEl.classList.add('active');
     if (!opts.fromPopstate) updateUrl('welcome', opts.replace);
@@ -1074,6 +1081,7 @@ function showPageReal(p, opts) {
     home:         initHome,
     market:       () => loadMarket('all'),
     market2:      () => window.initMarket2?.(),
+    market3:      () => window.initMarket3?.(),
     tools:        loadTools,
     deposit:      loadDeposit,
     wallet:       () => (window.KLSWallet ? window.KLSWallet.load() : null),
@@ -1086,13 +1094,12 @@ function showPageReal(p, opts) {
     dm:           () => switchChatMode('dm'),
     games:        initGames,
     settings:     initSettings,
-    apidocs:      fillApiBaseUrl,
   };
   const loader = pageLoaders[p];
   // Await the page's own loader (if it returns a promise) so the bar finishes exactly when the
   // new page's content is actually ready — falls back to a short fixed delay for pages with no
   // loader (e.g. static pages like Terms) so the bar never gets stuck mid-way.
-  Promise.resolve(loader ? loader() : null)
+  return Promise.resolve(loader ? loader() : null)
     .catch(() => {})
     .finally(finishPageLoadBar);
 }
@@ -1367,7 +1374,6 @@ function initSettings() {
   // Phone field
   const phoneEl = document.getElementById('settingsPhone');
   if (phoneEl) phoneEl.value = currentUser.contactPhone || '';
-  loadApiKeySection();
 }
 async function updateProfile() {
   const name=v('settingsName'), email=v('settingsEmail');
@@ -1416,79 +1422,6 @@ async function setPassword() {
 }
 // ── API KEY MANAGEMENT ────────────────────────────────────────
 // ── API DOCS PAGE ────────────────────────────────────────────
-function switchLangTab(btn, panelId) {
-  const group = btn.closest('.api-doc-section');
-  group.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
-  group.querySelectorAll('.lang-panel').forEach(p => p.style.display = 'none');
-  btn.classList.add('active');
-  document.getElementById(panelId).style.display = 'block';
-}
-function fillApiBaseUrl() {
-  const el = document.getElementById('apiBaseUrlBlock');
-  if (el) el.textContent = window.location.origin + '/api/v1';
-}
-async function loadApiKeySection() {
-  const box = document.getElementById('apiKeySection');
-  try {
-    const d = await req('/api/user/api-key','GET',null,true);
-    if (!d.hasSecret) {
-      box.innerHTML = `
-        <p class="mgid-hint" style="margin:0 0 14px">Generate a personal API key to connect Mizzy Sales to your own scripts or third-party apps — check your balance, list items, and buy programmatically.</p>
-        <button class="btn-gold" onclick="generateApiKey()"><svg class="icon i-key" aria-hidden="true"><use href="#i-key"/></svg> Generate API Key</button>
-        <div id="apiKeyFeedback" class="form-feedback"></div>
-      `;
-    } else {
-      box.innerHTML = `
-        <div class="api-key-box">
-          <div class="api-key-row">
-            <span class="api-key-label">API Key</span>
-            <span class="api-key-value" id="apiKeyDisplay">${esc(d.apiKey)}</span>
-            <button class="api-key-copy" onclick="copyText('apiKeyDisplay',this)">Copy</button>
-          </div>
-        </div>
-        <p class="mgid-hint" style="margin:0 0 10px">Created ${d.createdAt?new Date(d.createdAt).toLocaleDateString('en-NG'):'—'} ${d.lastUsedAt?'· Last used '+new Date(d.lastUsedAt).toLocaleString('en-NG'):'· Never used yet'}</p>
-        <div class="api-docs-block">GET  /api/v1/me
-GET  /api/v1/balance
-GET  /api/v1/purchases
-GET  /api/v1/listings
-GET  /api/v1/listings/:id
-POST /api/v1/buy/:id
-Headers required on every request:
-X-API-Key: your_api_key
-X-API-Secret: your_api_secret</div>
-        <button class="btn-del" style="margin-top:14px" onclick="revokeApiKey()"><svg class="icon i-ban" aria-hidden="true"><use href="#i-ban"/></svg> Revoke Key</button>
-        <div id="apiKeyFeedback" class="form-feedback"></div>
-      `;
-    }
-  } catch(e) { box.innerHTML = `<p style="color:var(--red)">${e.message}</p>`; }
-}
-async function generateApiKey() {
-  const fb = document.getElementById('apiKeyFeedback');
-  try {
-    const d = await req('/api/user/api-key/generate','POST',{},true);
-    document.getElementById('apiKeySection').innerHTML = `
-      <div class="api-secret-warning"><svg class="icon i-alert-triangle" aria-hidden="true"><use href="#i-alert-triangle"/></svg> Save your secret now — for your security it will never be shown again after you leave this page.</div>
-      <div class="api-key-box">
-        <div class="api-key-row">
-          <span class="api-key-label">API Key</span>
-          <span class="api-key-value" id="apiKeyDisplay">${esc(d.apiKey)}</span>
-          <button class="api-key-copy" onclick="copyText('apiKeyDisplay',this)">Copy</button>
-        </div>
-        <div class="api-key-row">
-          <span class="api-key-label">Secret</span>
-          <span class="api-key-value" id="apiSecretDisplay">${esc(d.apiSecret)}</span>
-          <button class="api-key-copy" onclick="copyText('apiSecretDisplay',this)">Copy</button>
-        </div>
-      </div>
-      <button class="btn-primary" onclick="loadApiKeySection()">Done — I've saved it</button>
-    `;
-  } catch(e) { setFb(fb,e.message,'err'); }
-}
-async function revokeApiKey() {
-  if (!confirm('Revoke your API key? Any scripts using it will stop working immediately.')) return;
-  try { await req('/api/user/api-key/revoke','POST',{},true); loadApiKeySection(); showToast('API key revoked'); }
-  catch(e) { showToast(e.message,'err'); }
-}
 // ── HOME ───────────────────────────────────────────────────────
 async function initHome() {
   try {
@@ -1935,7 +1868,7 @@ async function buySubAccount(logId, subId, price) {
     document.getElementById('itemModal').classList.remove('open');
     showPage('deposit'); return;
   }
-  if (!confirm(`Are you ready to make this purchase? ${P(price)} will be deducted from your wallet.`)) return;
+  if (!await kslConfirm(`Are you ready to make this purchase? ${P(price)} will be deducted from your wallet.`)) return;
   const btn=document.getElementById('subBuyBtnBottom');
   if (btn) { btn.disabled=true; btn.textContent='Processing...'; }
   try {
@@ -2087,7 +2020,7 @@ async function buySelectedSubAccounts() {
     document.getElementById('itemModal').classList.remove('open');
     showPage('deposit'); return;
   }
-  if (!confirm(`Buy ${items.length} account${items.length>1?'s':''} for ${P(total)} total? This will be deducted from your wallet.`)) return;
+  if (!await kslConfirm(`Buy ${items.length} account${items.length>1?'s':''} for ${P(total)} total? This will be deducted from your wallet.`)) return;
   const btn = document.getElementById('subBuyBtnBottom');
   if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
   try {
@@ -2121,7 +2054,7 @@ async function buyItem(id) {
     document.getElementById('itemModal').classList.remove('open');
     showPage('deposit'); return;
   }
-  if (!confirm(`Are you ready to make this purchase? ${P(item.price)} will be deducted from your wallet.`)) return;
+  if (!await kslConfirm(`Are you ready to make this purchase? ${P(item.price)} will be deducted from your wallet.`)) return;
   const btn=document.getElementById('mbuyBtn');
   if (btn) { btn.disabled=true; btn.textContent='Processing...'; }
   try {
@@ -2260,7 +2193,7 @@ function copyHistory(idx,btn) {
   const detailEl=card.querySelector('.pc-details')||card.querySelector('.trb-input');
   const details=detailEl?.textContent||detailEl?.value||'';
   const text=`═══════════════════════════
-Mizzy Sales — Mizzy Sales
+Mizzysales
 PURCHASE RECEIPT
 ═══════════════════════════
 ${pid.replace(' ','')}
@@ -2371,49 +2304,6 @@ function renderTxnList() {
       </div>`;
   }).join('')}</div>`;
 }
-function downloadApiDocs() {
-  const base = document.getElementById('apiBaseUrlBlock')?.textContent.trim() || 'https://your-site.example.com/api/v1';
-  const text = `Mizzy Sales API DOCUMENTATION
-======================
-GETTING STARTED
-Generate a personal API Key + API Secret from Settings API Access.
-All endpoints are scoped to your own account only.
-AUTHENTICATION
-Every request must include these headers:
-  X-API-Key: your_api_key
-  X-API-Secret: your_api_secret
-BASE URL
-${base}
-ENDPOINTS
-  GET   /me            Your account info (name, email, balance, Game ID)
-  GET   /balance        Your current wallet balance
-  GET   /purchases      Your full purchase history
-  GET   /listings       All available logs/tools (?type=tool or ?type=log to filter)
-  GET   /listings/:id   Details of one specific listing
-  POST  /buy/:id        Purchase a listing using your wallet balance
-EXAMPLE — Check your balance (cURL)
-curl ${base}/balance \\
-  -H "X-API-Key: your_api_key" \\
-  -H "X-API-Secret: your_api_secret"
-EXAMPLE — Buy an item (cURL)
-curl -X POST ${base}/buy/LISTING_ID_HERE \\
-  -H "X-API-Key: your_api_key" \\
-  -H "X-API-Secret: your_api_secret"
-Note: no platform fee — you're charged exactly the item's listed price via
-the API, deducted from your wallet balance the same way a marketplace
-purchase would be.
-ERRORS
-  401  Missing or invalid API key/secret
-  403  Account restricted
-  404  Listing not found or no longer available
-  400  Insufficient balance, sold out, or invalid request
-`;
-  const blob = new Blob([text], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'Mizzy Sales-API-Docs.txt';
-  a.click();
-}
 function toggleFaq(btn) {
   const item = btn.closest('.faq-item');
   const wasOpen = item.classList.contains('open');
@@ -2422,12 +2312,12 @@ function toggleFaq(btn) {
 }
 function copyTxn(i,btn) {
   const t=window._txnList[i];
-  const text=`Mizzy Sales Transaction\n─────────────────\nType:   ${t.type}\nAmount: ${t.type==='purchase'?'-':'+'}${P(t.amount)}\nDesc:   ${t.description||t.type}\nDate:   ${new Date(t.createdAt).toLocaleString('en-NG')}\nStatus: ${t.status}`;
+  const text=`Mizzysales Transaction\n─────────────────\nType:   ${t.type}\nAmount: ${t.type==='purchase'?'-':'+'}${P(t.amount)}\nDesc:   ${t.description||t.type}\nDate:   ${new Date(t.createdAt).toLocaleString('en-NG')}\nStatus: ${t.status}`;
  copyRaw(text,btn,'');
 }
 function exportAllTxns(btn) {
   if (!window._txnList?.length) return;
-  const header=`Mizzy Sales — Mizzy Sales\nTRANSACTION HISTORY EXPORT\nGenerated: ${new Date().toLocaleString('en-NG')}\n${'═'.repeat(50)}\n`;
+  const header=`Mizzysales\nTRANSACTION HISTORY EXPORT\nGenerated: ${new Date().toLocaleString('en-NG')}\n${'═'.repeat(50)}\n`;
   const rows=window._txnList.map((t,i)=>`${i+1}. ${new Date(t.createdAt).toLocaleString('en-NG')} | ${t.type.padEnd(14)} | ${t.type==='purchase'?'-':'+'}${P(t.amount)} | ${t.description||''}`).join('\n');
  copyRaw(header+rows,btn,' Copy All Transactions');
 }
@@ -2480,7 +2370,7 @@ function drawTxnReceipt(t) {
   // Brand header
   ctx.textAlign = 'center';
   ctx.fillStyle = textMuted; ctx.font = '700 12px "Plus Jakarta Sans", sans-serif';
- ctx.fillText(' Mizzy Sales · Mizzy Sales', W / 2, 30);
+ ctx.fillText(' Mizzysales · KingBadBoi Log Sale', W / 2, 30);
   // Status icon circle (check / clock / cross, OPay-style)
   const iconCy = 80;
   ctx.beginPath(); ctx.arc(W / 2, iconCy, 30, 0, Math.PI * 2);
@@ -2548,7 +2438,7 @@ function downloadTxnReceipt() {
   if (!txnReceiptDataUrl) return;
   const a = document.createElement('a');
   a.href = txnReceiptDataUrl;
-  a.download = `Mizzy Sales-receipt-${Date.now()}.png`;
+  a.download = `Mizzysales-receipt-${Date.now()}.png`;
   a.click();
 }
 async function shareTxnReceipt() {
@@ -2558,7 +2448,7 @@ async function shareTxnReceipt() {
     const blob = await res.blob();
     const file = new File([blob], 'ksl-receipt.png', { type: 'image/png' });
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'Mizzy Sales Receipt' });
+      await navigator.share({ files: [file], title: 'Mizzysales Receipt' });
     } else {
       downloadTxnReceipt();
       showToast('Sharing not supported on this device — downloaded instead');
@@ -2595,7 +2485,7 @@ function toggleAiChatFab() {
   renderAiChatQuickTopics();
   if (opening && !overlay.dataset.greeted) {
     overlay.dataset.greeted = '1';
-    appendAiChatFabBubble("Hi! I'm the Mizzy Sales Assistant. Ask me about deposits, purchases, refunds, referrals, the API, or anything else basic — I'll do my best to help. Or tap a topic below to get started.", 'bot');
+    appendAiChatFabBubble("Hi! I'm the Mizzysales Assistant. Ask me about deposits, purchases, refunds, referrals, the API, or anything else basic — I'll do my best to help. Or tap a topic below to get started.", 'bot');
   }
 }
 function appendAiChatFabBubble(text, who, isTyping) {
@@ -2727,7 +2617,7 @@ function reportClientError(message, url, status, contentType) {
 }
 async function req(url,method='GET',body=null,auth=false,_isRetry=false,silent=false) {
   const _klsStarted = Date.now();
-  console.log(`[Mizzy Sales] → ${method} ${url}`);
+  console.log(`[Mizzysales] → ${method} ${url}`);
   const headers={'Content-Type':'application/json'};
   if (auth&&token) headers['Authorization']=`Bearer ${token}`;
   const opts={method,headers,cache:'no-store'};
@@ -2744,7 +2634,7 @@ async function req(url,method='GET',body=null,auth=false,_isRetry=false,silent=f
           : 'Connection problem — check your internet and try again'
     );
   }
-  console.log(`[Mizzy Sales] ← ${method} ${url} ${res.status} ${Date.now()-_klsStarted}ms`);
+  console.log(`[Mizzysales] ← ${method} ${url} ${res.status} ${Date.now()-_klsStarted}ms`);
   const contentType = res.headers.get('content-type') || '';
   let parseFailed = false;
   const data=await res.json().catch(() => { parseFailed = true; return {error:'Invalid server response'}; });
@@ -2994,16 +2884,46 @@ function switchDepMethod(method) {
   if (method === 'va') depGoVAWithPoller();
   else { stopVAPoller(); depGoPL(); }
 }
+// ── VIRTUAL ACCOUNT GATEWAY PICKER (Flutterwave / Paystack) ─────────────────────────────
+// Shown only when the admin has both gateways switched on; otherwise the one that is on is used.
+let selectedVAGateway = '';
+let _vaPendingRetries = 0;
+function vaGatewaysAvailable() {
+  const g = window.KLS_VA_GATEWAYS;
+  if (!g) return ['flutterwave'];
+  return ['flutterwave', 'paystack'].filter(k => g[k]);
+}
+function renderVAGatewayChooser() {
+  const avail = vaGatewaysAvailable();
+  if (!avail.includes(selectedVAGateway)) selectedVAGateway = avail[0] || 'flutterwave';
+  const box = document.getElementById('vaGatewayChooser');
+  if (!box) return;
+  if (avail.length < 2) { box.style.display = 'none'; box.innerHTML = ''; return; }
+  box.style.display = 'block';
+  box.innerHTML = '<div style="font-size:.78rem;font-weight:700;color:var(--t2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Bank account provider</div>' +
+    '<div style="display:flex;gap:10px">' + avail.map(g =>
+      `<button type="button" onclick="pickVAGateway('${g}')" style="flex:1;padding:12px 10px;border-radius:10px;cursor:pointer;font:inherit;font-weight:700;` +
+      `border:2px solid ${g === selectedVAGateway ? 'var(--accent)' : 'var(--border2, rgba(255,255,255,.15))'};` +
+      `background:${g === selectedVAGateway ? 'rgba(7,136,232,.14)' : 'transparent'};color:var(--t1)">${GATEWAY_NAMES[g]}</button>`
+    ).join('') + '</div>';
+}
+function pickVAGateway(g) {
+  selectedVAGateway = g;
+  _vaPendingRetries = 0;
+  if (typeof stopVAPoller === 'function') stopVAPoller();
+  loadVAInDeposit();
+}
 async function loadVAInDeposit() {
+  renderVAGatewayChooser();
   const states = ['vaLoadingState','vaAccountCard','vaGenerateCard','vaDisabledCard'];
   states.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   const loadEl = document.getElementById('vaLoadingState');
   if (loadEl) loadEl.style.display = 'block';
   try {
     const token = localStorage.getItem('ksl_token');
-    const res = await fetch('/api/user/virtual-account', { headers: { Authorization: 'Bearer ' + token } });
+    const res = await fetch('/api/user/virtual-account?gateway=' + encodeURIComponent(selectedVAGateway || 'flutterwave'), { headers: { Authorization: 'Bearer ' + token } });
     const va  = await res.json();
-    console.log('[Mizzy Sales] virtual-account response', res.status, va);
+    console.log('[Mizzysales] virtual-account response', res.status, va);
     if (loadEl) loadEl.style.display = 'none';
     if (!res.ok) throw new Error(va.error || ('Server returned ' + res.status));
     if (va.available === false && va.reason === 'country') {
@@ -3021,7 +2941,7 @@ async function loadVAInDeposit() {
     // an old cached body) was treated as "disabled", which is why some people
     // saw "Temporarily Unavailable" while others did not.
     if (va.globalEnabled === false) {
-      console.warn('[Mizzy Sales] Virtual accounts are globally disabled by admin');
+      console.warn('[Mizzysales] Virtual accounts are globally disabled by admin');
       const disabledEl = document.getElementById('vaDisabledCard');
       if (disabledEl) disabledEl.style.display = 'block';
       return;
@@ -3029,6 +2949,11 @@ async function loadVAInDeposit() {
     if (!va.enabled || !va.accountNumber) {
       const genEl = document.getElementById('vaGenerateCard');
       if (genEl) genEl.style.display = 'block';
+      if (va.pending) {
+        const pfb = document.getElementById('vaGenerateFeedback');
+        if (pfb) { pfb.textContent = 'Your account is being set up — this takes a few seconds…'; pfb.style.color = 'var(--t2)'; }
+        if (_vaPendingRetries++ < 6) setTimeout(() => { if (document.getElementById('vaGenerateCard')?.style.display !== 'none') loadVAInDeposit(); }, 5000);
+      }
       // Show new-user prompt banner inside the generate card
       const isNewUser = !currentUser?.createdAt || (Date.now() - new Date(currentUser.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000);
       const existingBanner = document.getElementById('vaNewUserBanner');
@@ -3046,7 +2971,7 @@ async function loadVAInDeposit() {
           <div>
             <div class="va-newuser-title">Welcome! Set up your virtual bank account</div>
             <div class="va-newuser-sub">
-              Generate your free permanent Nigerian bank account below. Transfer money to it anytime and your Mizzy Sales wallet is credited automatically — no approval, no screenshots needed.
+              Generate your free permanent Nigerian bank account below. Transfer money to it anytime and your Mizzysales wallet is credited automatically — no approval, no screenshots needed.
             </div>
           </div>`;
         genEl.insertBefore(banner, genEl.firstChild);
@@ -3055,8 +2980,8 @@ async function loadVAInDeposit() {
     }
     // Populate account details
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-    // Account name format: "Mizzy Sales {Username}" — clearly shows the bank name + Mizzy Sales branding
-    const displayAccName = va.accountName || ('Mizzy Sales ' + (currentUser?.name || 'User'));
+    // Account name format: "Mizzysales {Username}" — clearly shows the bank name + Mizzysales branding
+    const displayAccName = va.accountName || ('Mizzysales ' + (currentUser?.name || 'User'));
     const displayBank = va.bankName || 'Wema Bank';
     set('vaDisplayAccNum', va.accountNumber);
     set('vaDisplayBank',   displayBank);
@@ -3075,7 +3000,7 @@ async function loadVAInDeposit() {
     // Start the live poller now that the account card is visible
     if (typeof startVAPoller === 'function') startVAPoller();
   } catch (e) {
-    console.error('[Mizzy Sales] loadVAInDeposit failed:', e);
+    console.error('[Mizzysales] loadVAInDeposit failed:', e);
     if (loadEl) loadEl.style.display = 'none';
     const genEl = document.getElementById('vaGenerateCard');
     if (genEl) genEl.style.display = 'block';
@@ -3092,10 +3017,11 @@ async function generateVirtualAccount() {
     const token = localStorage.getItem('ksl_token');
     const res = await fetch('/api/user/virtual-account/create', {
       method: 'POST',
-      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gateway: selectedVAGateway || 'flutterwave' })
     });
     const data = await res.json();
-    console.log('[Mizzy Sales] virtual-account/create response', res.status, data);
+    console.log('[Mizzysales] virtual-account/create response', res.status, data);
     if (!res.ok) throw new Error(data.error || 'Failed to create virtual account');
     if (fb) { fb.textContent = 'Account generated! Loading details…'; fb.style.color = 'var(--green)'; }
     setTimeout(() => loadVAInDeposit(), 800);
@@ -3202,7 +3128,7 @@ async function _vaPollTick() {
         const bannerWrap2 = document.querySelector('.va-confirm-banner');
         if (bannerWrap2) {
           const subEl2 = bannerWrap2.querySelector('.va-confirm-sub');
-          if (subEl2) subEl2.textContent = `${P2(displayAdded)} credited to your Mizzy Sales wallet automatically.`;
+          if (subEl2) subEl2.textContent = `${P2(displayAdded)} credited to your Mizzysales wallet automatically.`;
           bannerWrap2.style.display = 'flex';
           setTimeout(() => { if (bannerWrap2) bannerWrap2.style.display = 'none'; }, 12000);
         }
@@ -3216,7 +3142,7 @@ async function _vaPollTick() {
           const confirmBanner = document.getElementById('vaConfirmBanner');
           if (confirmBanner) {
             const subEl = confirmBanner.closest ? confirmBanner.closest('.va-confirm-banner')?.querySelector('.va-confirm-sub') : null;
-            if (subEl) subEl.textContent = `${P2(displayAdded)} credited to your Mizzy Sales wallet automatically.`;
+            if (subEl) subEl.textContent = `${P2(displayAdded)} credited to your Mizzysales wallet automatically.`;
           }
         }
  console.log(`[VA-poller] Balance ₦${_vaLastBalance} ₦${newBal} (+₦${displayAdded})`);
@@ -3459,14 +3385,20 @@ async function checkPaymentMethodSettings() {
     const plCard  = document.getElementById('depChoosePL');
     const plNote  = document.getElementById('depPlUnavailableNote');
     const plBtn   = document.getElementById('depPlGenerateBtn');
-    const plOff   = data.paymentlink && data.paymentlink.enabled === false;
+    window.KLS_GATEWAYS = data.gateways || null;
+    window.KLS_VA_GATEWAYS = data.vaGateways || null;
+    renderVAGatewayChooser();
+    const gwList = data.gateways ? ['flutterwave', 'paystack'].filter(g => data.gateways[g] && data.gateways[g].available) : null;
+    const noGateway = !!gwList && gwList.length === 0;
+    renderGatewayChooser(data.gateways, data.defaultGateway);
+    const plOff   = (data.paymentlink && data.paymentlink.enabled === false) || noGateway;
     if (plCard) {
       if (plOff) {
         plCard.classList.add('dep-disabled');
         plCard.onclick = null; plCard.onkeydown = null;
         if (plBtn) plBtn.disabled = true;
         if (plNote) {
- plNote.textContent = ' ' + (data.paymentlink.disabledMessage || 'Payment Link is temporarily unavailable — please use Bank Transfer instead.');
+ plNote.textContent = ' ' + ((data.paymentlink && data.paymentlink.disabledMessage) || (noGateway && data.gateways && (data.gateways.flutterwave.disabledMessage || data.gateways.paystack.disabledMessage)) || 'Payment Link is temporarily unavailable — please use Bank Transfer instead.');
           plNote.style.display = 'block';
         }
       } else {
@@ -3565,7 +3497,7 @@ function showDepositResultCard(state) {
       <p style="color:var(--t2);font-size:.9rem;margin:0 0 16px;line-height:1.5">${msgs[state]}</p>
       ${state==='pending' ? `
         <div id="depPendingSpinner" style="margin:0 auto 12px;width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--gold,#f59e0b);border-radius:50%;animation:spin 0.8s linear infinite"></div>
-        <p id="depPendingStatus" style="color:var(--t2);font-size:.82rem;margin:0 0 12px">Checking with Flutterwave every 5 seconds…</p>
+        <p id="depPendingStatus" style="color:var(--t2);font-size:.82rem;margin:0 0 12px">Checking your payment every 5 seconds…</p>
         <button class="btn-secondary" onclick="manualCheckPending()" style="margin-bottom:8px"><svg class="icon i-refresh" aria-hidden="true"><use href="#i-refresh"/></svg> Check Now</button>
       ` : ''}
       ${state==='success' ? `<button class="btn-primary" onclick="showPage('market')"><svg class="icon i-cart" aria-hidden="true"><use href="#i-cart"/></svg> Shop Marketplace</button>` : ''}
@@ -3648,10 +3580,10 @@ function showPhoneModal() {
   el.innerHTML = `
     <div style="background:var(--card,#131320);border:1px solid var(--border,#252535);border-radius:18px;max-width:400px;width:100%;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.6)">
       <!-- Top gradient header -->
-      <div style="background:linear-gradient(135deg,#2f7bf6 0%,#7c3aed 100%);padding:28px 24px 22px;text-align:center;color:#fff">
+      <div style="background:linear-gradient(135deg,#0788e8 0%,#7c3aed 100%);padding:28px 24px 22px;text-align:center;color:#fff">
         <div style="font-size:3rem;margin-bottom:10px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))"><svg class="icon i-smartphone" aria-hidden="true"><use href="#i-smartphone"/></svg></div>
         <h3 style="margin:0 0 6px;font-size:1.2rem;font-weight:800;letter-spacing:-.02em">Phone Number Required</h3>
-        <p style="margin:0;font-size:.85rem;opacity:.9;line-height:1.5">To protect your account and help us reach you about orders — a valid Nigerian number is required before you can use Mizzy Sales.</p>
+        <p style="margin:0;font-size:.85rem;opacity:.9;line-height:1.5">To protect your account and help us reach you about orders — a valid Nigerian number is required before you can use Mizzysales.</p>
       </div>
       <!-- Body -->
       <div style="padding:22px 22px 24px">
@@ -3666,7 +3598,7 @@ function showPhoneModal() {
             style="flex:1;padding:12px 14px;border:1.5px solid var(--border2,#2e2e42);border-radius:9px;font-size:1rem;font-family:inherit;background:var(--card2,#1a1a2b);color:var(--t1,#eeeef5);outline:none;transition:border-color .2s"
             oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length>1&&this.value[0]==='0')this.value=this.value.slice(1)"
             onkeydown="if(event.key==='Enter')submitPhonePrompt()"
-            onfocus="this.style.borderColor='#2f7bf6'"
+            onfocus="this.style.borderColor='#0788e8'"
             onblur="this.style.borderColor='var(--border2,#2e2e42)'"
           />
         </div>
@@ -3675,7 +3607,7 @@ function showPhoneModal() {
         </p>
         <div id="phonePromptFb" style="font-size:.83rem;min-height:20px;margin-bottom:12px;color:#ff4757;font-weight:600"></div>
         <button id="phonePromptSubmitBtn" onclick="submitPhonePrompt()"
-          style="width:100%;padding:14px;border:none;border-radius:11px;background:linear-gradient(135deg,#2f7bf6,#7c3aed);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:-.01em;transition:opacity .2s;box-shadow:0 4px 18px rgba(47,123,246,.35)">
+          style="width:100%;padding:14px;border:none;border-radius:11px;background:linear-gradient(135deg,#0788e8,#7c3aed);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:-.01em;transition:opacity .2s;box-shadow:0 4px 18px rgba(7,136,232,.35)">
  Save &amp; Continue
         </button>
         <!-- Rules -->
@@ -3716,7 +3648,7 @@ async function submitPhonePrompt() {
     // Remove modal and restore scroll
     document.getElementById('phonePromptModal')?.remove();
     document.body.style.overflow = '';
-    showToast('Phone number saved — welcome to Mizzy Sales!', 'ok');
+    showToast('Phone number saved — welcome to Mizzysales!', 'ok');
     window.location.href = '/dashboard';
   } catch(e) {
  if(fb) fb.textContent = ' ' + (e.message || 'Failed — try again');
@@ -3748,6 +3680,9 @@ async function updatePhone() {
 // nothing here fakes data, it just adds a beat of perceived loading before the page appears.
 const DBFL_MESSAGES = ['Loading…', 'Almost there…'];
 let dbflBusy = false;
+// The overlay now STAYS on screen until the next page has really loaded (its own data requests
+// finished), then fades away. A minimum time avoids a flash, and a long safety cap makes sure a
+// broken request can never trap the visitor behind the loader.
 function openFakeLoad(then) {
   const overlay = document.getElementById('dbfl-overlay');
   const textEl = document.getElementById('dbfl-text');
@@ -3759,13 +3694,27 @@ function openFakeLoad(then) {
   const msgTimer = setInterval(() => {
     i = (i + 1) % DBFL_MESSAGES.length;
     textEl.textContent = DBFL_MESSAGES[i];
-  }, 400);
-  setTimeout(() => {
+  }, 700);
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
     clearInterval(msgTimer);
-    then();
+    clearTimeout(safety);
     overlay.classList.remove('show');
     dbflBusy = false;
-  }, 700);
+  };
+  const safety = setTimeout(finish, 20000);
+  const started = Date.now();
+  setTimeout(() => {
+    let result = null;
+    try { result = then(); } catch (e) { console.error(e); }
+    // wait for the new page's loader, then let the page paint before the overlay lifts
+    Promise.resolve(result).catch(() => {}).then(() => {
+      const wait = Math.max(0, 450 - (Date.now() - started));
+      setTimeout(() => requestAnimationFrame(() => requestAnimationFrame(finish)), wait);
+    });
+  }, 250);
 }
 // ── METHOD 2: Payment Link (Flutterwave hosted checkout — Bank Transfer / Card / OPay) ─────
 // Deposit fees are calculated and charged entirely server-side (see server.js calcDepositFee)
@@ -3773,6 +3722,30 @@ function openFakeLoad(then) {
 // Our deposit page only offers Bank Transfer — Flutterwave's own hosted checkout page still
 // shows Card/USSD/etc. as switchable tabs there, this just controls what opens first.
 const selectedPlMethod = 'banktransfer';
+// ── PAYMENT GATEWAY PICKER (Flutterwave / Paystack) ──────────────────────────────────────
+// The admin switches each gateway on/off. This shows the customer only what is currently on:
+// two on -> a picker, one on -> used silently, none on -> Payment Link greys out.
+let selectedGateway = '';
+const GATEWAY_NAMES = { flutterwave: 'Flutterwave', paystack: 'Paystack' };
+function gatewayName() { return GATEWAY_NAMES[selectedGateway] || 'our secure payment partner'; }
+function renderGatewayChooser(gateways, defaultGateway) {
+  const box = document.getElementById('depGatewayChooser');
+  const avail = ['flutterwave', 'paystack'].filter(g => gateways && gateways[g] && gateways[g].available);
+  if (!avail.includes(selectedGateway)) selectedGateway = avail.includes(defaultGateway) ? defaultGateway : (avail[0] || '');
+  if (!box) return;
+  if (avail.length < 2) { box.style.display = 'none'; box.innerHTML = ''; return; }
+  box.style.display = 'block';
+  box.innerHTML = '<div class="dep-amt-label" style="margin-bottom:8px">Pay with</div>' +
+    '<div style="display:flex;gap:10px">' + avail.map(g =>
+      `<button type="button" data-gw="${g}" onclick="pickGateway('${g}')" style="flex:1;padding:12px 10px;border-radius:10px;cursor:pointer;font:inherit;font-weight:700;` +
+      `border:2px solid ${g === selectedGateway ? 'var(--accent)' : 'var(--border2, rgba(255,255,255,.15))'};` +
+      `background:${g === selectedGateway ? 'rgba(7,136,232,.14)' : 'transparent'};color:var(--t1)">${GATEWAY_NAMES[g]}</button>`
+    ).join('') + '</div>';
+}
+function pickGateway(g) {
+  selectedGateway = g;
+  renderGatewayChooser(window.KLS_GATEWAYS, g);
+}
 // ── DEPOSIT CURRENCY UI ────────────────────────────────────────────────────
 // The wallet ledger is naira, but only customers in Nigeria are charged in
 // naira. Everyone else pays in US dollars, so the whole payment-link amount
@@ -3793,7 +3766,7 @@ function applyDepositCurrencyUI() {
   if (sym)   sym.textContent   = usd ? '$' : '\u20a6';
   if (note)  note.textContent  = usd
     ? 'Enter the amount in US dollars. Your wallet is credited with the naira equivalent at today\u2019s exchange rate.'
-    : 'Enter the amount to credit your wallet. A small processing fee covers Flutterwave costs.';
+    : 'Enter the amount to credit your wallet. A small processing fee covers payment processing costs.';
   if (input) {
     input.placeholder = usd ? 'e.g. 10' : 'e.g. 1000';
     input.min  = usd ? '1' : '100';
@@ -3836,7 +3809,7 @@ function startPaymentLinkCheckout() {
     // Outside Nigeria the amount typed IS the dollar amount charged; the naira
     // credit is worked out by the server at the live rate, minus the same fee.
     if (!amount || amount < 1) return setFb(fb, 'Enter a valid amount (minimum $1)', 'err');
-    document.getElementById('depPlConfirmMethod').textContent = ' Flutterwave (International Card)';
+    document.getElementById('depPlConfirmMethod').textContent = ' ' + gatewayName() + ' (International Card)';
     const feeElU = document.getElementById('depPlConfirmFee');
     const chargeElU = document.getElementById('depPlConfirmCharge');
     if (feeElU) feeElU.textContent = 'Included';
@@ -3856,7 +3829,7 @@ function startPaymentLinkCheckout() {
   else if (amount >= 1000 && amount <= 9999) fee = 50;
   else if (amount >= 10000) fee = 100;
   const charged = amount + fee;
- document.getElementById('depPlConfirmMethod').textContent = ' Flutterwave (Bank / Card / OPay)';
+ document.getElementById('depPlConfirmMethod').textContent = ' ' + gatewayName() + (selectedGateway === 'paystack' ? ' (Card / Bank / USSD)' : ' (Bank / Card / OPay)');
   const feeEl = document.getElementById('depPlConfirmFee');
   const chargeEl = document.getElementById('depPlConfirmCharge');
   if (feeEl) feeEl.textContent = '₦' + fmtNGNn(fee);
@@ -3881,9 +3854,9 @@ async function createPaymentLink() {
   }
   btn.disabled = true; btn.textContent = 'Preparing payment...'; setFb(fb, '', '');
   try {
-    const data = await req('/api/deposit/paymentlink/create', 'POST', { amount, method: selectedPlMethod }, true);
+    const data = await req('/api/deposit/paymentlink/create', 'POST', { amount, method: selectedPlMethod, gateway: selectedGateway || undefined }, true);
     currentPaymentLinkTxRef = data.txRef;
-    // Send the user to Flutterwave's hosted page — they'll be redirected back to THIS deposit
+    // Send the user to the gateway's hosted page — they'll be redirected back to THIS deposit
     // page after paying (server sends them to /deposit, not home).
     window.location.href = data.link;
   } catch (e) {
@@ -4079,7 +4052,7 @@ async function loadSecurityPanel() {
   }
 }
 async function revokeSession(id) {
-  if (!confirm('Sign this device out of your account?')) return;
+  if (!await kslConfirm('Sign this device out of your account?')) return;
   try {
     const r = await req(`/api/user/security/sessions/${id}/revoke`, 'POST', null, true);
     showToast(r.message || 'Device signed out');
@@ -4087,7 +4060,7 @@ async function revokeSession(id) {
   loadSecurityPanel();
 }
 async function revokeOtherSessions() {
-  if (!confirm('Sign out every other device on your account?')) return;
+  if (!await kslConfirm('Sign out every other device on your account?')) return;
   try {
     const r = await req('/api/user/security/sessions/revoke-others', 'POST', null, true);
     showToast(r.message || 'Other devices signed out');
@@ -4096,7 +4069,7 @@ async function revokeOtherSessions() {
 }
 
 
-/* ─── Mizzy Sales presence heartbeat ────────────────────────────────────────────────
+/* ─── Mizzysales presence heartbeat ────────────────────────────────────────────────
  * Pings the server every 60 s while a page is open so that anyone reading the
  * site counts as "online" in the admin panel — including accounts created
  * before activity tracking existed, which otherwise never showed up there.
@@ -4107,8 +4080,8 @@ async function revokeOtherSessions() {
     if (!t || document.hidden) return;
     try {
       const r = await fetch('/api/heartbeat', { method: 'POST', headers: { Authorization: 'Bearer ' + t } });
-      console.log('[Mizzy Sales] heartbeat', r.status);
-    } catch (e) { console.warn('[Mizzy Sales] heartbeat failed', e.message); }
+      console.log('[Mizzysales] heartbeat', r.status);
+    } catch (e) { console.warn('[Mizzysales] heartbeat failed', e.message); }
   };
   ping();
   setInterval(ping, 60000);

@@ -3,27 +3,26 @@
 <head>
 <script src="/js/auth-keeper.js?v=1"></script>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Referrals — Earn Commission | Mizzy Sales</title>
-  <meta name="description" content="Invite friends to Mizzy Sales and earn referral commission on their purchases."/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Referrals — Earn Commission | Mizzysales</title>
+  <meta name="description" content="Invite friends to Mizzysales and earn referral commission on their purchases."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Sora:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css?v=20260910a"/>
   <link rel="stylesheet" href="theme.css?v=20260910a"/>
   <link rel="stylesheet" href="css/layout-polish.css?v=20260910a"/>
- <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232f7bf6'/><text y='72' x='50' font-size='58' text-anchor='middle' fill='white' font-family='system-ui,sans-serif' font-weight='800'>M</text></svg>"/>
-  <meta name="theme-color" content="#00b4f8"/>
+  <meta name="theme-color" content="#0788e8"/>
   <script>
     (function(){
       try {
-        var pref = localStorage.getItem('ksl_theme');
+        var pref = 'dark'; /* dark-only brand */
         var effective = (pref === 'light' || pref === 'dark') ? pref : (function(){ var h = new Date().getHours(); return (h >= 19 || h < 7) ? 'dark' : 'light'; })();
         document.documentElement.setAttribute('data-theme', effective);
         // Follow the device / country clock: with no manual override, re-evaluate the
         // theme on a timer and whenever the tab is shown again (covers timezone changes).
         var auto = function(){
           try {
-            var p = localStorage.getItem('ksl_theme');
+            var p = 'dark'; /* dark-only brand */
             if (p === 'light' || p === 'dark') return;
             var h = new Date().getHours();
             document.documentElement.setAttribute('data-theme', (h >= 19 || h < 7) ? 'dark' : 'light');
@@ -43,10 +42,16 @@
   <!-- Brand colours/fonts from site.config.js — keep last so it can override -->
   <link rel="stylesheet" href="/brand.css"/>
   <link rel="stylesheet" href="/css/mobile-fix.css">
-  <link rel="stylesheet" href="/css/mizzy-unified.css?v=2"/>
-  <link rel="stylesheet" href="/css/dashboard-look.css?v=20261016"/>
+<script src="/kls-ui.js?v=2"></script>
+
+<link rel="icon" type="image/png" sizes="128x128" href="/favicon.png?v=mz3">
+<link rel="shortcut icon" href="/favicon.ico?v=mz3">
+<link rel="stylesheet" href="/css/marvinums-brand.css">
+<script defer src="/js/marvinums-brand.js"></script>
+  <link rel="stylesheet" href="/css/marvel-nums-mobile-polish.css?v=2">
+  <link rel="stylesheet" href="/css/glass-ui.css?v=1">
 </head>
-<body>
+<body class="mn-bg-social">
 
 <!-- Shared WhatsApp logo icon — referenced via <svg class="wa-icon"><use href="#wa-logo"/></svg> -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -135,15 +140,15 @@
   <symbol id="i-disc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></g></symbol>
 </svg>
 
-<!-- Single consolidated Support button — everything (community, channel, owner, telegram, Mizzy Sales
+<!-- Single consolidated Support button — everything (community, channel, owner, telegram, Mizzysales
      Assistant) lives behind one icon so nothing floats loose over the bottom nav on mobile. -->
 <div id="supportFab" class="support-fab">
   <div class="sfab-menu" id="sfabMenu">
-    <button type="button" class="sfab-item" onclick="toggleAiChatFab();toggleSupportFab()"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Mizzy Sales Assistant</button>
+    <button type="button" class="sfab-item" onclick="toggleAiChatFab();toggleSupportFab()"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Mizzysales Assistant</button>
     <a href="https://chat.whatsapp.com/HBqJeik773M1pqEmIjfpXr" data-link="group" target="_blank" class="sfab-item"><svg class="wa-icon" aria-hidden="true"><use href="#wa-logo"/></svg> Join Community</a>
     <a href="https://whatsapp.com/channel/0029Vb7ivq9HLHQcS4XgQu2Q" data-link="channel" target="_blank" class="sfab-item"><svg class="wa-icon" aria-hidden="true"><use href="#wa-logo"/></svg> Join Channel</a>
     <a href="https://t.me/klslogs" data-link="telegram" target="_blank" class="sfab-item"><svg class="icon i-send" aria-hidden="true"><use href="#i-send"/></svg> Telegram</a>
-    <a href="https://wa.me/2347026881419" data-link="contact" target="_blank" class="sfab-item sfab-item-primary"><svg class="wa-icon" aria-hidden="true"><use href="#wa-logo"/></svg> Contact Owner</a>
+    <a href="https://wa.me/2349065518402" data-link="contact" target="_blank" class="sfab-item sfab-item-primary"><svg class="wa-icon" aria-hidden="true"><use href="#wa-logo"/></svg> Contact Owner</a>
   </div>
   <button type="button" class="sfab-toggle" onclick="toggleSupportFab()" aria-label="Support"><svg class="icon i-headset" aria-hidden="true"><use href="#i-headset"/></svg></button>
 </div>
@@ -151,7 +156,7 @@
   <div class="modal-box" style="max-width:380px;padding:0;display:flex;flex-direction:column;height:min(560px,80vh)">
  <button class="modal-x" onclick="toggleAiChatFab()"><svg class="icon i-x" aria-hidden="true"><use href="#i-x"/></svg></button>
     <div style="padding:20px 20px 12px;border-bottom:1px solid var(--border)">
- <h3 style="margin:0"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Mizzy Sales Assistant</h3>
+ <h3 style="margin:0"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Mizzysales Assistant</h3>
       <p style="color:var(--t2);font-size:12.5px;margin:4px 0 0">Ask about deposits, purchases, refunds, and more</p>
     </div>
     <div id="aiChatFabLog" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:16px 20px"></div>
@@ -169,19 +174,15 @@
     <a class="nav-brand" href="/dashboard" style="text-decoration:none">
  <div class="brand-icon"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg></div>
       <div class="brand-words">
-        <span class="brand-ksl">Mizzy Sales</span>
-        <span class="brand-full">Mizzy Sales</span>
+        <span class="brand-ksl">Mizzysales</span>
+        <span class="brand-full">KingBadBoi Log Sale</span>
       </div>
     </a>
     <div class="nav-center" id="navCenter">
       <a class="nav-link" href="/">Home</a>
       <a class="nav-link" href="/marketplace">Marketplace</a>
       <a class="nav-link" href="/tools">Tools & FMT</a>
- <a class="nav-link" href="/games"><svg class="icon i-gamepad" aria-hidden="true"><use href="#i-gamepad"/></svg> Games</a>
  <a class="nav-link" href="/buy-number"><svg class="icon i-smartphone" aria-hidden="true"><use href="#i-smartphone"/></svg> Numbers</a>
- <a class="nav-link" href="/giveaways"><svg class="icon i-gift" aria-hidden="true"><use href="#i-gift"/></svg> Giveaways</a>
- <a class="nav-link" href="/groups"><svg class="icon i-users" aria-hidden="true"><use href="#i-users"/></svg> Groups</a>
- <a class="nav-link" href="/messages"><svg class="icon i-mail" aria-hidden="true"><use href="#i-mail"/></svg> DMs</a>
       <a class="nav-link" href="/support">Support</a>
     </div>
     <div class="nav-right">
@@ -202,7 +203,7 @@
           </svg>
         </button>
       </div>
-      <a href="https://wa.me/2347026881419" data-link="contact" target="_blank" class="nav-wa-btn" title="Chat with us on WhatsApp" aria-label="WhatsApp">
+      <a href="https://wa.me/2349065518402" data-link="contact" target="_blank" class="nav-wa-btn" title="Chat with us on WhatsApp" aria-label="WhatsApp">
         <svg class="wa-icon"><use href="#wa-logo"/></svg>
       </a>
       <div class="notif-wrap">
@@ -226,7 +227,6 @@
  <a class="dd-item" href="/referrals"><span><svg class="icon i-link" aria-hidden="true"><use href="#i-link"/></svg></span> Referrals</a>
  <a class="dd-item" href="/purchases"><span><svg class="icon i-package" aria-hidden="true"><use href="#i-package"/></svg></span> My Purchases</a>
  <a class="dd-item" href="/transactions"><span><svg class="icon i-clipboard" aria-hidden="true"><use href="#i-clipboard"/></svg></span> Transactions</a>
- <a class="dd-item" href="/api-docs"><span><svg class="icon i-plug" aria-hidden="true"><use href="#i-plug"/></svg></span> API Docs</a>
  <a class="dd-item" href="/settings"><span><svg class="icon i-settings" aria-hidden="true"><use href="#i-settings"/></svg></span> Settings</a>
  <a class="dd-item" href="/terms"><span><svg class="icon i-scroll" aria-hidden="true"><use href="#i-scroll"/></svg></span> Terms &amp; Conditions</a>
           <div class="dropdown-divider"></div>
@@ -253,20 +253,20 @@
     <div class="footer-brand">
  <span class="footer-crown"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg></span>
       <div>
-        <div class="footer-name">Mizzy Sales — Mizzy Sales</div>
+        <div class="footer-name">Mizzysales</div>
  <div class="footer-tag">Verified Social Media Account Seller <svg class="icon i-alert-triangle" aria-hidden="true"><use href="#i-alert-triangle"/></svg>‼</div>
       </div>
     </div>
     <div class="footer-links">
       <a href="https://whatsapp.com/channel/0029Vb7ivq9HLHQcS4XgQu2Q" data-link="channel" target="_blank"><svg class="wa-icon"><use href="#wa-logo"/></svg> Channel</a>
       <a href="https://chat.whatsapp.com/HBqJeik773M1pqEmIjfpXr" data-link="group" target="_blank"><svg class="wa-icon"><use href="#wa-logo"/></svg> Group</a>
-      <a href="https://wa.me/2347026881419" data-link="contact" target="_blank"><svg class="wa-icon"><use href="#wa-logo"/></svg> Contact</a>
+      <a href="https://wa.me/2349065518402" data-link="contact" target="_blank"><svg class="wa-icon"><use href="#wa-logo"/></svg> Contact</a>
  <a href="/terms"><svg class="icon i-scroll" aria-hidden="true"><use href="#i-scroll"/></svg> Terms &amp; Conditions</a>
     </div>
   </div>
   <div class="footer-bottom">
  <div class="footer-visits"><svg class="icon i-user" aria-hidden="true"><use href="#i-user"/></svg> <span id="footerVisitCount">—</span> visitors</div>
-    <div class="footer-copy">© <span id="footerYear"></span> Mizzy Sales — Mizzy Sales. All rights reserved.</div>
+    <div class="footer-copy">© <span id="footerYear"></span> Mizzysales. All rights reserved.</div>
   </div>
 </footer>
 
@@ -280,9 +280,6 @@
   </button>
   <button class="bt-item" id="btWallet" onclick="window.location.href='/deposit'">
  <span class="bt-icon"><svg class="icon i-wallet" aria-hidden="true"><use href="#i-wallet"/></svg></span><span class="bt-label">Wallet</span>
-  </button>
-  <button class="bt-item" id="btChat" onclick="window.location.href='/groups'">
- <span class="bt-icon"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg></span><span class="bt-label">Chat</span>
   </button>
   <button class="bt-item" id="btProfile" onclick="window.location.href='/settings'">
  <span class="bt-icon"><svg class="icon i-user" aria-hidden="true"><use href="#i-user"/></svg></span><span class="bt-label">Profile</span>
@@ -298,8 +295,8 @@
 <script src="js/country-select.js?v=20260910a" defer></script>
 <script src="js/global-pay.js?v=20260910a" defer></script>
   <script src="js/wallet.js?v=20260910a" defer></script>
+<script src="js/dev-credit.js?v=20260910a" defer></script>
 <script src="/js/mobile-features.js" defer></script>
 <script src="/js/vpn-notice.js" defer></script>
-<script src="js/dev-credit.js?v=20261017" defer></script>
 </body>
 </html>

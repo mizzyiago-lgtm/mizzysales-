@@ -3,34 +3,33 @@
 <head>
 <script src="/js/auth-keeper.js?v=1"></script>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mizzy Sales — Mizzy Sales</title>
-  <meta name="description" content="Mizzy Sales — buy verified social media logs, SMS verification numbers and digital services worldwide. Trusted, blue-tick verified seller with instant delivery."/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Mizzysales</title>
+  <meta name="description" content="Mizzysales — buy verified social media logs, SMS verification numbers and digital services worldwide. Trusted, blue-tick verified seller with instant delivery."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Sora:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css?v=20260910a"/>
   <link rel="stylesheet" href="theme.css?v=20260910a"/>
   <link rel="stylesheet" href="css/layout-polish.css?v=20260910a"/>
-  <link rel="icon" type="image/jpeg" href="/img/mizzy-logo.jpg"/>
   <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#00b4f8"/>
+  <meta name="theme-color" content="#0788e8"/>
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="Mizzy Sales"/>
-  <link rel="apple-touch-icon" href="/img/mizzy-logo.jpg"/>
+  <meta name="apple-mobile-web-app-title" content="Mizzysales"/>
+  <link rel="apple-touch-icon" href="/favicon.png?v=mz3">
   <script>
     // Apply theme before first paint to avoid a flash of the wrong theme
     (function(){
       try {
-        var pref = localStorage.getItem('ksl_theme');
+        var pref = 'dark'; /* dark-only brand */
         var effective = (pref === 'light' || pref === 'dark') ? pref : (function(){ var h = new Date().getHours(); return (h >= 19 || h < 7) ? 'dark' : 'light'; })();
         document.documentElement.setAttribute('data-theme', effective);
         // Follow the device / country clock: with no manual override, re-evaluate the
         // theme on a timer and whenever the tab is shown again (covers timezone changes).
         var auto = function(){
           try {
-            var p = localStorage.getItem('ksl_theme');
+            var p = 'dark'; /* dark-only brand */
             if (p === 'light' || p === 'dark') return;
             var h = new Date().getHours();
             document.documentElement.setAttribute('data-theme', (h >= 19 || h < 7) ? 'dark' : 'light');
@@ -49,11 +48,16 @@
   <!-- Brand colours/fonts from site.config.js — keep last so it can override -->
   <link rel="stylesheet" href="/brand.css"/>
   <link rel="stylesheet" href="/css/mobile-fix.css">
-  <link rel="stylesheet" href="/css/mizzy-unified.css?v=2"/>
-  <link rel="stylesheet" href="/css/home-editorial.css?v=1"/>
-  <link rel="stylesheet" href="/css/dashboard-look.css?v=20261016"/>
+<script src="/kls-ui.js?v=2"></script>
+
+<link rel="icon" type="image/png" sizes="128x128" href="/favicon.png?v=mz3">
+<link rel="shortcut icon" href="/favicon.ico?v=mz3">
+<link rel="stylesheet" href="/css/marvinums-brand.css?v=3">
+<script defer src="/js/marvinums-brand.js?v=3"></script>
+  <link rel="stylesheet" href="/css/marvel-nums-mobile-polish.css?v=2">
+  <link rel="stylesheet" href="/css/glass-ui.css?v=1">
 </head>
-<body>
+<body class="mn-bg-hero">
 <div id="pageLoadBar" class="page-load-bar"></div>
 <div id="dbfl-overlay" class="dbfl-overlay">
   <div class="dbfl-brand">
@@ -154,15 +158,15 @@
   <symbol id="i-cloud" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 01-1-8.9A5.5 5.5 0 0116.5 7 4.5 4.5 0 0117 16H7z"/></g></symbol>
   <symbol id="i-disc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></g></symbol>
 </svg>
-<!-- Single consolidated Support button — everything (community, channel, owner, telegram, Mizzy Sales
+<!-- Single consolidated Support button — everything (community, channel, owner, telegram, Mizzysales
      Assistant) lives behind one icon so nothing floats loose over the bottom nav on mobile. -->
 <div id="supportFab" class="support-fab">
   <div class="sfab-menu" id="sfabMenu">
-    <button type="button" class="sfab-item" onclick="toggleAiChatFab();toggleSupportFab()"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Mizzy Sales Assistant</button>
+    <button type="button" class="sfab-item" onclick="toggleAiChatFab();toggleSupportFab()"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Mizzysales Assistant</button>
     <a href="https://chat.whatsapp.com/HBqJeik773M1pqEmIjfpXr" data-link="group" target="_blank" class="sfab-item"><svg class="wa-icon" aria-hidden="true"><use href="#wa-logo"/></svg> Join Community</a>
     <a href="https://whatsapp.com/channel/0029Vb7ivq9HLHQcS4XgQu2Q" data-link="channel" target="_blank" class="sfab-item"><svg class="wa-icon" aria-hidden="true"><use href="#wa-logo"/></svg> Join Channel</a>
     <a href="https://t.me/klslogs" data-link="telegram" target="_blank" class="sfab-item"><svg class="icon i-send" aria-hidden="true"><use href="#i-send"/></svg> Telegram</a>
-    <a href="https://wa.me/2347026881419" data-link="contact" target="_blank" class="sfab-item sfab-item-primary"><svg class="wa-icon" aria-hidden="true"><use href="#wa-logo"/></svg> Contact Owner</a>
+    <a href="https://wa.me/2349065518402" data-link="contact" target="_blank" class="sfab-item sfab-item-primary"><svg class="wa-icon" aria-hidden="true"><use href="#wa-logo"/></svg> Contact Owner</a>
   </div>
   <button type="button" class="sfab-toggle" onclick="toggleSupportFab()" aria-label="Support"><svg class="icon i-headset" aria-hidden="true"><use href="#i-headset"/></svg></button>
 </div>
@@ -170,7 +174,7 @@
   <div class="modal-box" style="max-width:380px;padding:0;display:flex;flex-direction:column;height:min(560px,80vh)">
  <button class="modal-x" onclick="toggleAiChatFab()"><svg class="icon i-x" aria-hidden="true"><use href="#i-x"/></svg></button>
     <div style="padding:20px 20px 12px;border-bottom:1px solid var(--border)">
-      <h3 style="margin:0">Mizzy Sales Assistant</h3>
+      <h3 style="margin:0">Mizzysales Assistant</h3>
       <p style="color:var(--t2);font-size:12.5px;margin:4px 0 0">Ask about deposits, purchases, refunds, and more</p>
     </div>
     <div id="aiChatFabLog" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:16px 20px"></div>
@@ -191,7 +195,7 @@
         </svg>
       </div>
       <div class="brand-words">
-        <span class="brand-ksl">Mizzy Sales<svg class="brand-verified" viewBox="0 0 24 24" aria-label="Verified" role="img"><path fill="#1d9bf0" d="M12 1.5 14.3 4l3.4-.4 1 3.3 3.1 1.5-1.2 3.2 1.2 3.2-3.1 1.5-1 3.3-3.4-.4L12 22.5 9.7 20l-3.4.4-1-3.3L2.2 15.6 3.4 12.4 2.2 9.2l3.1-1.5 1-3.3L9.7 4 12 1.5Z"/><path fill="#fff" d="m10.8 15.3-3-3 1.3-1.3 1.7 1.7 4.1-4.2 1.4 1.3-5.5 5.5Z"/></svg></span>
+        <span class="brand-ksl">Mizzysales<svg class="brand-verified" viewBox="0 0 24 24" aria-label="Verified" role="img"><path fill="#1d9bf0" d="M12 1.5 14.3 4l3.4-.4 1 3.3 3.1 1.5-1.2 3.2 1.2 3.2-3.1 1.5-1 3.3-3.4-.4L12 22.5 9.7 20l-3.4.4-1-3.3L2.2 15.6 3.4 12.4 2.2 9.2l3.1-1.5 1-3.3L9.7 4 12 1.5Z"/><path fill="#fff" d="m10.8 15.3-3-3 1.3-1.3 1.7 1.7 4.1-4.2 1.4 1.3-5.5 5.5Z"/></svg></span>
         <span class="brand-full">Logs • SMS Verification • Digital Services</span>
       </div>
     </div>
@@ -200,12 +204,8 @@
       <a class="nav-link" href="/marketplace">Marketplace</a>
       <a class="nav-link" href="/tools">Tools & FMT</a>
       <a class="nav-link" href="#" onclick="showPage('wallet')">Wallet</a>
-      <a class="nav-link" href="/games">Games</a>
       <a class="nav-link" href="/buy-number">Numbers</a>
       <a class="nav-link" href="/boost">Boost</a>
-      <a class="nav-link" href="/giveaways">Giveaways</a>
-      <a class="nav-link" href="/groups">Groups</a>
-      <a class="nav-link" href="/messages">DMs</a>
       <a class="nav-link" href="/support">Support</a>
     </div>
     <div class="nav-right">
@@ -226,7 +226,7 @@
           </svg>
         </button>
       </div>
-      <a href="https://wa.me/2347026881419" data-link="contact" target="_blank" class="nav-wa-btn nav-hide-sm" title="Chat with us on WhatsApp" aria-label="WhatsApp">
+      <a href="https://wa.me/2349065518402" data-link="contact" target="_blank" class="nav-wa-btn nav-hide-sm" title="Chat with us on WhatsApp" aria-label="WhatsApp">
         <svg class="wa-icon"><use href="#wa-logo"/></svg>
       </a>
       <div class="notif-wrap" id="notifWrap" style="display:none">
@@ -256,7 +256,6 @@
  <a class="dd-item" href="/referrals"><span><svg class="icon i-link" aria-hidden="true"><use href="#i-link"/></svg></span> Referrals</a>
  <a class="dd-item" href="/purchases"><span><svg class="icon i-package" aria-hidden="true"><use href="#i-package"/></svg></span> My Purchases</a>
  <a class="dd-item" href="/transactions"><span><svg class="icon i-clipboard" aria-hidden="true"><use href="#i-clipboard"/></svg></span> Transactions</a>
- <a class="dd-item" href="/api-docs"><span><svg class="icon i-plug" aria-hidden="true"><use href="#i-plug"/></svg></span> API Docs</a>
  <a class="dd-item" href="/settings"><span><svg class="icon i-settings" aria-hidden="true"><use href="#i-settings"/></svg></span> Settings</a>
  <a class="dd-item" href="#" onclick="showPage('terms')"><span><svg class="icon i-scroll" aria-hidden="true"><use href="#i-scroll"/></svg></span> Terms &amp; Conditions</a>
           <div class="dropdown-divider"></div>
@@ -270,34 +269,51 @@
 <main id="app">
 <div id="adBanner" class="ad-banner" style="display:none"></div>
 <div id="page-home" class="page active">
-  <section class="hero-section" aria-labelledby="homeHeroTitle">
+  <section class="hero-section">
+    <div class="hero-glow"></div>
     <div class="hero-content">
-      <div class="hero-chip"><span class="chip-dot"></span> TRUSTED SELLER <svg class="hero-tick" viewBox="0 0 24 24" aria-label="Verified" role="img"><path fill="currentColor" d="M12 1.5 14.3 4l3.4-.4 1 3.3 3.1 1.5-1.2 3.2 1.2 3.2-3.1 1.5-1 3.3-3.4-.4L12 22.5 9.7 20l-3.4.4-1-3.3L2.2 15.6 3.4 12.4 2.2 9.2l3.1-1.5 1-3.3L9.7 4 12 1.5Z"/><path fill="var(--bg)" d="m10.8 15.3-3-3 1.3-1.3 1.7 1.7 4.1-4.2 1.4 1.3-5.5 5.5Z"/></svg></div>
-      <h1 class="hero-h1" id="homeHeroTitle">Mizzy Sales</h1>
-      <p class="hero-subtitle">Your digital marketplace,<br>ready when you are.</p>
-      <p class="hero-p">Find verified accounts, SMS numbers, boosting and digital tools in one place. Shop with confidence and get help whenever you need it.</p>
-      <div class="hero-actions">
-        <a href="/marketplace" class="hero-cta">Explore marketplace <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12h16m-7-7 7 7-7 7"/></svg></a>
-        <a href="/buy-number" class="hero-wa">Buy a number <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12h16m-7-7 7 7-7 7"/></svg></a>
+      <div class="hero-chip">
+        <span class="chip-dot"></span>
+        TRUSTED SELLER
+        <svg class="hero-tick" viewBox="0 0 24 24" aria-label="Verified" role="img"><path fill="#1d9bf0" d="M12 1.5 14.3 4l3.4-.4 1 3.3 3.1 1.5-1.2 3.2 1.2 3.2-3.1 1.5-1 3.3-3.4-.4L12 22.5 9.7 20l-3.4.4-1-3.3L2.2 15.6 3.4 12.4 2.2 9.2l3.1-1.5 1-3.3L9.7 4 12 1.5Z"/><path fill="#fff" d="m10.8 15.3-3-3 1.3-1.3 1.7 1.7 4.1-4.2 1.4 1.3-5.5 5.5Z"/></svg>
       </div>
-      <div class="trust-row" aria-label="Shopping benefits">
-        <span class="trust-pill"><svg class="icon i-shield" aria-hidden="true"><use href="#ic-shield"/></svg> Trust guarantee</span>
-        <span class="trust-pill"><svg class="icon i-zap" aria-hidden="true"><use href="#i-zap"/></svg> Instant delivery</span>
-        <span class="trust-pill"><svg class="icon i-globe" aria-hidden="true"><use href="#i-globe"/></svg> Worldwide access</span>
+      <h1 class="hero-h1">Logs, Numbers &amp; More —<br/><span class="hero-gradient">Buy Anything, Worldwide</span></h1>
+      <p class="hero-p">Mizzysales is Nigeria's all-in-one digital marketplace, open worldwide. Buy verified social media accounts, SMS verification numbers, social media boosting and premium digital tools — from one wallet, delivered instantly.</p>
+      <p class="hero-p" hidden>Mizzysales is more than logs. Social media accounts, SMS verification numbers, digital tools and gift services — one wallet, instant delivery, available to buyers in Nigeria and every other country.</p>
+      <div class="trust-row">
+        <span class="trust-pill"><svg class="icon i-shield" aria-hidden="true"><use href="#ic-shield"/></svg> Trust Guarantee</span>
+        <span class="trust-pill"><svg class="hero-tick" viewBox="0 0 24 24" aria-hidden="true"><path fill="#1d9bf0" d="M12 1.5 14.3 4l3.4-.4 1 3.3 3.1 1.5-1.2 3.2 1.2 3.2-3.1 1.5-1 3.3-3.4-.4L12 22.5 9.7 20l-3.4.4-1-3.3L2.2 15.6 3.4 12.4 2.2 9.2l3.1-1.5 1-3.3L9.7 4 12 1.5Z"/><path fill="#fff" d="m10.8 15.3-3-3 1.3-1.3 1.7 1.7 4.1-4.2 1.4 1.3-5.5 5.5Z"/></svg> Blue-Tick Verified</span>
+        <span class="trust-pill"><svg class="icon i-globe" aria-hidden="true"><use href="#i-globe"/></svg> Worldwide Payments</span>
+      </div>
+      <div class="hero-actions">
+        <button class="hero-cta" onclick="window.location.href='/marketplace'">
+          <span>Browse Marketplace</span>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </button>
+        <a href="https://wa.me/2349065518402" data-link="contact" target="_blank" class="hero-wa">
+          <span><svg class="wa-icon"><use href="#wa-logo"/></svg></span> WhatsApp Us
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat"><span class="hstat-n" id="homeStatUsers">—</span><span class="hstat-l">Members</span></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><span class="hstat-n" id="homeStatLogs">—</span><span class="hstat-l">Listings</span></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><span class="hstat-n">100%</span><span class="hstat-l">Verified</span></div>
+        <div class="hstat-div"></div>
+ <div class="hstat"><span class="hstat-n"><svg class="icon i-zap" aria-hidden="true"><use href="#i-zap"/></svg></span><span class="hstat-l">Instant</span></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><span class="hstat-n" id="homeStatVisitors">—</span><span class="hstat-l">Visitors</span></div>
+        <div class="hstat-div"></div>
+ <div class="hstat"><span class="hstat-n" id="homeStatActiveNow">—</span><span class="hstat-l"><svg class="icon i-dot" aria-hidden="true"><use href="#i-dot"/></svg> Active Now</span></div>
       </div>
     </div>
-    <div class="hero-stats">
-      <div class="hstat"><span class="hstat-n" id="homeStatUsers">—</span><span class="hstat-l">Members</span></div>
-      <div class="hstat"><span class="hstat-n" id="homeStatLogs">—</span><span class="hstat-l">Listings</span></div>
-      <div class="hstat"><span class="hstat-n" id="homeStatVisitors">—</span><span class="hstat-l">Visitors</span></div>
-      <div class="hstat"><span class="hstat-n" id="homeStatActiveNow">—</span><span class="hstat-l">Active now</span></div>
+    <div class="hero-links-row">
+      <a href="https://whatsapp.com/channel/0029Vb7ivq9HLHQcS4XgQu2Q" data-link="channel" target="_blank" class="hlink"><svg class="wa-icon"><use href="#wa-logo"/></svg> WhatsApp Channel</a>
+      <a href="https://chat.whatsapp.com/HBqJeik773M1pqEmIjfpXr" data-link="group" target="_blank" class="hlink"><svg class="wa-icon"><use href="#wa-logo"/></svg> Buy Group</a>
+      <a href="https://wa.me/2349065518402" data-link="contact" target="_blank" class="hlink"><svg class="wa-icon"><use href="#wa-logo"/></svg> Direct Contact</a>
     </div>
   </section>
-  <nav class="hero-links-row" aria-label="Ways to connect">
-    <a href="https://whatsapp.com/channel/0029Vb7ivq9HLHQcS4XgQu2Q" data-link="channel" target="_blank" rel="noopener noreferrer" class="hlink">WhatsApp channel ↗</a>
-    <a href="https://chat.whatsapp.com/HBqJeik773M1pqEmIjfpXr" data-link="group" target="_blank" rel="noopener noreferrer" class="hlink">Community ↗</a>
-    <a href="https://wa.me/2347026881419" data-link="contact" target="_blank" rel="noopener noreferrer" class="hlink">Contact admin ↗</a>
-  </nav>
 
   <section class="live-stats-sec" id="liveStatsSec">
     <div class="section-wrap">
@@ -346,13 +362,13 @@
   </section>
   <section class="welcome-offers" style="padding:56px 0 8px">
     <div class="section-wrap">
-      <div class="sec-label" style="text-align:center;display:block">What Mizzy Sales Offers</div>
+      <div class="sec-label" style="text-align:center;display:block">What Mizzysales Offers</div>
       <h2 class="sec-h2" style="text-align:center">Everything In One Place</h2>
       <p style="text-align:center;color:var(--t2);font-size:14px;max-width:560px;margin:-16px auto 32px">Social media accounts, disposable verification numbers, and a support assistant that actually knows the site — all under one wallet.</p>
       <div class="wo-grid">
         <div class="wo-card">
           <div class="wo-icon"><svg class="icon i-cart" aria-hidden="true" style="width:28px;height:28px"><use href="#i-cart"/></svg></div>
-          <div class="wo-title">Mizzy Sales Logs Marketplace</div>
+          <div class="wo-title">Mizzysales Logs Marketplace</div>
           <div class="wo-desc">Verified Twitter, Facebook, Instagram, Discord and other social media accounts, tested before listing and delivered instantly the moment payment clears.</div>
           <a href="/marketplace" class="hlink" style="margin-top:14px;display:inline-flex">Browse Marketplace</a>
         </div>
@@ -364,7 +380,7 @@
         </div>
         <div class="wo-card">
           <div class="wo-icon"><svg class="icon i-message-circle" aria-hidden="true" style="width:28px;height:28px"><use href="#i-message-circle"/></svg></div>
-          <div class="wo-title">Mizzy Sales Assistant Support</div>
+          <div class="wo-title">Mizzysales Assistant Support</div>
           <div class="wo-desc">A chat assistant built into the Support button (bottom-right, on every page) that knows how deposits, numbers and orders work — ask it a question any time, day or night, and escalate to a human on WhatsApp whenever you need to.</div>
           <a href="/support" class="hlink" style="margin-top:14px;display:inline-flex">Open Support</a>
         </div>
@@ -386,13 +402,13 @@
       <div id="homeBadgesPreview" style="display:flex;flex-wrap:wrap;gap:10px"></div>
     </div>
   </section>
-  <!-- What Mizzy Sales is, in plain words -->
+  <!-- What Mizzysales is, in plain words -->
   <section class="kls-what">
     <div class="section-wrap">
-      <div class="sec-label">What is Mizzy Sales?</div>
+      <div class="sec-label">What is Mizzysales?</div>
       <h2 class="sec-h2">Everything digital, in one account</h2>
       <p style="color:var(--t2);font-size:13.5px;max-width:640px;margin:0 0 18px">
-        Mizzy Sales (Mizzy Sales) is a verified seller platform. You fund one wallet, then buy anything
+        Mizzysales (KingBadBoi Log Sale) is a verified seller platform. You fund one wallet, then buy anything
         below at any time of the day — every order is delivered to your account automatically, with real
         support on WhatsApp if something ever goes wrong.
       </p>
@@ -445,7 +461,7 @@
 
   <section class="why-section">
     <div class="section-wrap">
-      <div class="sec-label">Why Choose Mizzy Sales</div>
+      <div class="sec-label">Why Choose Mizzysales</div>
       <h2 class="sec-h2">Trusted by buyers across Nigeria</h2>
       <div class="why-grid">
         <div class="why-card">
@@ -544,10 +560,10 @@
   <section class="footer-cta">
     <div class="fcta-inner">
       <h3>Ready to buy?</h3>
-      <p>Join hundreds of satisfied buyers on Mizzy Sales today.</p>
+      <p>Join hundreds of satisfied buyers on Mizzysales today.</p>
       <div class="fcta-btns">
         <button class="hero-cta" onclick="showPage('register')">Create Free Account</button>
-        <a href="https://wa.me/2347026881419" data-link="contact" target="_blank" class="hero-wa">Chat on WhatsApp</a>
+        <a href="https://wa.me/2349065518402" data-link="contact" target="_blank" class="hero-wa">Chat on WhatsApp</a>
       </div>
     </div>
   </section>
@@ -576,7 +592,7 @@
   </div>
 </div>
 <div id="page-tools" class="page">
-  <div class="page-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(47,123,246,.08))">
+  <div class="page-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(7,136,232,.08))">
  <div class="ph-chip"><svg class="icon i-wrench" aria-hidden="true"><use href="#i-wrench"/></svg> Tools</div>
     <h1>Digital Tools & Resources</h1>
     <p>Unlimited-use tools — buy once and use as many times as you want</p>
@@ -649,7 +665,7 @@ function filterToolsGrid(){
   <div class="page-hero">
  <div class="ph-chip"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Community</div>
     <h1>Chat</h1>
-    <p>Talk with other Mizzy Sales members, message people directly, and find game opponents</p>
+    <p>Talk with other Mizzysales members, message people directly, and find game opponents</p>
   </div>
   <div class="section-wrap chat-wrap">
     <div class="chat-mode-toggle" style="display:flex;gap:8px;margin-bottom:12px">
@@ -756,14 +772,14 @@ function filterToolsGrid(){
   <div class="support-wrap">
     <div class="support-left">
       <div class="supp-card">
- <h3><svg class="icon i-bot" aria-hidden="true"><use href="#i-bot"/></svg> Ask Mizzy Sales Assistant</h3>
+ <h3><svg class="icon i-bot" aria-hidden="true"><use href="#i-bot"/></svg> Ask Mizzysales Assistant</h3>
         <p style="color:var(--t2);font-size:14px;margin-bottom:12px">Instant answers to basic questions — deposits, purchases, refunds, referrals, the API, and more.</p>
  <button class="btn-primary" onclick="toggleAiChatFab()"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Open Chat</button>
       </div>
       <div class="supp-card">
         <h3>Quick Contact</h3>
         <p style="color:var(--t2);font-size:14px;margin-bottom:16px">Fastest response via WhatsApp</p>
-        <a href="https://wa.me/2347026881419" data-link="contact" target="_blank" class="supp-btn supp-wa">
+        <a href="https://wa.me/2349065518402" data-link="contact" target="_blank" class="supp-btn supp-wa">
           <span><svg class="wa-icon"><use href="#wa-logo"/></svg></span> Chat on WhatsApp
         </a>
         <a href="https://whatsapp.com/channel/0029Vb7ivq9HLHQcS4XgQu2Q" data-link="channel" target="_blank" class="supp-btn supp-ch">
@@ -828,12 +844,7 @@ function filterToolsGrid(){
       <button class="btn-primary" onclick="setPassword()">Add Password</button>
       <div id="setPasswordFeedback" class="form-feedback"></div>
     </div>
-    <div class="settings-card">
- <h3><svg class="icon i-key" aria-hidden="true"><use href="#i-key"/></svg> API Access <span class="mgid-hint" style="display:inline">— for connecting Mizzy Sales to your own scripts/apps</span></h3>
-      <div id="apiKeySection">Loading...</div>
- <button class="btn-primary" style="margin-top:14px" onclick="showPage('apidocs')"><svg class="icon i-book-open" aria-hidden="true"><use href="#i-book-open"/></svg> View Full API Documentation</button>
-    </div>
-  </div>
+      </div>
 </div>
 <div id="page-welcome" class="page">
   <div class="welcome-wrap">
@@ -843,9 +854,9 @@ function filterToolsGrid(){
         TRUSTED SELLER
         <svg class="hero-tick" viewBox="0 0 24 24" aria-label="Verified" role="img"><path fill="#1d9bf0" d="M12 1.5 14.3 4l3.4-.4 1 3.3 3.1 1.5-1.2 3.2 1.2 3.2-3.1 1.5-1 3.3-3.4-.4L12 22.5 9.7 20l-3.4.4-1-3.3L2.2 15.6 3.4 12.4 2.2 9.2l3.1-1.5 1-3.3L9.7 4 12 1.5Z"/><path fill="#fff" d="m10.8 15.3-3-3 1.3-1.3 1.7 1.7 4.1-4.2 1.4 1.3-5.5 5.5Z"/></svg>
       </div>
- <div class="auth-brand" style="font-size:42px;margin-bottom:10px"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg> Mizzy Sales</div>
+ <div class="auth-brand" style="font-size:42px;margin-bottom:10px"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg> Mizzysales</div>
       <h1 class="hero-h1" style="font-size:clamp(34px,7vw,60px);margin-bottom:18px;line-height:1.08">Logs, Numbers &amp; More —<br/><span class="hero-gradient">Buy Anything, Worldwide</span></h1>
-      <p class="hero-p" style="margin-bottom:22px;font-size:clamp(15px,2.5vw,18px);max-width:620px;margin-left:auto;margin-right:auto;line-height:1.65">Mizzy Sales is not just logs. Social media accounts, SMS verification numbers, digital tools and more — funded from one wallet, delivered instantly, and open to buyers in every country (pay in ₦ or $).</p>
+      <p class="hero-p" style="margin-bottom:22px;font-size:clamp(15px,2.5vw,18px);max-width:620px;margin-left:auto;margin-right:auto;line-height:1.65">Mizzysales is not just logs. Social media accounts, SMS verification numbers, digital tools and more — funded from one wallet, delivered instantly, and open to buyers in every country (pay in ₦ or $).</p>
       <div class="trust-row" style="justify-content:center;margin-bottom:26px">
         <span class="trust-pill"><svg class="icon i-shield" aria-hidden="true"><use href="#ic-shield"/></svg> Trust Guarantee</span>
         <span class="trust-pill"><svg class="hero-tick" viewBox="0 0 24 24" aria-hidden="true"><path fill="#1d9bf0" d="M12 1.5 14.3 4l3.4-.4 1 3.3 3.1 1.5-1.2 3.2 1.2 3.2-3.1 1.5-1 3.3-3.4-.4L12 22.5 9.7 20l-3.4.4-1-3.3L2.2 15.6 3.4 12.4 2.2 9.2l3.1-1.5 1-3.3L9.7 4 12 1.5Z"/><path fill="#fff" d="m10.8 15.3-3-3 1.3-1.3 1.7 1.7 4.1-4.2 1.4 1.3-5.5 5.5Z"/></svg> Blue-Tick Verified</span>
@@ -878,14 +889,14 @@ function filterToolsGrid(){
       <div class="ls-feed" id="lsFeedW"></div>
     </section>
     <div class="welcome-categories">
-      <div class="sec-label" style="text-align:center;display:block;margin-bottom:8px">WHAT'S ON Mizzy Sales</div>
+      <div class="sec-label" style="text-align:center;display:block;margin-bottom:8px">WHAT'S ON Mizzysales</div>
       <h2 class="sec-h2" style="text-align:center;margin-bottom:20px">Every Platform, One Marketplace</h2>
       <div class="wc-grid" id="welcomeCatGrid">
         <div class="spin" style="margin:20px auto"></div>
       </div>
     </div>
     <div class="welcome-offers">
-      <div class="sec-label" style="text-align:center;display:block;margin-bottom:8px">EVERYTHING ON Mizzy Sales</div>
+      <div class="sec-label" style="text-align:center;display:block;margin-bottom:8px">EVERYTHING ON Mizzysales</div>
       <h2 class="sec-h2" style="text-align:center;margin-bottom:20px">More Than Just a Marketplace</h2>
       <div class="wo-grid">
         <div class="wo-card">
@@ -922,7 +933,7 @@ function filterToolsGrid(){
     </div>
     <div class="welcome-how">
       <div class="sec-label" style="text-align:center;display:block;margin-bottom:8px">GETTING STARTED</div>
-      <h2 class="sec-h2" style="text-align:center;margin-bottom:28px">How Mizzy Sales Works</h2>
+      <h2 class="sec-h2" style="text-align:center;margin-bottom:28px">How Mizzysales Works</h2>
       <div class="wh-step">
         <div class="wh-num">1</div>
         <div class="wh-body">
@@ -976,10 +987,10 @@ function filterToolsGrid(){
  <span style="font-weight:800;font-size:15px;color:var(--t2)"><svg class="icon i-bank" aria-hidden="true"><use href="#i-bank"/></svg> Bank Transfer</span>
  <span style="font-weight:800;font-size:15px;color:var(--t2)"><svg class="icon i-credit-card" aria-hidden="true"><use href="#i-credit-card"/></svg> Card Payments</span>
       </div>
-      <p style="color:var(--t2);font-size:12.5px;margin-top:10px">All deposits are processed by Flutterwave, a licensed payment processor — Mizzy Sales never stores your card details.</p>
+      <p style="color:var(--t2);font-size:12.5px;margin-top:10px">All deposits are processed by Flutterwave, a licensed payment processor — Mizzysales never stores your card details.</p>
     </div>
     <div class="welcome-how">
-      <div class="sec-label" style="text-align:center;display:block;margin-bottom:8px">WHY BUYERS TRUST Mizzy Sales</div>
+      <div class="sec-label" style="text-align:center;display:block;margin-bottom:8px">WHY BUYERS TRUST Mizzysales</div>
       <h2 class="sec-h2" style="text-align:center;margin-bottom:28px">Trust &amp; Safety</h2>
       <div class="wh-step">
  <div class="wh-num"><svg class="icon i-check" aria-hidden="true"><use href="#i-check"/></svg></div>
@@ -1015,7 +1026,7 @@ function filterToolsGrid(){
       <h2 class="sec-h2" style="text-align:center;margin-bottom:20px">Frequently Asked Questions</h2>
       <div class="faq-list" id="welcomeFaqList">
         <div class="faq-item">
-          <button class="faq-q" onclick="toggleFaq(this)">Is Mizzy Sales legit? <span class="faq-caret">▾</span></button>
+          <button class="faq-q" onclick="toggleFaq(this)">Is Mizzysales legit? <span class="faq-caret">▾</span></button>
           <div class="faq-a">Yes — every listing is checked by an admin before it's posted, payments run through Flutterwave (a licensed processor), and every purchase gets a receipt ID you can reference if anything goes wrong.</div>
         </div>
         <div class="faq-item">
@@ -1039,7 +1050,7 @@ function filterToolsGrid(){
     <div class="hero-links-row" style="padding-top:8px">
       <a href="https://whatsapp.com/channel/0029Vb7ivq9HLHQcS4XgQu2Q" data-link="channel" target="_blank" class="hlink"><svg class="wa-icon"><use href="#wa-logo"/></svg> WhatsApp Channel</a>
       <a href="https://chat.whatsapp.com/HBqJeik773M1pqEmIjfpXr" data-link="group" target="_blank" class="hlink"><svg class="wa-icon"><use href="#wa-logo"/></svg> Buy Group</a>
-      <a href="https://wa.me/2347026881419" data-link="contact" target="_blank" class="hlink"><svg class="wa-icon"><use href="#wa-logo"/></svg> Direct Contact</a>
+      <a href="https://wa.me/2349065518402" data-link="contact" target="_blank" class="hlink"><svg class="wa-icon"><use href="#wa-logo"/></svg> Direct Contact</a>
     </div>
   </div>
 </div>
@@ -1047,7 +1058,7 @@ function filterToolsGrid(){
   <div class="auth-bg">
     <div class="auth-card">
  <button type="button" class="auth-home-btn" onclick="showPage('welcome')"><svg class="icon i-arrow-left" aria-hidden="true"><use href="#i-arrow-left"/></svg> Back to Home</button>
- <div class="auth-brand"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg> Mizzy Sales</div>
+ <div class="auth-brand"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg> Mizzysales</div>
       <h2>Welcome Back</h2>
       <p class="auth-sub">Login to your account</p>
       <a href="/auth/google" class="google-btn-link" id="googleLoginBtn">
@@ -1087,7 +1098,7 @@ function filterToolsGrid(){
         <div id="forgotFeedback" class="form-feedback"></div>
         <p style="margin:10px 0 0;font-size:.78rem;line-height:1.6;color:var(--t2)">
           <b>Can't find the email?</b> Check your <b>Spam / Junk / Promotions</b> folder — and please mark it as
-          <b>"Not spam"</b> so future Mizzy Sales emails land in your inbox. It arrives within a minute or two.
+          <b>"Not spam"</b> so future Mizzysales emails land in your inbox. It arrives within a minute or two.
         </p>
       </div>
 
@@ -1098,9 +1109,9 @@ function filterToolsGrid(){
   <div class="auth-bg">
     <div class="auth-card">
  <button type="button" class="auth-home-btn" onclick="showPage('welcome')"><svg class="icon i-arrow-left" aria-hidden="true"><use href="#i-arrow-left"/></svg> Back to Home</button>
- <div class="auth-brand"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg> Mizzy Sales</div>
+ <div class="auth-brand"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg> Mizzysales</div>
       <h2>Create Account</h2>
-      <p class="auth-sub">Join Mizzy Sales and start buying today</p>
+      <p class="auth-sub">Join Mizzysales and start buying today</p>
       <a href="#" class="google-btn-link" id="googleRegisterBtn" onclick="event.preventDefault();startGoogleRegister()">
         <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92A8.78 8.78 0 0 0 17.64 9.2z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.29-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.59-2.59A8.6 8.6 0 0 0 9 0 9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
         Continue with Google
@@ -1125,194 +1136,28 @@ function filterToolsGrid(){
  <h2 class="terms-title"><svg class="icon i-scroll" aria-hidden="true"><use href="#i-scroll"/></svg> Terms &amp; Conditions</h2>
     <p class="terms-updated">Last updated: <span id="termsDate"></span></p>
     <div class="terms-body">
-      <h3>1. About Mizzy Sales</h3>
-      <p>Mizzy Sales — Mizzy Sales ("Mizzy Sales", "we", "us") is a digital marketplace for social media accounts ("logs") and digital tools. By creating an account or using this site, you agree to these Terms &amp; Conditions in full.</p>
+      <h3>1. About Mizzysales</h3>
+      <p>Mizzysales ("Mizzysales", "we", "us") is a digital marketplace for social media accounts ("logs") and digital tools. By creating an account or using this site, you agree to these Terms &amp; Conditions in full.</p>
       <h3>2. Account Registration</h3>
-      <p>You must create an account with an accurate name and email address to browse or purchase on Mizzy Sales. You are responsible for keeping your login details secure and for all activity under your account.</p>
+      <p>You must create an account with an accurate name and email address to browse or purchase on Mizzysales. You are responsible for keeping your login details secure and for all activity under your account.</p>
       <h3>3. Wallet & Payments</h3>
-      <p>Purchases are made from your Mizzy Sales wallet balance. You fund your wallet by depositing to the account details provided and submitting proof of payment. Deposits are reviewed automatically and/or manually before your balance is credited. Providing a fake, altered, or duplicate payment receipt is fraud and will result in account restriction and forfeiture of any pending balance.</p>
+      <p>Purchases are made from your Mizzysales wallet balance. You fund your wallet by depositing to the account details provided and submitting proof of payment. Deposits are reviewed automatically and/or manually before your balance is credited. Providing a fake, altered, or duplicate payment receipt is fraud and will result in account restriction and forfeiture of any pending balance.</p>
       <h3>4. Purchases & Delivery</h3>
       <p>Once a purchase is completed, log details or tool access (link or file) are revealed to you immediately and are considered delivered. Because delivery is instant and details are private the moment they're revealed, all sales are final except where an item is confirmed non-functional or materially different from its listing — contact support with your Purchase ID within 24 hours in that case.</p>
       <h3>5. Prohibited Use</h3>
-      <p>You may not use Mizzy Sales for money laundering, fraud, purchasing accounts/tools for the purpose of harassment or illegal activity, chargebacks/payment reversal abuse, or attempts to exploit bugs in the platform for financial gain. Violating this may lead to immediate account restriction and forfeiture of wallet balance.</p>
+      <p>You may not use Mizzysales for money laundering, fraud, purchasing accounts/tools for the purpose of harassment or illegal activity, chargebacks/payment reversal abuse, or attempts to exploit bugs in the platform for financial gain. Violating this may lead to immediate account restriction and forfeiture of wallet balance.</p>
       <h3>6. Account Restriction</h3>
-      <p>Mizzy Sales reserves the right to restrict or suspend any account suspected of fraud, abuse, chargeback attempts, or violation of these terms, with or without prior notice. Restricted accounts cannot log in, browse, or make purchases until the matter is resolved with support.</p>
+      <p>Mizzysales reserves the right to restrict or suspend any account suspected of fraud, abuse, chargeback attempts, or violation of these terms, with or without prior notice. Restricted accounts cannot log in, browse, or make purchases until the matter is resolved with support.</p>
       <h3>7. No Warranty on Third-Party Platforms</h3>
-      <p>Logs and tools sold on Mizzy Sales relate to third-party platforms (social media networks, software, etc.) that Mizzy Sales does not own or control. Mizzy Sales is not responsible for actions taken by those third parties against an account or tool after delivery (e.g. suspension by the originating platform), except where Mizzy Sales's own listing was inaccurate.</p>
+      <p>Logs and tools sold on Mizzysales relate to third-party platforms (social media networks, software, etc.) that Mizzysales does not own or control. Mizzysales is not responsible for actions taken by those third parties against an account or tool after delivery (e.g. suspension by the originating platform), except where Mizzysales's own listing was inaccurate.</p>
       <h3>8. Support & Disputes</h3>
       <p>For any issue with an order, contact support via WhatsApp with your Purchase ID and account email. We aim to resolve disputes fairly and promptly.</p>
       <h3>9. Changes to These Terms</h3>
-      <p>We may update these Terms &amp; Conditions from time to time. Continued use of Mizzy Sales after changes are posted means you accept the revised terms.</p>
+      <p>We may update these Terms &amp; Conditions from time to time. Continued use of Mizzysales after changes are posted means you accept the revised terms.</p>
       <h3>10. Contact</h3>
-      <p>Reach us any time via WhatsApp at <a href="https://wa.me/2347026881419" data-link="contact" target="_blank" id="termsWaTextLink">wa.me/2347026881419</a> or through the Support page on this site.</p>
+      <p>Reach us any time via WhatsApp at <a href="https://wa.me/2349065518402" data-link="contact" target="_blank" id="termsWaTextLink">wa.me/2349065518402</a> or through the Support page on this site.</p>
     </div>
  <button class="btn-primary" onclick="history.length>1?history.back():showPage(token?'home':'login')" style="margin-top:20px"><svg class="icon i-arrow-left" aria-hidden="true"><use href="#i-arrow-left"/></svg> Back</button>
-  </div>
-</div>
-<div id="page-apidocs" class="page">
-  <div class="page-hero">
- <div class="ph-chip"><svg class="icon i-key" aria-hidden="true"><use href="#i-key"/></svg> Developers</div>
-    <h1>Mizzy Sales API Documentation</h1>
-    <p>Connect your own scripts and apps to your Mizzy Sales account</p>
-  </div>
-  <div class="section-wrap terms-wrap api-docs-wrap">
-    <div class="api-doc-section">
-      <h3>Getting Started</h3>
-      <p>Every Mizzy Sales user can generate a personal <strong>API Key</strong> and <strong>API Secret</strong> from
- <a href="/settings">Settings <svg class="icon i-arrow-right" aria-hidden="true"><use href="#i-arrow-right"/></svg> API Access</a>. These two values authenticate every request
-        you make to the API — treat them like a password. Your secret is shown <strong>once</strong> at generation time and never again,
-        so save it somewhere safe immediately.</p>
-      <p>All endpoints are scoped to your own account only — you can check your own balance, list available items, view your
-        own purchase history, and buy items on your own behalf. You cannot access any other user's data.</p>
-    </div>
-    <div class="api-doc-section">
-      <h3>Authentication</h3>
-      <p>Every request must include these two headers:</p>
-      <div class="api-docs-block">X-API-Key: your_api_key
-X-API-Secret: your_api_secret</div>
-      <p>Requests missing either header, or with an invalid/revoked key, get a <code>401 Unauthorized</code> response.</p>
-    </div>
-    <div class="api-doc-section">
-      <h3>Base URL</h3>
-      <div class="api-docs-block" id="apiBaseUrlBlock">https://your-site.example.com/api/v1</div>
-    </div>
-    <div class="api-doc-section">
-      <h3>Endpoints</h3>
-      <table class="api-endpoint-table">
-        <thead><tr><th>Method</th><th>Endpoint</th><th>What it does</th></tr></thead>
-        <tbody>
-          <tr><td><span class="api-method get">GET</span></td><td><code>/me</code></td><td>Your account info (name, email, balance, Game ID)</td></tr>
-          <tr><td><span class="api-method get">GET</span></td><td><code>/balance</code></td><td>Your current wallet balance</td></tr>
-          <tr><td><span class="api-method get">GET</span></td><td><code>/purchases</code></td><td>Your full purchase history</td></tr>
-          <tr><td><span class="api-method get">GET</span></td><td><code>/listings</code></td><td>All available logs/tools (add <code>?type=tool</code> or <code>?type=log</code> to filter)</td></tr>
-          <tr><td><span class="api-method get">GET</span></td><td><code>/listings/:id</code></td><td>Details of one specific listing</td></tr>
-          <tr><td><span class="api-method post">POST</span></td><td><code>/buy/:id</code></td><td>Purchase a listing using your wallet balance</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="api-doc-section">
-      <h3>Example: Check your balance</h3>
-      <div class="lang-tabs">
-        <button class="lang-tab active" onclick="switchLangTab(this,'bal-curl')">cURL</button>
-        <button class="lang-tab" onclick="switchLangTab(this,'bal-js')">JavaScript</button>
-        <button class="lang-tab" onclick="switchLangTab(this,'bal-py')">Python</button>
-      </div>
-      <div class="lang-panel" id="bal-curl">
-        <div class="api-docs-block">curl https://your-site.example.com/api/v1/balance \
-  -H "X-API-Key: your_api_key" \
-  -H "X-API-Secret: your_api_secret"</div>
-      </div>
-      <div class="lang-panel" id="bal-js" style="display:none">
-        <div class="api-docs-block">const res = await fetch('https://your-site.example.com/api/v1/balance', {
-  headers: {
-    'X-API-Key': 'your_api_key',
-    'X-API-Secret': 'your_api_secret'
-  }
-});
-const data = await res.json();
-console.log(data.balance);</div>
-      </div>
-      <div class="lang-panel" id="bal-py" style="display:none">
-        <div class="api-docs-block">import requests
-res = requests.get(
-    "https://your-site.example.com/api/v1/balance",
-    headers={
-        "X-API-Key": "your_api_key",
-        "X-API-Secret": "your_api_secret"
-    }
-)
-print(res.json()["balance"])</div>
-      </div>
-    </div>
-    <div class="api-doc-section">
-      <h3>Example: List available items</h3>
-      <div class="lang-tabs">
-        <button class="lang-tab active" onclick="switchLangTab(this,'list-curl')">cURL</button>
-        <button class="lang-tab" onclick="switchLangTab(this,'list-js')">JavaScript</button>
-        <button class="lang-tab" onclick="switchLangTab(this,'list-py')">Python</button>
-      </div>
-      <div class="lang-panel" id="list-curl">
-        <div class="api-docs-block">curl "https://your-site.example.com/api/v1/listings?type=tool" \
-  -H "X-API-Key: your_api_key" \
-  -H "X-API-Secret: your_api_secret"</div>
-      </div>
-      <div class="lang-panel" id="list-js" style="display:none">
-        <div class="api-docs-block">const res = await fetch('https://your-site.example.com/api/v1/listings?type=tool', {
-  headers: {
-    'X-API-Key': 'your_api_key',
-    'X-API-Secret': 'your_api_secret'
-  }
-});
-const tools = await res.json();
-tools.forEach(t => console.log(t.title, t.price));</div>
-      </div>
-      <div class="lang-panel" id="list-py" style="display:none">
-        <div class="api-docs-block">import requests
-res = requests.get(
-    "https://your-site.example.com/api/v1/listings",
-    params={"type": "tool"},
-    headers={
-        "X-API-Key": "your_api_key",
-        "X-API-Secret": "your_api_secret"
-    }
-)
-for tool in res.json():
-    print(tool["title"], tool["price"])</div>
-      </div>
-    </div>
-    <div class="api-doc-section">
-      <h3>Example: Buy an item</h3>
- <div class="info-box" style="margin-bottom:12px"><svg class="icon i-credit-card" aria-hidden="true"><use href="#i-credit-card"/></svg> No platform fee — you're charged exactly the item's listed price via the API, same as buying it through the marketplace. The response includes <code>itemPrice</code> and <code>totalCharged</code> (always equal) so you can confirm this.</div>
-      <div class="lang-tabs">
-        <button class="lang-tab active" onclick="switchLangTab(this,'buy-curl')">cURL</button>
-        <button class="lang-tab" onclick="switchLangTab(this,'buy-js')">JavaScript</button>
-        <button class="lang-tab" onclick="switchLangTab(this,'buy-py')">Python</button>
-      </div>
-      <div class="lang-panel" id="buy-curl">
-        <div class="api-docs-block">curl -X POST https://your-site.example.com/api/v1/buy/LISTING_ID_HERE \
-  -H "X-API-Key: your_api_key" \
-  -H "X-API-Secret: your_api_secret"</div>
-      </div>
-      <div class="lang-panel" id="buy-js" style="display:none">
-        <div class="api-docs-block">const res = await fetch('https://your-site.example.com/api/v1/buy/LISTING_ID_HERE', {
-  method: 'POST',
-  headers: {
-    'X-API-Key': 'your_api_key',
-    'X-API-Secret': 'your_api_secret'
-  }
-});
-const result = await res.json();
-console.log(result.message, result.newBalance);</div>
-      </div>
-      <div class="lang-panel" id="buy-py" style="display:none">
-        <div class="api-docs-block">import requests
-res = requests.post(
-    "https://your-site.example.com/api/v1/buy/LISTING_ID_HERE",
-    headers={
-        "X-API-Key": "your_api_key",
-        "X-API-Secret": "your_api_secret"
-    }
-)
-result = res.json()
-print(result["message"], result["newBalance"])</div>
-      </div>
-    </div>
-    <div class="api-doc-section">
-      <h3>Errors</h3>
-      <table class="api-endpoint-table">
-        <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
-        <tbody>
-          <tr><td><code>401</code></td><td>Missing or invalid API key/secret</td></tr>
-          <tr><td><code>403</code></td><td>Account restricted</td></tr>
-          <tr><td><code>404</code></td><td>Listing not found or no longer available</td></tr>
-          <tr><td><code>400</code></td><td>Insufficient balance, sold out, or invalid request</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
- <button class="btn-primary" onclick="downloadApiDocs()"><svg class="icon i-arrow-down" aria-hidden="true"><use href="#i-arrow-down"/></svg> Download These Docs</button>
- <button class="btn-primary" onclick="showPage('settings')" style="background:transparent;border:1px solid var(--border);color:var(--t2)"><svg class="icon i-arrow-left" aria-hidden="true"><use href="#i-arrow-left"/></svg> Back to Settings</button>
-    </div>
   </div>
 </div>
 </main>
@@ -1346,20 +1191,20 @@ print(result["message"], result["newBalance"])</div>
     <div class="footer-brand">
  <span class="footer-crown"><svg class="icon i-crown" aria-hidden="true"><use href="#i-crown"/></svg></span>
       <div>
-        <div class="footer-name">Mizzy Sales — Mizzy Sales</div>
+        <div class="footer-name">Mizzysales</div>
  <div class="footer-tag">Verified Social Media Account Seller <svg class="icon i-alert-triangle" aria-hidden="true"><use href="#i-alert-triangle"/></svg>‼</div>
       </div>
     </div>
     <div class="footer-links">
       <a href="https://whatsapp.com/channel/0029Vb7ivq9HLHQcS4XgQu2Q" data-link="channel" target="_blank"><svg class="wa-icon"><use href="#wa-logo"/></svg> Channel</a>
       <a href="https://chat.whatsapp.com/HBqJeik773M1pqEmIjfpXr" data-link="group" target="_blank"><svg class="wa-icon"><use href="#wa-logo"/></svg> Group</a>
-      <a href="https://wa.me/2347026881419" data-link="contact" target="_blank"><svg class="wa-icon"><use href="#wa-logo"/></svg> Contact</a>
+      <a href="https://wa.me/2349065518402" data-link="contact" target="_blank"><svg class="wa-icon"><use href="#wa-logo"/></svg> Contact</a>
  <a href="#" onclick="event.preventDefault();showPage('terms')"><svg class="icon i-scroll" aria-hidden="true"><use href="#i-scroll"/></svg> Terms &amp; Conditions</a>
     </div>
   </div>
   <div class="footer-bottom">
  <div class="footer-visits"><svg class="icon i-user" aria-hidden="true"><use href="#i-user"/></svg> <span id="footerVisitCount">—</span> visitors</div>
-    <div class="footer-copy">© <span id="footerYear"></span> Mizzy Sales — Mizzy Sales. All rights reserved.</div>
+    <div class="footer-copy">© <span id="footerYear"></span> Mizzysales. All rights reserved.</div>
   </div>
 </footer>
 <nav class="bottom-tabbar" id="bottomTabbar">
@@ -1371,9 +1216,6 @@ print(result["message"], result["newBalance"])</div>
   </button>
   <button class="bt-item" id="btWallet" onclick="window.location.href='/deposit'">
  <span class="bt-icon"><svg class="icon i-wallet" aria-hidden="true"><use href="#i-wallet"/></svg></span><span class="bt-label">Wallet</span>
-  </button>
-  <button class="bt-item" id="btChat" onclick="window.location.href='/groups'">
- <span class="bt-icon"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg></span><span class="bt-label">Chat</span>
   </button>
   <button class="bt-item" id="btProfile" onclick="window.location.href='/settings'">
  <span class="bt-icon"><svg class="icon i-user" aria-hidden="true"><use href="#i-user"/></svg></span><span class="bt-label">Profile</span>
@@ -1401,8 +1243,9 @@ print(result["message"], result["newBalance"])</div>
 <script src="js/country-select.js?v=20260910a" defer></script>
 <script src="js/global-pay.js?v=20260910a" defer></script>
 <script src="js/wallet.js?v=20260910a" defer></script>
+<script src="js/dev-credit.js?v=20260910a" defer></script>
 <script src="/js/mobile-features.js" defer></script>
 <script src="/js/vpn-notice.js" defer></script>
-<script src="js/dev-credit.js?v=20261017" defer></script>
+<script src="/welcome-popup.js?v=3" defer></script>
 </body>
 </html>
