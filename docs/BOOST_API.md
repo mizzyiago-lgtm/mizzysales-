@@ -1,11 +1,11 @@
-# Mizzy Sales Boost API (v1)
+# Mizzysales Boost API (v1)
 
 Resell social-media boosting (followers, likes, views, subscribers) from your own
-app, using your Mizzy Sales wallet. Same catalogue, same prices and the same upstream
-provider (Really Simple Social) that powers the Mizzy Sales website.
+app, using your Mizzysales wallet. Same catalogue, same prices and the same upstream
+provider (Really Simple Social) that powers the Mizzysales website.
 
 - **Base URL:** `https://klslogs.com`
-- **Money:** all prices are **NGN**, charged to your Mizzy Sales wallet balance.
+- **Money:** all prices are **NGN**, charged to your Mizzysales wallet balance.
 - **Auth:** API key pair, sent as headers (generate it in **Settings → Developer API**).
 
 ```
@@ -14,8 +14,8 @@ X-API-Secret: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 Content-Type: application/json
 ```
 
-> **No webhooks.** The upstream panel does not send callbacks, so Mizzy Sales does not
-> either. Poll `GET /api/v1/boost/order/:id` (Mizzy Sales refreshes it live from the
+> **No webhooks.** The upstream panel does not send callbacks, so Mizzysales does not
+> either. Poll `GET /api/v1/boost/order/:id` (Mizzysales refreshes it live from the
 > provider on every call). Polling every 2–5 minutes is plenty; orders rarely
 > change faster than that.
 
@@ -78,7 +78,7 @@ is refunded automatically in the same request (`"charged": false`).
 
 ## 4. `GET /api/v1/boost/order/:orderId`
 
-Live status. While the order is open, Mizzy Sales pulls fresh numbers from the provider.
+Live status. While the order is open, Mizzysales pulls fresh numbers from the provider.
 
 ```json
 {
@@ -147,12 +147,12 @@ const HEADERS = {
   'X-API-SECRET': process.env.KLS_API_SECRET,
 };
 
-async function mizzySales(path, options = {}) {
+async function kls(path, options = {}) {
   const res = await fetch(BASE + path, { ...options, headers: HEADERS });
   const text = await res.text();
   let body;
   try { body = JSON.parse(text); }
-  catch { throw new Error(`Mizzy Sales returned non-JSON (HTTP ${res.status}): ${text.slice(0, 200)}`); }
+  catch { throw new Error(`Mizzysales returned non-JSON (HTTP ${res.status}): ${text.slice(0, 200)}`); }
   if (!res.ok || body.ok === false) {
     const err = new Error(body.error || `HTTP ${res.status}`);
     err.status = res.status;
@@ -164,23 +164,23 @@ async function mizzySales(path, options = {}) {
 
 async function boost(link, quantity) {
   // 1. find a service
-  const { services } = await mizzySales('/api/v1/boost/services?platform=Instagram&search=followers');
+  const { services } = await kls('/api/v1/boost/services?platform=Instagram&search=followers');
   const service = services.find(s => quantity >= s.min && quantity <= s.max);
   if (!service) throw new Error('No Instagram followers service accepts that quantity');
 
   // 2. price it
-  const quote = await mizzySales('/api/v1/boost/quote', {
+  const quote = await kls('/api/v1/boost/quote', {
     method: 'POST',
     body: JSON.stringify({ serviceId: service.serviceId, quantity }),
   });
   console.log(`Price: ₦${quote.priceNgn}`);
 
   // 3. check the wallet
-  const { balanceNgn } = await mizzySales('/api/v1/boost/balance');
-  if (balanceNgn < quote.priceNgn) throw new Error('Top up your Mizzy Sales wallet first');
+  const { balanceNgn } = await kls('/api/v1/boost/balance');
+  if (balanceNgn < quote.priceNgn) throw new Error('Top up your Mizzysales wallet first');
 
   // 4. order
-  const order = await mizzySales('/api/v1/boost/order', {
+  const order = await kls('/api/v1/boost/order', {
     method: 'POST',
     body: JSON.stringify({ serviceId: service.serviceId, link, quantity }),
   });
@@ -189,7 +189,7 @@ async function boost(link, quantity) {
   // 5. poll until it finishes (no webhooks upstream)
   for (;;) {
     await new Promise(r => setTimeout(r, 120000)); // 2 minutes
-    const { order: o } = await mizzySales(`/api/v1/boost/order/${order.orderId}`);
+    const { order: o } = await kls(`/api/v1/boost/order/${order.orderId}`);
     console.log(o.status, 'remaining:', o.remains);
     if (o.bucket !== 'pending') return o;
   }
@@ -274,7 +274,7 @@ curl -s -X POST https://klslogs.com/api/v1/boost/order \
 
 ---
 
-## How Mizzy Sales talks to Really Simple Social (internal reference)
+## How Mizzysales talks to Really Simple Social (internal reference)
 
 One endpoint, form-encoded `POST`, JSON back — `lib/boost.js → providerCall()`:
 
@@ -298,7 +298,7 @@ known provider strings to plain English before they reach a customer.
 ## Cancelling a running order (pro-rata refund)
 
 Really Simple Social stops an order where it is and only returns the value of
-the units it never delivered. Mizzy Sales mirrors that behaviour exactly.
+the units it never delivered. Mizzysales mirrors that behaviour exactly.
 
 | Endpoint | Who | What it does |
 |---|---|---|

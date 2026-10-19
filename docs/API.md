@@ -1,4 +1,4 @@
-# Mizzy Sales Global Payments & Localization API
+# Mizzysales Global Payments & Localization API
 
 Base URL: `https://<your-domain>` · All authenticated endpoints require the normal
 session cookie / bearer token used by the rest of the app. All money is stored in the

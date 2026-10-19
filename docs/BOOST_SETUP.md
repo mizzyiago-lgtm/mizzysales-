@@ -66,7 +66,7 @@ https://klslogs.com/api/boost/webhook?secret=YOUR_BOOST_WEBHOOK_SECRET
 (the same value you put in `BOOST_WEBHOOK_SECRET`). The secret may also be sent
 as an `X-Boost-Secret` header.
 
-The webhook only tells Mizzy Sales *which* order changed — the real status is always
+The webhook only tells Mizzysales *which* order changed — the real status is always
 re-read from the provider API, so a fake call can never mark an order delivered
 or trigger a refund.
 
