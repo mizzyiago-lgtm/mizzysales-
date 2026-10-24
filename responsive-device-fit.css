@@ -1,0 +1,67 @@
+/* Mizzy Sales — device-fit layer
+   Shared responsive rules for Android, iPhone, tablets and laptops.
+   Intentionally additive: preserves each page's existing layout and behavior. */
+:root { --mys-safe-bottom: env(safe-area-inset-bottom, 0px); --mys-safe-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: border-box; }
+html { width: 100%; max-width: 100%; min-height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: 72px; scroll-padding-bottom: 100px; }
+body { width: 100%; max-width: 100%; min-width: 0; margin-left: auto; margin-right: auto; overflow-wrap: anywhere; }
+img, picture, video, canvas, iframe, svg { max-width: 100%; }
+img, video { height: auto; }
+input, select, textarea, button { max-width: 100%; font: inherit; }
+input, select, textarea { min-width: 0; }
+button, [role="button"], input[type="button"], input[type="submit"], a.btn, .btn { touch-action: manipulation; }
+:focus-visible { outline-offset: 3px; }
+pre, code { max-width: 100%; overflow-wrap: anywhere; }
+pre { overflow-x: auto; }
+table { max-width: 100%; }
+.table-wrap, .table-responsive, .table-container, .admin-table-wrap, .an-table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-wrap table, .table-responsive table, .table-container table, .admin-table-wrap table, .an-table-wrap table { min-width: 560px; }
+.container, .container-fluid, main, #app, #root, .page, .page-content, .content, .main-content, .dashboard-content, .app-content, .admin-main { min-width: 0; max-width: 100%; }
+/* Common grids can wrap naturally instead of forcing a desktop width. */
+.grid2, .ops-grid, .admin-live-grid, .self-check-grid, .dsh-contact-grid, .bw-grid, .srv-grid, .db-cat-grid, .db-biller-grid { min-width: 0; max-width: 100%; }
+/* Keep long service names, order IDs and email addresses inside their cards. */
+.card, .panel, .box, .modal-box, .modal-content, .order-card, .service-card, .product-card, .admin-card, .stat-card, .chat-sidebar, .chat-main { min-width: 0; max-width: 100%; }
+/* Modal sheets fit the visible viewport on short phones and landscape screens. */
+.modal-ov, .modal-overlay, .modal, .dialog, .mys-modal, .confirm-modal { padding: max(12px, var(--mys-safe-top)) 12px max(12px, var(--mys-safe-bottom)); }
+.modal-box, .modal-content, .dialog-content, .mys-modal-card, .confirm-card { max-height: calc(100dvh - 24px - var(--mys-safe-top) - var(--mys-safe-bottom)); overflow-y: auto; overscroll-behavior: contain; }
+/* Tablet / compact laptop: prevent sidebars and wide grids from crushing content. */
+@media (max-width: 1024px) {
+  .admin-layout, .dashboard-layout, .app-layout, .layout-with-sidebar { min-width: 0; max-width: 100%; }
+  .admin-main, .dashboard-main, .main-content, .app-content { min-width: 0; }
+  .stats-grid, .dsh-stats-grid, .dsh-features-grid, .products-grid, .services-grid, .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sidebar { max-width: 100%; }
+}
+/* Phones: stack content, keep controls readable, and respect iPhone safe areas. */
+@media (max-width: 700px) {
+  html, body { overflow-x: clip; }
+  body { font-size: 15px; padding-bottom: var(--mys-safe-bottom); }
+  main, #app, #root, .page, .page-content, .content, .main-content, .dashboard-content, .app-content { width: 100%; min-width: 0; }
+  .container, .container-fluid { width: 100%; padding-left: 14px; padding-right: 14px; }
+  .row { margin-left: 0; margin-right: 0; max-width: 100%; }
+  [class*="col-"] { min-width: 0; max-width: 100%; }
+  .grid, .grid2, .cards, .card-grid, .products-grid, .services-grid, .stats-grid, .dsh-stats-grid, .dsh-features-grid, .dsh-contact-grid, .ops-grid, .self-check-grid, .admin-live-grid, .bw-grid, .srv-grid, .db-cat-grid, .db-biller-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]), select, textarea, .form-control, .form-select, .search-input, .search-box { width: 100%; max-width: 100%; min-width: 0; font-size: 16px; }
+  button, .btn, a.btn, [role="button"], input[type="button"], input[type="submit"] { min-height: 44px; }
+  .btn-group, .button-row, .actions, .form-actions, .toolbar, .filters, .filter-row { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+  .btn-group > *, .button-row > *, .actions > *, .form-actions > *, .toolbar > *, .filters > *, .filter-row > * { min-width: 0; max-width: 100%; }
+  .page-hero, .hero, .hero-section { max-width: 100%; overflow-wrap: anywhere; }
+  .table-wrap, .table-responsive, .table-container, .admin-table-wrap, .an-table-wrap { width: 100%; }
+  .modal-ov, .modal-overlay, .modal { align-items: flex-end; }
+  .modal-box, .modal-content, .dialog-content, .mys-modal-card, .confirm-card { width: 100%; max-width: 100%; border-radius: 22px 22px 14px 14px; }
+  .bottom-tabbar, .app-bottom-nav, .mobile-bottom-nav { padding-bottom: max(6px, var(--mys-safe-bottom)); }
+  .mobile-menu { max-height: calc(100dvh - var(--mys-safe-top)); overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: max(88px, calc(72px + var(--mys-safe-bottom))); }
+  .table-wrap table, .table-responsive table, .table-container table, .admin-table-wrap table, .an-table-wrap table { min-width: 520px; }
+}
+@media (max-width: 380px) {
+  .container, .container-fluid { padding-left: 10px; padding-right: 10px; }
+  .card, .panel, .box, .modal-box, .modal-content { padding-left: 12px; padding-right: 12px; }
+  h1 { font-size: clamp(1.45rem, 7vw, 2rem); }
+  h2 { font-size: clamp(1.2rem, 5.5vw, 1.6rem); }
+}
+/* Wide laptop / desktop: cap reading width without constraining admin tables. */
+@media (min-width: 1440px) {
+  .page-content, .dashboard-content, .app-content { margin-left: auto; margin-right: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}

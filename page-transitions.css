@@ -1,0 +1,59 @@
+/* Mizzy Sales — lightweight page-to-page transitions */
+:root { --mys-transition-accent: var(--brand-primary, #0b7cf5); }
+html.mys-transition-ready body > :not(#mys-page-transition):not(#dbfl-overlay):not(#kb-loader):not(script):not(style):not(.mys-drawer):not(.mys-menu-backdrop) {
+  animation: mysPageEnter .34s cubic-bezier(.2,.75,.25,1) both;
+}
+@keyframes mysPageEnter {
+  from { opacity: .72; transform: translate3d(0, 9px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+#mys-page-transition {
+  position: fixed; inset: 0; z-index: 2147483000; pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden; overflow: hidden;
+  background:radial-gradient(ellipse at 50% 45%, rgba(11,124,245,.18), transparent 55%),
+              rgba(255,255,255,0.28);
+  -webkit-backdrop-filter: blur(0); backdrop-filter: blur(0);
+  transition: opacity .18s ease, visibility .18s ease, backdrop-filter .18s ease;
+}
+#mys-page-transition::before {
+  content: ''; position: absolute; width: 180vmax; height: 180vmax; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(11,124,245,.12), rgba(59,130,246,.12));
+  transform: scale(.01); opacity: 0; transition: transform .34s cubic-bezier(.2,.8,.2,1), opacity .2s ease;
+}
+#mys-page-transition .mys-transition-card {
+  position: relative; display: flex; align-items: center; gap: 12px;
+  padding: 13px 17px; border:1px solid #dbe6f6; border-radius: 18px;
+  color:#0b1b3a; background:rgba(255,255,255,0.88); box-shadow: 0 18px 60px rgba(0,0,0,.28);
+  opacity: 0; transform: translateY(10px) scale(.97);
+  transition: opacity .18s ease .04s, transform .22s cubic-bezier(.2,.8,.2,1) .02s;
+  font: 700 13px/1.2 system-ui, -apple-system, sans-serif; letter-spacing: .02em;
+}
+#mys-page-transition .mys-transition-crown {
+  display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px;
+  color: #fff; background: linear-gradient(145deg, #0b7cf5, #0562d6);
+  box-shadow: 0 5px 18px rgba(11,124,245,.32); font-size: 19px;
+}
+#mys-page-transition .mys-transition-copy { display: flex; flex-direction: column; gap: 4px; }
+#mys-page-transition .mys-transition-copy small { color: #a7ccf3; font-size: 10px; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; }
+#mys-page-transition .mys-transition-dots { display: flex; gap: 4px; margin-left: 5px; }
+#mys-page-transition .mys-transition-dots i { width: 4px; height: 4px; border-radius: 50%; background: #5cc8ff; animation: mysDot .7s ease-in-out infinite alternate; }
+#mys-page-transition .mys-transition-dots i:nth-child(2) { animation-delay: .14s; }
+#mys-page-transition .mys-transition-dots i:nth-child(3) { animation-delay: .28s; }
+@keyframes mysDot { to { opacity: .28; transform: translateY(-3px); } }
+#mys-page-transition.is-active { opacity: 1; visibility: visible; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+#mys-page-transition.is-active::before { opacity: 1; transform: scale(1); }
+#mys-page-transition.is-active .mys-transition-card { opacity: 1; transform: translateY(0) scale(1); }
+html.mys-transition-leaving body > :not(#mys-page-transition):not(#dbfl-overlay):not(#kb-loader):not(script):not(style) {
+  opacity: .38; transform: translate3d(0,-5px,0) scale(.997); transition: opacity .16s ease, transform .16s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.mys-transition-ready body > :not(#mys-page-transition):not(#dbfl-overlay):not(#kb-loader):not(script):not(style),
+  html.mys-transition-leaving body > :not(#mys-page-transition):not(#dbfl-overlay):not(#kb-loader):not(script):not(style) { animation: none !important; transition: none !important; transform: none !important; }
+  #mys-page-transition, #mys-page-transition::before, #mys-page-transition .mys-transition-card { transition: none !important; }
+  #mys-page-transition .mys-transition-dots i { animation: none !important; }
+}
+
+/* MYS-LOADER-STUCK-FIX: the hidden "Loading…" overlay must never stay visible */
+#dbfl-overlay:not(.show) { opacity: 0 !important; visibility: hidden !important; }
+#kb-loader.kb-hide { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
