@@ -1,0 +1,57 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tutorials - Mizzy Sales</title><style>*{box-sizing:border-box}body{margin:0;background:#ffffff;color:#0b1b3a;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:0 0 30px}.top{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #dbe6f6}.top a{color:#18a0fb;text-decoration:none;font-weight:700;font-size:14px}.top b{font-size:16px}.wrap{max-width:560px;margin:0 auto;padding:16px}.card{border:1px solid #dbe6f6;border-radius:14px;background:rgba(255,255,255,.03);padding:14px;margin-bottom:12px}.card h3{margin:0 0 8px;font-size:15px}.card p{margin:0;font-size:13.5px;line-height:1.5;opacity:.85;white-space:pre-wrap}.tag{display:inline-block;font-size:11px;font-weight:700;color:#18a0fb;border:1px solid #0c3d6f;border-radius:20px;padding:2px 9px;margin-bottom:8px}video,img{width:100%;border-radius:10px;margin-top:8px;display:block}.btn{display:inline-block;margin-top:10px;padding:10px 16px;border-radius:10px;background:#0b7cf5;color:#fff;text-decoration:none;font-weight:700;font-size:14px}.chips{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;margin:0 0 4px;-webkit-overflow-scrolling:touch}.chip{flex:0 0 auto;border:1px solid #dbe6f6;background:rgba(255,255,255,.03);color:#eeeef5;border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer}.chip.on{background:#0b7cf5;border-color:#0b7cf5;color:#fff}#q{width:100%;padding:11px 14px;border-radius:12px;border:1px solid #dbe6f6;background:rgba(255,255,255,.04);color:#0b1b3a;font-size:14px;margin-bottom:12px;outline:none}</style><link rel="stylesheet" href="/css/mys-ui-fixes.css?v=20261022c">
+<link rel="stylesheet" href="/css/mizzy-theme.css?v=1"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#ffffff"/>
+</head><body><div class="top"><a href="/dashboard">&lsaquo; Back</a><b>Tutorials</b></div><div class="wrap"><input id="q" type="search" placeholder="Search tutorials (e.g. Facebook login)" autocomplete="off"><div class="chips" id="chips"></div><div id="list"><div class="card"><p>Loading tutorials...</p></div></div><div class="card"><h3>Tutorials for products</h3><p>Open any product in the Marketplace and tap its Tutorial button to see how to log in.</p><a class="btn" href="/marketplace">Go to Marketplace</a></div><script>(function(){
+var list=document.getElementById("list"),chips=document.getElementById("chips"),q=document.getElementById("q");
+var all=[],cat="All";
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function safeUrl(u){u=String(u||"");return /^(https?:\/\/|\/)/i.test(u)?u:"";}
+function card(t){
+  var h='<div class="card">';
+  if(t.category)h+='<span class="tag">'+esc(t.category)+'</span>';
+  h+='<h3>'+esc(t.title)+'</h3>';
+  if(t.description)h+='<p>'+esc(t.description)+'</p>';
+  if(t.videoUrl&&safeUrl(t.videoUrl))h+='<video controls playsinline preload="metadata" src="'+esc(safeUrl(t.videoUrl))+'"></video>';
+  (t.imageUrls||[]).forEach(function(u){if(safeUrl(u))h+='<img loading="lazy" alt="" src="'+esc(safeUrl(u))+'">';});
+  if(t.linkUrl&&safeUrl(t.linkUrl))h+='<a class="btn" target="_blank" rel="noopener noreferrer" href="'+esc(safeUrl(t.linkUrl))+'">Open link</a>';
+  return h+'</div>';
+}
+function render(){
+  var term=q.value.trim().toLowerCase();
+  var rows=all.filter(function(t){
+    if(cat!=="All"&&t.category!==cat)return false;
+    if(!term)return true;
+    return (t.title+" "+(t.description||"")+" "+(t.category||"")).toLowerCase().indexOf(term)>-1;
+  });
+  if(!rows.length){list.innerHTML='<div class="card"><h3>'+(all.length?"No match":"No tutorials yet")+'</h3><p>'+(all.length?"Try another word or category.":"Check back soon.")+'</p></div>';return;}
+  list.innerHTML=rows.map(card).join("");
+}
+function renderChips(){
+  var cats=["All"];all.forEach(function(t){if(t.category&&cats.indexOf(t.category)<0)cats.push(t.category);});
+  if(cats.length<3){chips.style.display="none";return;}
+  chips.style.display="flex";
+  chips.innerHTML=cats.map(function(c){return '<button type="button" class="chip'+(c===cat?' on':'')+'" data-c="'+esc(c)+'">'+esc(c)+'</button>';}).join("");
+}
+chips.addEventListener("click",function(e){var b=e.target.closest(".chip");if(!b)return;cat=b.getAttribute("data-c");renderChips();render();});
+q.addEventListener("input",render);
+function loadDeposit(){
+  return fetch("/api/deposit-tutorials").then(function(r){return r.ok?r.json():{};}).then(function(d){
+    var v=d&&d.paymentlink;
+    if(v&&(v.videoUrl||(v.imageUrls&&v.imageUrls.length)||v.caption))return [{title:"How to deposit money",category:"Deposit",description:v.caption||"",videoUrl:v.videoUrl||"",imageUrls:v.imageUrls||[],linkUrl:""}];
+    return [];
+  }).catch(function(){return [];});
+}
+Promise.all([
+  fetch("/api/tutorials").then(function(r){return r.ok?r.json():[];}).catch(function(){return [];}),
+  loadDeposit()
+]).then(function(res){
+  all=(Array.isArray(res[0])?res[0]:[]).concat(res[1]);
+  renderChips();render();
+}).catch(function(){list.innerHTML='<div class="card"><p>Could not load tutorials.</p></div>';});
+})();</script></div><script src="/js/loader-failsafe.js?v=1" defer></script>
+</body></html>

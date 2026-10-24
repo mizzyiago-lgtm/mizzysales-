@@ -1,0 +1,257 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Mizzy Sales — refined design layer  (theme.css)
+   Loaded AFTER style.css. Adds a disciplined type scale, calmer surfaces,
+   real elevation, and the components introduced by the global-payments work
+   (language switcher, country picker, deposit screens).
+
+   Rules followed here:
+     • Everything is a token. No one-off hex values in markup.
+     • One accent hue, used sparingly. Contrast ≥ 4.5:1 for body text.
+     • 4px spacing grid, one radius scale, two shadow levels.
+     • Motion is 120–220ms, ease-out, and respects prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Type */
+  --mys-font-display: 'Sora', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --mys-font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --mys-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --mys-step--1: clamp(0.78rem, 0.76rem + 0.1vw, 0.84rem);
+  --mys-step-0:  clamp(0.92rem, 0.90rem + 0.1vw, 1rem);
+  --mys-step-1:  clamp(1.1rem, 1.04rem + 0.3vw, 1.28rem);
+  --mys-step-2:  clamp(1.38rem, 1.26rem + 0.6vw, 1.7rem);
+  --mys-step-3:  clamp(1.75rem, 1.5rem + 1.2vw, 2.4rem);
+  --mys-step-4:  clamp(2.2rem, 1.7rem + 2.2vw, 3.4rem);
+
+  /* Space — 4px grid */
+  --mys-1: 4px;  --mys-2: 8px;  --mys-3: 12px; --mys-4: 16px;
+  --mys-5: 24px; --mys-6: 32px; --mys-7: 48px; --mys-8: 64px;
+
+  /* Radius + elevation */
+  --mys-r-sm: 8px; --mys-r-md: 12px; --mys-r-lg: 18px; --mys-r-pill: 999px;
+  --mys-shadow-1: 0 1px 2px rgba(8, 10, 22, .06), 0 2px 8px rgba(8, 10, 22, .05);
+  --mys-shadow-2: 0 12px 32px -12px rgba(8, 10, 22, .28);
+
+  --mys-ease: cubic-bezier(.2, .7, .3, 1);
+  --mys-dur: 160ms;
+
+  /* Semantic surfaces mapped onto the existing palette */
+  --mys-surface: var(--card, #fff);
+  --mys-surface-2: var(--card2, #f5f5fa);
+  --mys-line: var(--border, #e2e2ec);
+  --mys-text: var(--t1, #15151f);
+  --mys-text-muted: var(--t2, #55556e);
+  --mys-accent: var(--gold, #0b7cf5);
+  --mys-success: var(--green, #0b7cf5);
+  --mys-danger: var(--red, #e0293f);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ── Typography discipline ─────────────────────────────────────────────── */
+body { font-family: var(--mys-font-body); font-size: var(--mys-step-0); letter-spacing: -0.005em; }
+h1, h2, h3, h4 { font-family: var(--mys-font-display); letter-spacing: -0.022em; line-height: 1.12; text-wrap: balance; }
+h1 { font-size: var(--mys-step-4); font-weight: 800; }
+h2 { font-size: var(--mys-step-3); font-weight: 750; }
+h3 { font-size: var(--mys-step-2); font-weight: 700; }
+p  { line-height: 1.62; max-width: 68ch; }
+.mys-mono, code, kbd { font-family: var(--mys-font-mono); font-size: .92em; }
+.mys-eyebrow {
+  font-size: var(--mys-step--1); font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--mys-text-muted);
+}
+
+/* ── Focus visibility (accessibility, all interactive elements) ─────────── */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--mys-accent);
+  outline-offset: 2px;
+  border-radius: var(--mys-r-sm);
+}
+
+/* ── Card / section primitives ─────────────────────────────────────────── */
+.mys-card {
+  background: var(--mys-surface);
+  border: 1px solid var(--mys-line);
+  border-radius: var(--mys-r-lg);
+  box-shadow: var(--mys-shadow-1);
+  padding: var(--mys-5);
+}
+.mys-stack > * + * { margin-top: var(--mys-4); }
+.mys-row { display: flex; align-items: center; gap: var(--mys-3); }
+.mys-between { display: flex; align-items: center; justify-content: space-between; gap: var(--mys-3); }
+.mys-muted { color: var(--mys-text-muted); }
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+.mys-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--mys-2);
+  font: 600 var(--mys-step-0)/1 var(--mys-font-body);
+  padding: 12px 18px; border-radius: var(--mys-r-md); border: 1px solid transparent;
+  cursor: pointer; transition: transform var(--mys-dur) var(--mys-ease), background var(--mys-dur) var(--mys-ease), border-color var(--mys-dur) var(--mys-ease);
+}
+.mys-btn:active { transform: translateY(1px); }
+.mys-btn[disabled] { opacity: .55; cursor: not-allowed; }
+.mys-btn-primary { background: var(--mys-accent); color: #fff; }
+.mys-btn-primary:hover { filter: brightness(1.06); }
+.mys-btn-ghost { background: transparent; border-color: var(--mys-line); color: var(--mys-text); }
+.mys-btn-ghost:hover { border-color: var(--mys-accent); color: var(--mys-accent); }
+.mys-btn-block { width: 100%; }
+
+/* ═══ LANGUAGE SWITCHER ═══════════════════════════════════════════════════ */
+.mys-lang { position: relative; }
+.mys-lang-btn {
+  display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 10px;
+  background: var(--bg4, var(--mys-surface-2)); border: 1px solid var(--border2, var(--mys-line));
+  border-radius: var(--mys-r-md); color: var(--mys-text); cursor: pointer;
+  font: 700 var(--mys-step--1)/1 var(--mys-font-body);
+}
+.mys-lang-btn:hover { border-color: var(--mys-accent); color: var(--mys-accent); }
+.mys-lang-flag { font-size: 15px; line-height: 1; }
+.mys-lang-menu {
+  position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 400;
+  min-width: 190px; max-height: 320px; overflow-y: auto; display: none;
+  background: var(--mys-surface); border: 1px solid var(--mys-line);
+  border-radius: var(--mys-r-md); box-shadow: var(--mys-shadow-2); padding: 6px;
+}
+.mys-lang.open .mys-lang-menu { display: block; }
+.mys-lang-opt {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px;
+  background: none; border: 0; border-radius: var(--mys-r-sm); cursor: pointer;
+  color: var(--mys-text-muted); font: 600 var(--mys-step--1)/1 var(--mys-font-body); text-align: start;
+}
+.mys-lang-opt:hover { background: var(--bg4, var(--mys-surface-2)); color: var(--mys-text); }
+.mys-lang-opt.active { color: var(--mys-accent); background: color-mix(in oklab, var(--mys-accent) 12%, transparent); }
+
+/* ═══ COUNTRY / PHONE PICKER ══════════════════════════════════════════════ */
+.mys-cs { position: relative; width: 100%; }
+.mys-cs-control {
+  display: flex; align-items: stretch; gap: 0;
+  border: 1.5px solid var(--border2, var(--mys-line)); border-radius: var(--mys-r-md);
+  background: var(--bg4, var(--mys-surface-2)); overflow: hidden;
+  transition: border-color var(--mys-dur) var(--mys-ease), box-shadow var(--mys-dur) var(--mys-ease);
+}
+.mys-cs:focus-within .mys-cs-control {
+  border-color: var(--mys-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--mys-accent) 14%, transparent);
+}
+.mys-cs-trigger {
+  display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; min-height: 46px;
+  background: transparent; border: 0; border-inline-end: 1px solid var(--border2, var(--mys-line));
+  color: var(--mys-text); cursor: pointer; font: 600 var(--mys-step-0)/1 var(--mys-font-body); white-space: nowrap;
+}
+.mys-cs-trigger .mys-cs-flag { font-size: 18px; }
+.mys-cs-number {
+  flex: 1; min-width: 0; border: 0 !important; background: transparent !important;
+  padding: 0 14px !important; color: var(--mys-text); font: 500 var(--mys-step-0)/1 var(--mys-font-body);
+  box-shadow: none !important;
+}
+.mys-cs-menu {
+  position: absolute; top: calc(100% + 6px); inset-inline-start: 0; width: min(380px, 100%); z-index: 500;
+  background: var(--mys-surface); border: 1px solid var(--mys-line);
+  border-radius: var(--mys-r-md); box-shadow: var(--mys-shadow-2); display: none; overflow: hidden;
+}
+.mys-cs.open .mys-cs-menu { display: block; }
+.mys-cs-search { padding: 10px; border-bottom: 1px solid var(--mys-line); }
+.mys-cs-search input {
+  width: 100%; height: 38px; padding: 0 12px; border-radius: var(--mys-r-sm);
+  border: 1px solid var(--mys-line); background: var(--bg4, var(--mys-surface-2)); color: var(--mys-text);
+  font: 500 var(--mys-step--1)/1 var(--mys-font-body);
+}
+.mys-cs-list { max-height: 300px; overflow-y: auto; overscroll-behavior: contain; padding: 6px; }
+.mys-cs-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px;
+  background: none; border: 0; border-radius: var(--mys-r-sm); cursor: pointer;
+  color: var(--mys-text); font: 500 var(--mys-step--1)/1.2 var(--mys-font-body); text-align: start;
+}
+.mys-cs-item:hover, .mys-cs-item.active { background: var(--bg4, var(--mys-surface-2)); }
+.mys-cs-item .mys-cs-name { flex: 1; }
+.mys-cs-item .mys-cs-dial, .mys-cs-trigger .mys-cs-dial { color: var(--mys-text-muted); font-family: var(--mys-font-mono); }
+.mys-cs-empty { padding: 18px; text-align: center; color: var(--mys-text-muted); font-size: var(--mys-step--1); }
+
+/* ═══ CHIP SELECT CONTROLS ════════════════════════════════════════════════ */
+.mys-sc-grid { display: grid; gap: var(--mys-3); grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.mys-chip-select {
+  display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; cursor: pointer;
+  border: 1.5px solid var(--mys-line); border-radius: var(--mys-r-md); background: var(--mys-surface);
+  transition: border-color var(--mys-dur) var(--mys-ease), background var(--mys-dur) var(--mys-ease);
+  text-align: start; color: var(--mys-text); font-family: var(--mys-font-body);
+}
+.mys-chip-select:hover { border-color: color-mix(in oklab, var(--mys-accent) 55%, var(--mys-line)); }
+.mys-chip-select[aria-pressed="true"] {
+  border-color: var(--mys-accent);
+  background: color-mix(in oklab, var(--mys-accent) 8%, transparent);
+}
+.mys-chip-title { font-weight: 700; font-size: var(--mys-step-0); }
+.mys-chip-sub { font-size: var(--mys-step--1); color: var(--mys-text-muted); }
+
+.mys-address-box {
+  display: flex; align-items: center; gap: var(--mys-3); padding: var(--mys-4);
+  background: var(--mys-surface-2); border: 1px dashed var(--mys-line); border-radius: var(--mys-r-md);
+}
+.mys-address-value { flex: 1; min-width: 0; font-family: var(--mys-font-mono); font-size: var(--mys-step--1); word-break: break-all; }
+
+.mys-qr { width: 168px; height: 168px; border-radius: var(--mys-r-md); background: #fff; padding: 8px; }
+
+.mys-status {
+  display: flex; align-items: center; gap: var(--mys-3); padding: var(--mys-4);
+  border-radius: var(--mys-r-md); font-size: var(--mys-step--1); font-weight: 600;
+}
+.mys-status-waiting { background: color-mix(in oklab, var(--mys-accent) 10%, transparent); color: var(--mys-accent); }
+.mys-status-success { background: color-mix(in oklab, var(--mys-success) 12%, transparent); color: var(--mys-success); }
+.mys-status-failed  { background: color-mix(in oklab, var(--mys-danger) 12%, transparent); color: var(--mys-danger); }
+.mys-pulse {
+  width: 10px; height: 10px; border-radius: 50%; background: currentColor; flex: none;
+  animation: mys-pulse 1.4s var(--mys-ease) infinite;
+}
+@keyframes mys-pulse { 0%, 100% { opacity: .35; transform: scale(.85); } 50% { opacity: 1; transform: scale(1.15); } }
+
+/* ── RTL support (Arabic) ──────────────────────────────────────────────── */
+[dir="rtl"] .mys-cs-trigger { border-inline-end: 1px solid var(--border2, var(--mys-line)); }
+[dir="rtl"] body { letter-spacing: 0; }
+
+/* ── Small screens ─────────────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .mys-card { padding: var(--mys-4); border-radius: var(--mys-r-md); }
+  .mys-address-box { flex-direction: column; align-items: stretch; }
+  .mys-cs-menu { width: 100%; }
+}
+
+/* Consistent mobile dark palette override */
+
+/* Reference-inspired mobile storefront: charcoal surfaces, soft blue accents, fixed app-like navigation. */
+:root{--bg:#0b0c10;--bg2:#111318;--bg3:#171a20;--bg4:#20252d;--card:#171a20;--card2:#1d222a;--border:#252b34;--border2:#303946;--t1:#f1f3f7;--t2:#9299a6;--t3:#626c7a;--gold:#78b8e8;--gold2:#5799ce;--gold3:#a8d8ff;--blue:#78b8e8;--sh:0 8px 28px rgba(0,0,0,.34);--sh2:0 2px 12px rgba(0,0,0,.24)}
+html[data-theme="light"]{--bg:#0b0c10;--bg2:#111318;--bg3:#171a20;--bg4:#20252d;--card:#171a20;--card2:#1d222a;--border:#252b34;--border2:#303946;--t1:#f1f3f7;--t2:#9299a6;--t3:#626c7a;--gold:#78b8e8;--gold2:#5799ce;--gold3:#a8d8ff;--blue:#78b8e8;--green:#1a7ee6}
+body{background:radial-gradient(ellipse at 95% 8%,rgba(54,112,157,.10),transparent 34%),radial-gradient(ellipse at 0% 55%,rgba(255,255,255,0.08),transparent 40%),#ffffff;color:#0b1b3a}
+.navbar{background:#ffffff!important;border-bottom:1px solid #dbe6f6;backdrop-filter:blur(18px)}
+.card,.wo-card,.dsh-card,.dsh-svc-item,.product-card,.market-card{background:linear-gradient(145deg,#ffffff,#ffffff)!important;border-color:#dbe6f6!important;border-radius:20px!important;box-shadow:0 6px 20px rgba(0,0,0,.16)}
+.btn-primary,.btn-gold,.prod-select-btn{background:#78b8e8!important;color:#0b1118!important;border-radius:12px!important}
+@media(max-width:768px){.nav-center{display:none!important}.navbar{position:sticky;top:0;z-index:500}.dsh-bottom-nav{background:#ffffff!important;border:1px solid #dbe6f6!important;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.25);backdrop-filter:blur(18px)}.dsh-nav-item.active{color:#78b8e8!important}.dsh-nav-item.active:before{background:#78b8e8!important}}
+/* Games are removed from customer-facing navigation and feature tiles. */
+a[href="/games"],a[href="/games/"],.dsh-svc-item[href="/games"]{display:none!important}
+
+/* Mizzy Sales expandable hamburger navigation */
+.mys-menu-trigger{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:42px;height:42px;padding:0 12px;border:1px solid var(--border2);border-radius:12px;background:var(--card);color:var(--t1);cursor:pointer;font:700 14px inherit;flex-shrink:0;z-index:401}
+.mys-menu-trigger .mys-burger{display:flex;flex-direction:column;gap:4px;width:19px}
+.mys-menu-trigger .mys-burger i{display:block;height:2px;width:19px;border-radius:2px;background:currentColor;transition:transform .2s,opacity .2s}
+.mys-menu-trigger[aria-expanded="true"] .mys-burger i:first-child{transform:translateY(6px) rotate(45deg)}
+.mys-menu-trigger[aria-expanded="true"] .mys-burger i:nth-child(2){opacity:0}
+.mys-menu-trigger[aria-expanded="true"] .mys-burger i:last-child{transform:translateY(-6px) rotate(-45deg)}
+.mys-menu-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.58);backdrop-filter:blur(3px);z-index:998;opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s}
+.mys-menu-backdrop.open{opacity:1;visibility:visible}
+.mys-drawer{position:fixed;z-index:999;inset:0 auto 0 0;width:min(340px,88vw);padding:18px 14px calc(24px + env(safe-area-inset-bottom,0px));overflow-y:auto;background:var(--bg2);border-right:1px solid var(--border);box-shadow:var(--sh);transform:translateX(-105%);transition:transform .25s ease;color:var(--t1)}
+.mys-drawer.open{transform:translateX(0)}
+.mys-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 6px 18px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.mys-drawer-brand{font-weight:900;font-size:17px;letter-spacing:.2px;color:var(--gold)}
+.mys-drawer-close{width:36px;height:36px;border:1px solid var(--border2);border-radius:10px;background:var(--card);color:var(--t1);font-size:22px;cursor:pointer}
+.mys-drawer-link,.mys-menu-toggle{width:100%;display:flex;align-items:center;gap:12px;padding:12px 13px;margin:3px 0;border:0;border-radius:11px;background:transparent;color:var(--t1);text-decoration:none;font:600 14px inherit;text-align:left;cursor:pointer}
+.mys-drawer-link:hover,.mys-menu-toggle:hover,.mys-sub-link:hover{background:var(--bg4);text-decoration:none}
+.mys-menu-toggle .mys-chevron{margin-left:auto;color:var(--t2);transition:transform .2s}
+.mys-menu-toggle[aria-expanded="true"] .mys-chevron{transform:rotate(180deg)}
+.mys-submenu{display:none;padding:2px 0 7px 18px}
+.mys-submenu.open{display:block}
+.mys-sub-link{display:block;padding:10px 12px;margin:2px 0;border-radius:9px;color:var(--t2);font-size:13.5px;font-weight:600;text-decoration:none;border-left:2px solid var(--border2)}
+.mys-drawer-label{padding:15px 12px 5px;color:var(--t3);font-size:10px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase}
+body.mys-menu-open{overflow:hidden}
+@media(max-width:679px){.mys-menu-trigger{height:40px;padding:0 10px}.mys-menu-trigger .mys-menu-word{display:none}.nav-inner{gap:10px;padding-left:12px;padding-right:12px}}
