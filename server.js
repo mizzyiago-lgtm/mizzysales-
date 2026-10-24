@@ -72,7 +72,7 @@ const rateLimit = require('express-rate-limit');
 app.get('/', (req, res) => { res.set('Cache-Control', 'no-store, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'home.html')); });
 app.use(cors({ origin: '*', methods: ['GET','POST','PUT','DELETE','PATCH','OPTIONS'], allowedHeaders: ['Content-Type','Authorization','x-admin-passcode','x-subadmin-token'] }));
 app.options('*', cors()); // handle pre-flight OPTIONS requests
-app.set('trust proxy', 1);
+app.set('trust proxy', 2);
 
 // Per-browser device id (cookie). Used by the sign-up limit so people who share
 // one IP (mobile networks, offices) are not blocked because of each other.
