@@ -1,0 +1,38 @@
+{
+  "name": "Mizzy Sales",
+  "short_name": "Mizzy Sales",
+  "description": "Verified Social Media Account & Digital Tools Marketplace",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b7cf5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/img/mizzy-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/mizzy-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/mizzy-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/img/mizzy-sales-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

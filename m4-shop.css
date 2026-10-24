@@ -1,0 +1,72 @@
+/* Marketplace 4 shop: categories, cart, checkout sheet. Works on Android + iPhone. */
+@media(max-width:900px){.mkt-toolbar,.mkt-chips{position:static !important;top:auto !important;z-index:auto !important}}
+body.m4-shop #m4Top{position:static}
+.m4-bar{display:flex;gap:10px;align-items:center;margin:0 0 12px;flex-wrap:wrap}
+.m4-back{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--border2,#dbe6f6);background:var(--card2,#ffffff);color:var(--t1,#0b1b3a);font-weight:700;font-size:14px;cursor:pointer}
+.m4-search{flex:1 1 200px;min-width:0}
+.m4-search input{width:100%;box-sizing:border-box;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--border2,#dbe6f6);background:var(--card2,#ffffff);color:var(--t1,#0b1b3a);font-size:16px}
+.m4-title{margin:6px 0 14px;font-size:20px;font-weight:800;color:var(--t1,#0b1b3a)}
+.m4-cats{display:grid !important;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;position:relative;z-index:1}
+.m4-cat{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 10px;border-radius:14px;border:1px solid var(--border2,#dbe6f6);background:var(--card2,#ffffff);color:var(--t1,#0b1b3a);cursor:pointer;min-height:120px;justify-content:center;font-family:inherit}
+.m4-cat:active{transform:scale(.97)}
+.m4-cat-ico{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--gold,#0b7cf5);color:#fff;font-weight:900;font-size:20px}
+.m4-cat-name{font-weight:800;font-size:15px;text-align:center;word-break:break-word}
+.m4-cat-n{font-size:12px;color:var(--t2,#5a6c8c)}
+.m4-prods{display:grid !important;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;position:relative;z-index:1}
+.m4-card{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:14px;border:1px solid var(--border2,#dbe6f6);background:var(--card2,#ffffff);color:var(--t1,#0b1b3a);min-width:0}
+.m4-card-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.m4-card-title{font-weight:800;font-size:15px;word-break:break-word;min-width:0}
+.m4-card-price{font-weight:900;color:var(--gold,#0b7cf5);white-space:nowrap}
+.m4-card-desc{font-size:13px;color:var(--t2,#5a6c8c);white-space:pre-line;max-height:78px;overflow:hidden}
+.m4-card-stock{font-size:12px;font-weight:700}
+.m4-card-act{display:flex;gap:8px;align-items:center;margin-top:auto}
+.m4-qty{display:flex;align-items:center;border:1px solid var(--border2,#dbe6f6);border-radius:10px;overflow:hidden;flex:0 0 auto}
+.m4-qty button{width:40px;height:44px;border:0;background:transparent;color:var(--t1,#fff);font-size:20px;font-weight:800;cursor:pointer}
+.m4-qty input{width:46px;height:44px;border:0;background:transparent;color:var(--t1,#0b1b3a);text-align:center;font-size:16px;-moz-appearance:textfield}
+.m4-qty.sm button{width:32px;height:36px}.m4-qty.sm input{width:34px;height:36px}
+.m4-add{flex:1;min-height:44px;border:0;border-radius:10px;background:var(--gold,#0b7cf5);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+.m4-add.in{background:#2563eb}
+.m4-cartbar{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:900;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#ffffff;color:#fff;border:1px solid var(--gold,#0b7cf5);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.m4-cartbar button{min-height:44px;padding:0 18px;border:0;border-radius:10px;background:var(--gold,#0b7cf5);color:#fff;font-weight:800;cursor:pointer}
+body.m4-has-cart .section-wrap{padding-bottom:150px}
+.m4-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center}
+.m4-overlay.open{display:flex}
+.m4-sheet{width:100%;max-width:560px;max-height:88vh;max-height:88dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--card,#ffffff);color:var(--t1,#0b1b3a);border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));box-sizing:border-box}
+@media(min-width:700px){.m4-overlay{align-items:center}.m4-sheet{border-radius:18px}}
+body.m4-lock{overflow:hidden}
+.m4-sh-title{margin:0 0 6px;font-size:19px}.m4-sh-sub{margin:0 0 12px;font-size:13px;color:var(--t2,#5a6c8c)}
+.m4-line{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border2,#dbe6f6)}
+.m4-line-t{flex:1;min-width:0;display:flex;flex-direction:column;font-size:13px}.m4-line-t span{color:var(--t2,#5a6c8c);font-size:12px}
+.m4-line-sum{font-weight:800;font-size:13px;min-width:64px;text-align:right}
+.m4-x{border:0;background:transparent;color:#e74c3c;font-size:18px;width:32px;height:36px;cursor:pointer}
+.m4-total{display:flex;justify-content:space-between;padding:14px 0;font-size:17px}
+.m4-sh-btns{display:flex;gap:10px}.m4-sh-btns button{flex:1;min-height:48px;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;border:0}
+.m4-buy{background:var(--gold,#0b7cf5);color:#fff}.m4-ghost{background:var(--card2,#ffffff);color:var(--t1,#0b1b3a);border:1px solid var(--border2,#dbe6f6) !important}
+.m4-wait{text-align:center;padding:30px 10px}.m4-spin{width:42px;height:42px;margin:0 auto 14px;border:4px solid var(--border2,#dbe6f6);border-top-color:var(--gold,#0b7cf5);border-radius:50%;animation:m4s 1s linear infinite}
+@keyframes m4s{to{transform:rotate(360deg)}}
+.m4-warn{font-size:13px;color:#f5a623}.m4-note{font-size:12px;color:var(--t2,#5a6c8c);margin-top:12px}
+.m4-res{padding:12px;border-radius:12px;background:var(--card2,#ffffff);margin-bottom:12px}.m4-res.bad{border:1px solid #e74c3c}
+.m4-ok{color:#18a0fb;font-size:13px;font-weight:700}
+.m4-keys{white-space:pre-wrap;word-break:break-all;background:#ffffff;color:#0b1b3a;padding:10px;border-radius:8px;font-size:12px;max-height:200px;overflow:auto;margin:8px 0}
+.m4-copy{min-height:40px;padding:0 16px;border:0;border-radius:8px;background:var(--gold,#0b7cf5);color:#fff;font-weight:700;cursor:pointer}
+/* ---- v2: bullet-proof checkout layout on Android/iPhone (site CSS was stretching the qty box) ---- */
+.m4-sheet{overflow-x:hidden}
+.m4-sheet *{box-sizing:border-box}
+.m4-line{display:grid !important;grid-template-columns:auto 1fr auto !important;align-items:center !important;gap:8px 10px !important;width:100%}
+.m4-line-t{grid-column:1 / -1 !important;display:block !important;width:100% !important;min-width:0 !important;max-width:100% !important;white-space:normal !important;word-break:normal !important;overflow-wrap:anywhere !important}
+.m4-line-t b{display:block !important;writing-mode:horizontal-tb !important;white-space:normal !important;word-break:normal !important;overflow-wrap:anywhere !important}
+.m4-line-t span{display:block !important}
+.m4-qty{display:inline-flex !important;flex-direction:row !important;width:auto !important;max-width:150px !important}
+.m4-qty button{flex:0 0 auto !important;width:38px !important;min-width:38px !important;height:42px !important;padding:0 !important;margin:0 !important;border:0 !important;background:transparent !important;box-shadow:none !important}
+.m4-qty input{flex:0 0 auto !important;width:44px !important;min-width:0 !important;max-width:44px !important;height:42px !important;padding:0 !important;margin:0 !important;border:0 !important;border-radius:0 !important;background:transparent !important;text-align:center !important;box-shadow:none !important}
+.m4-qty.sm input{width:40px !important;max-width:40px !important}
+.m4-line-sum{text-align:right !important;justify-self:end !important}
+.m4-x{justify-self:end !important;width:36px !important;padding:0 !important}
+.m4-sh-btns button{width:auto !important}
+.m4-card-act{flex-wrap:nowrap}
+.m4-add{min-width:0}
+.m4-buy{background:#0b7cf5 !important;color:#fff !important;opacity:1 !important}
+.m4-ghost{background:var(--card2,#ffffff) !important;color:var(--t1,#0b1b3a) !important}
+.m4-add{background:#0b7cf5 !important;color:#fff !important}.m4-add.in{background:#2563eb !important}
+.m4-qty input{outline:0 !important;-webkit-appearance:none !important;appearance:none !important;background-color:transparent !important;background-image:none !important}
+.m4-cartbar button,.m4-copy{background:#0b7cf5 !important;color:#fff !important}
