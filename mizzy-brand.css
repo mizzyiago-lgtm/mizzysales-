@@ -1,0 +1,335 @@
+
+/* MIZZY SALES global visual layer — presentation only; preserves page structure and functionality. */
+:root{
+ --kb-cyan:#18a0fb; --kb-blue:#0b7cf5; --kb-pink:#18a0fb; --kb-ink:#08080f;
+ --kb-glass:rgba(14,14,24,.78); --kb-edge:rgba(24,160,251,.28);
+}
+html { background:#ffffff; }
+html[data-theme="light"] { background:#f7f7fb; }
+
+/* Backgrounds: your three artworks, mixed per page group (see js/mizzy-brand.js).
+   Body is transparent so the artwork shows; an overlay keeps text readable in BOTH themes. */
+body{
+ background:transparent !important; background-color:transparent !important; background-image:none !important;
+ color:var(--t1,#0b1b3a);
+ --kb-ov:linear-gradient(180deg,rgba(8,8,15,.30),rgba(8,8,15,.62));
+ --kb-img:linear-gradient(160deg,#041221 0%,#08080f 55%,#0a1410 100%);
+}
+html[data-theme] body{--kb-ov:linear-gradient(180deg,rgba(8,8,15,.28),rgba(8,8,15,.58))}
+body::before{
+ content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+ background-image:var(--kb-ov),var(--kb-img);
+ background-size:cover; background-position:center; background-repeat:no-repeat;
+}
+body.kb-bg-social{--kb-img:linear-gradient(160deg,#041221 0%,#08080f 55%,#0a1410 100%)}
+body.kb-bg-wave{--kb-img:linear-gradient(160deg,#041221 0%,#08080f 55%,#0a1410 100%)}
+body.kb-bg-hero{--kb-img:linear-gradient(160deg,#041221 0%,#08080f 55%,#0a1410 100%)}
+body.kb-bg-speed{--kb-img:linear-gradient(160deg,#041221 0%,#08080f 55%,#0a1410 100%)}
+body.kb-bg-phone{--kb-img:linear-gradient(160deg,#041221 0%,#08080f 55%,#0a1410 100%)}
+
+/* Header: dark glass in dark theme, light glass in light theme (fixes invisible Login text) */
+.navbar,.topbar,.app-header,.sidebar,.bottom-tabbar{ backdrop-filter:blur(18px) saturate(1.25); }
+html[data-theme="dark"] .navbar,html[data-theme="dark"] .app-header,html[data-theme="dark"] .topbar{background:rgba(255,255,255,0.88)!important;border-color:rgba(24,160,251,.2)!important}
+html[data-theme="light"] .navbar,html[data-theme="light"] .app-header,html[data-theme="light"] .topbar{background:rgba(255,255,255,.92)!important;border-color:rgba(11,124,245,.18)!important}
+.brand-icon,.dbfl-crown-svg{
+ background: url('/img/mizzy-sales-icon.svg') center/cover no-repeat, url('/img/mizzy-sales-icon.svg') center/cover no-repeat !important;
+ border:1px solid rgba(92,200,255,.45)!important;
+ box-shadow:0 0 22px rgba(11,124,245,.28)!important;
+}
+.brand-icon>svg,.dbfl-crown-svg>svg{display:none!important}
+.brand-ksl,.brand-name,.site-brand{
+ color:#f2f8ff!important;
+ background:linear-gradient(95deg,#fff 0%,#18a0fb 52%,#5cc8ff 100%);
+ -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.btn-primary,.btn-gold,.btn-nav-reg,.hero-cta,.buy-btn,.prod-select-btn,
+button.primary{
+ background:linear-gradient(115deg,#0b7cf5,#18a0fb 60%,#5cc8ff)!important;border:1px solid rgba(92,200,255,.45)!important;
+ box-shadow:0 8px 28px rgba(11,124,245,.22)!important;
+}
+.card,.mys-card,.stat-card,.panel,.box,.glass,.section-card,.tool-card,.log-card,
+.prod-card,.modal-content,.settings-card,.wallet-card{
+ border-color:rgba(24,160,251,.2)!important;
+ box-shadow:0 14px 36px rgba(0,0,0,.16);
+}
+input,select,textarea{max-width:100%}
+img{max-width:100%}
+html[data-theme="light"] .brand-ksl,html[data-theme="light"] .brand-name,html[data-theme="light"] .site-brand{
+ background:linear-gradient(95deg,#0a335d 0%,#0b7cf5 55%,#0562d6 100%);
+ -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+@media(max-width:700px){
+ /* phones are portrait: pick the part of each artwork that shows its best bit */
+ body.kb-bg-social::before{background-position:55% center}
+ body.kb-bg-hero::before{background-position:50% center}
+ body.kb-bg-phone::before{background-position:78% center}
+ body.kb-bg-speed::before{background-position:50% center}
+ .brand-icon{flex-shrink:0}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+
+/* Mizzy Sales is dark-only: hide the light/dark toggles */
+#themeBtn,#mThemeToggle,#dshThemeBtn,.theme-toggle-wrap{display:none!important}
+
+/* Phones: keep logo + name + Login + Get Started on one row (no cut-off) */
+@media(max-width:480px){
+ .nav-inner{gap:6px!important;padding:0 10px!important}
+ .brand-ksl{font-size:15px!important;letter-spacing:0!important;gap:3px!important}
+ .brand-verified{width:12px!important;height:12px!important}
+ .nav-guest{display:flex;gap:5px}
+ .btn-nav-login,.btn-nav-reg{padding:7px 10px!important;font-size:12px!important;white-space:nowrap;min-height:0!important}
+ .mys-lang-btn{padding:6px 7px!important}
+}
+/* Readability of body text over busy artwork */
+.hero-p,.welcome-hero p{text-shadow:0 1px 8px rgba(8,8,15,.85);color:#c8c8dc!important}
+
+/* Page wrappers that painted a solid colour over the artwork */
+.dsh-shell{background:transparent!important}
+
+/* ── Brand accent: Mizzy green ─────────────────────────────────────────── */
+html:root[data-theme]{ --accent:#0b7cf5; --primary:#0b7cf5; }
+/* Dashboard balance card (was solid green) */
+.dsh-balance-card{
+ background:linear-gradient(135deg,#0562d6 0%,#0b7cf5 48%,#18a0fb 100%)!important;
+ box-shadow:0 10px 30px rgba(11,124,245,.38),0 4px 18px rgba(24,160,251,.22)!important;
+}
+.dsh-balance-card .dsh-add-btn,.dsh-balance-card button{color:#0a335d}
+
+/* Dashboard: remaining green brand bits -> blue/pink (success ticks/amounts stay green on purpose) */
+.dsh-avatar{background:linear-gradient(135deg,#0b7cf5,#18a0fb)!important}
+.svc-blue{background:#e8f0f9!important;color:#0b7cf5!important}
+.svc-emerald{background:#e8f0f9!important;color:#0562d6!important}
+.dsh-promo{background:linear-gradient(135deg,#0562d6 0%,#0b7cf5 50%,#18a0fb 100%)!important}
+.dsh-icon-btn:hover{background:rgba(11,124,245,.16)!important}
+
+/* Shared header + chips on inner pages */
+.nav-avatar{background:linear-gradient(135deg,#0b7cf5,#18a0fb)!important;color:#fff!important}
+.nav-balance-btn{background:rgba(11,124,245,.12)!important;border-color:rgba(11,124,245,.32)!important;color:#5cc8ff!important}
+.ph-chip{background:rgba(11,124,245,.14)!important;color:#5cc8ff!important}
+
+/* Success / money-in states stay green on purpose */
+.dsh-activity-amt.credit,.dsh-activity-status.ok{color:#18a0fb!important}
+.dsh-stat-dot,.pdot{background:#18a0fb!important}
+.online-pill{color:#18a0fb!important}
+
+/* Brighter artworks get a slightly darker overlay + text shadow so headings stay readable */
+html[data-theme] body.kb-bg-speed{--kb-ov:linear-gradient(180deg,rgba(8,8,15,.46),rgba(8,8,15,.76))}
+html[data-theme] body.kb-bg-phone{--kb-ov:linear-gradient(180deg,rgba(8,8,15,.36),rgba(8,8,15,.66))}
+.page-hero h1,.page-hero p,.ph-sub,.hub-back,.boost-hub .lead,.boost-hub h1{text-shadow:0 1px 10px rgba(8,8,15,.9)}
+
+/* ══ Moving "Mizzy Sales" name across the whole background ═════════════════ */
+#kb-drift{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;user-select:none;-webkit-user-select:none}
+#kb-drift .kb-row{position:absolute;left:0;white-space:nowrap;display:flex;width:max-content;
+ font-family:"Sora","Plus Jakarta Sans",system-ui,sans-serif;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+ color:transparent;-webkit-text-stroke:1.5px rgba(132,185,241,.50);will-change:transform;
+ animation:kb-slide var(--kb-dur,60s) linear infinite;animation-direction:var(--kb-dir,normal)}
+#kb-drift .kb-row span{padding-right:.9em;flex:none}
+#kb-drift .kb-row.kb-fill span:nth-child(3n){color:rgba(24,160,251,.10);-webkit-text-stroke-color:transparent}
+#kb-drift .kb-row.kb-pink span:nth-child(2n){-webkit-text-stroke-color:rgba(92,200,255,.34)}
+@keyframes kb-slide{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+#kb-drift .kb-float{position:absolute;font-family:"Sora",system-ui,sans-serif;font-weight:800;white-space:nowrap;letter-spacing:.08em;
+ color:rgba(132,185,241,.26);text-shadow:0 0 24px rgba(11,124,245,.35);animation:kb-bob var(--kb-dur,14s) ease-in-out infinite;animation-delay:var(--kb-del,0s)}
+@keyframes kb-bob{0%,100%{transform:translate3d(0,0,0) rotate(var(--kb-rot,-8deg))}50%{transform:translate3d(24px,-26px,0) rotate(calc(var(--kb-rot,-8deg) + 5deg))}}
+
+/* ══ Feature cards: transparent, only the icon + name ═════════════════════ */
+.why-card,.mys-what-card,.rs-item{
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ -webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.why-card,.mys-what-card{display:flex!important;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:18px 10px!important}
+.why-card p,.mys-what-card p,.mys-what-card .mys-go{display:none!important}
+.why-card h3,.mys-what-card h3,.rs-item span{color:#ecf4fd!important;font-weight:800!important;text-shadow:0 1px 12px rgba(8,8,15,.9)}
+.why-card .why-icon,.rs-item .rs-ic,.mys-what-card .mys-what-ico{
+ width:46px!important;height:46px!important;margin:0 auto!important;display:flex;align-items:center;justify-content:center;
+ color:#18a0fb!important;background:transparent!important;border:0!important;box-shadow:none!important;
+ filter:drop-shadow(0 0 10px rgba(24,160,251,.55));animation:kb-icon-float 4.2s ease-in-out infinite}
+.mys-what-card .mys-what-ico svg{width:40px;height:40px}
+.mys-what-card:hover,.why-card:hover{transform:translateY(-4px) scale(1.04)!important}
+.mys-what-card,.why-card,.rs-item{transition:transform .3s cubic-bezier(.2,.8,.3,1.2)}
+.rs-item{display:flex;flex-direction:column!important;align-items:center;text-align:center;gap:8px}
+@keyframes kb-icon-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* ══ Appear animation for the feature cards (set up by mizzy-brand.js) ═ */
+.kb-reveal{opacity:0;transform:translateY(34px) scale(.86);filter:blur(6px)}
+.kb-reveal.kb-in{animation:kb-pop .75s cubic-bezier(.2,.9,.3,1.25) forwards;animation-delay:var(--kb-d,0s)}
+.kb-reveal.kb-from-left{transform:translateX(-40px) scale(.86)}
+.kb-reveal.kb-from-right{transform:translateX(40px) scale(.86)}
+@keyframes kb-pop{0%{opacity:0;filter:blur(6px)}60%{opacity:1;filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}
+@media(prefers-reduced-motion:reduce){
+ #kb-drift .kb-row,#kb-drift .kb-float,.why-icon,.rs-ic,.mys-what-ico{animation:none!important}
+ .kb-reveal{opacity:1!important;transform:none!important;filter:none!important}
+}
+
+/* Brighter Mizzy artworks: darker overlay + glow so green headings stay readable */
+html[data-theme] body.kb-bg-hero{--kb-ov:linear-gradient(180deg,rgba(8,8,15,.50),rgba(8,8,15,.80))}
+html[data-theme] body.kb-bg-social{--kb-ov:linear-gradient(180deg,rgba(8,8,15,.46),rgba(8,8,15,.78))}
+.hero-h1,.hero-h1 *{text-shadow:0 2px 14px rgba(0,0,0,.85)}
+
+/* ══ Page loader: Mizzy crown + logo, shown until the next page has entered ══ */
+#kb-loader{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+ background:radial-gradient(ellipse at 50% 40%,rgba(11,124,245,.22),#ffffff 62%),#ffffff;
+ opacity:1;visibility:visible;transition:opacity .35s ease,visibility .35s ease}
+#kb-loader.kb-hide{opacity:0;visibility:hidden;pointer-events:none}
+#kb-loader .kb-crown{font-size:40px;line-height:1;filter:drop-shadow(0 0 14px rgba(92,200,255,.8));animation:kb-crown 1.4s ease-in-out infinite}
+#kb-loader .kb-logo{position:relative;width:104px;height:104px;border-radius:26px;
+ background:url('/img/mizzy-sales-icon.svg') center/cover no-repeat,url('/img/mizzy-sales-icon.svg') center/cover no-repeat;
+ border:1px solid rgba(92,200,255,.5);box-shadow:0 0 36px rgba(24,160,251,.45)}
+#kb-loader .kb-logo::after{content:"";position:absolute;inset:-9px;border-radius:32px;border:3px solid rgba(24,160,251,.18);border-top-color:#5cc8ff;animation:kb-spin 1s linear infinite}
+#kb-loader .kb-name{font-family:"Sora",system-ui,sans-serif;font-weight:800;letter-spacing:.2em;text-transform:uppercase;font-size:14px;color:#ecf4fd;text-shadow:0 0 14px rgba(24,160,251,.7)}
+#kb-loader .kb-sub{font-size:12px;color:#77b2f0;letter-spacing:.08em}
+@keyframes kb-spin{to{transform:rotate(360deg)}}
+@keyframes kb-crown{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.12)}}
+/* the in-app page-switch overlay (index) gets the crown too */
+.dbfl-brand::before{content:"";position:absolute;top:-34px;left:50%;transform:translateX(-50%);font-size:26px;animation:kb-crown 1.4s ease-in-out infinite}
+
+#kb-drift{display:none!important}
+
+#kb-drift{display:none!important}
+
+#kb-drift{display:none!important}
+
+#kb-drift{display:none!important}
+
+#kb-drift{display:none!important}
+
+#kb-drift{display:none!important}
+
+/* Pure black website background */
+html,body{background:#ffffff!important}
+body::before{background-image:none!important;background:#ffffff!important}
+:root,html[data-theme]{--bg:#000}
+#kb-drift{display:none!important}
+
+/* MYS-UPDATE-2 */
+html body .app-tabbar,html body .dsh-bottom-nav,html body .bottom-tabbar{display:none!important}
+:root{--app-nav-h:0px}
+body.app-shell{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px)!important}
+.dashboard-body{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px)!important}
+.dsh-shell{padding-bottom:16px!important}
+html,body{overscroll-behavior-y:none}
+#mys-page-transition{display:none!important}
+.mys-drawer{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.mys-menu-backdrop{touch-action:none}
+html.mys-locked{overflow:hidden!important}
+#kb-loader{background:#ffffff!important;gap:0!important}
+#kb-loader .kb-crown,#kb-loader .kb-name,#kb-loader .kb-sub{display:none!important}
+#kb-loader .kb-logo{width:54px!important;height:54px!important;border-radius:50%!important;border:0!important;background:url('/img/mizzy-loader.svg') center/cover no-repeat!important;box-shadow:0 0 18px rgba(24,160,251,.4)!important}
+#kb-loader .kb-logo::after{inset:-7px!important;border-radius:50%!important;border-width:2px!important}
+.dbfl-overlay{background:#ffffff!important;gap:0!important}
+.dbfl-brand::before{display:none!important}
+.dbfl-brand{width:54px!important;height:54px!important}
+.dbfl-crown-svg{width:48px!important;height:48px!important;border-radius:50%!important;border:0!important;background:url('/img/mizzy-loader.svg') center/cover no-repeat!important}
+.dbfl-text{display:none!important}
+.dbfl-ring{border-width:2px!important}
+/* dashboard marketplace preview + chooser */
+.mys-seeall{background:none;border:0;color:var(--gold,#0b7cf5);font:700 13px inherit;cursor:pointer;padding:4px 2px}
+.mys-mk-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 14px}
+.mys-mk-item{display:block;text-decoration:none;color:inherit;border:1px solid var(--border,#dbe6f6);border-radius:12px;overflow:hidden;background:rgba(255,255,255,.03)}
+.mys-mk-item img{display:block;width:100%;height:84px;object-fit:cover;background:#ffffff}
+.mys-mk-ph{height:84px;display:flex;align-items:center;justify-content:center;font-size:28px;background:#ffffff}
+.mys-mk-item b{display:block;padding:8px 10px 2px;font-size:13px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.mys-mk-item span{display:block;padding:0 10px 10px;font-size:12px;color:var(--gold,#0b7cf5);font-weight:800}
+.mys-mk-empty{grid-column:1/-1;padding:14px 4px;font-size:13px;opacity:.7;text-align:center}
+.mys-sheet-bd{position:fixed;inset:0;background:rgba(255,255,255,0.6);z-index:9998;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s}
+.mys-sheet-bd.open{opacity:1;visibility:visible}
+.mys-sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:480px;transform:translate(-50%,105%);transition:transform .25s ease;z-index:9999;background:#ffffff;border:1px solid #dbe6f6;border-bottom:0;border-radius:18px 18px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.mys-sheet.open{transform:translate(-50%,0)}
+.mys-sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;color:#0b1b3a}
+.mys-sheet-head button{width:34px;height:34px;border-radius:10px;border:1px solid #dbe6f6;background:#ffffff;color:#eeeef5;font-size:20px;cursor:pointer}
+.mys-sheet a{display:flex;align-items:center;justify-content:space-between;padding:14px 12px;margin:6px 0;border:1px solid #dbe6f6;border-radius:12px;background:#ffffff;color:#0b1b3a;text-decoration:none;font-weight:700;font-size:14px}
+
+/* MYS-UPDATE-3 */
+*:has(> .dsh-svc-item){display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;overflow:visible!important}
+.dsh-svc-item{width:auto!important;min-width:0!important;margin:0!important;padding:10px 4px!important;border-radius:12px!important;font-size:11px!important;text-align:center}
+.dsh-svc-item *{max-width:100%}
+@media(max-width:340px){*:has(> .dsh-svc-item){grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+
+/* MYS-UPDATE-5 */
+body:has(#numHowToCard) .back-btn[href="/dashboard"],
+body:has(#numHowToCard) .back-btn[href="/number-history"],
+body:has(#numHowToCard) .pool-guide{display:none!important}
+
+/* MYS-UPDATE-6 */
+.brand-icon,.dbfl-crown-svg{background:url('/img/mizzy-loader.svg') center/cover no-repeat!important;border-radius:50%!important}
+
+/* MYS-UPDATE-9 */
+*:has(> .dsh-svc-item){display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;overflow:visible!important}
+.dsh-svc-item{width:auto!important;min-width:0!important;margin:0!important;padding:10px 4px!important;font-size:11px!important}
+.mys-mk-list{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;padding:0 10px 12px!important}
+.mys-mk-item img,.mys-mk-item .mys-mk-ph{height:auto!important;aspect-ratio:1/1;width:100%}
+.mys-mk-item b{font-size:10.5px!important;padding:5px 5px 1px!important;line-height:1.25!important}
+.mys-mk-item span{font-size:10.5px!important;padding:0 5px 6px!important}
+a.mys-seeall{text-decoration:none!important}
+html.mys-in .site-footer{display:none!important}
+html.mys-in body:has(#page-settings.active) .site-footer{display:block!important}
+html.mys-in a[href="/support"]:not([class*="fab"]):not([class*="float"]):not([id*="fab"]){display:none!important}
+.dsh-contact-item,.dsh-icon-btn{display:none!important}
+
+/* MYS-UPDATE-12 */
+#txnSegmented{display:flex!important;flex-wrap:wrap!important;gap:8px!important;padding:12px 14px!important}
+#txnSegmented button,#txnSegmented a{background:#ffffff!important;color:#eeeef5!important;border:1px solid #dbe6f6!important;padding:8px 14px!important;border-radius:999px!important;font-size:13px!important;white-space:nowrap!important;margin:0!important}
+#txnSegmented .active,#txnSegmented .on,#txnSegmented .selected,#txnSegmented [aria-pressed="true"]{background:#0b7cf5!important;border-color:#0b7cf5!important;color:#fff!important}
+.txn-wrap{display:flex;flex-direction:column;gap:10px;padding:0 14px 20px}
+.txn-item{display:flex!important;align-items:center;gap:12px;padding:14px!important;border:1px solid #dbe6f6;border-radius:12px;background:rgba(255,255,255,.03)}
+.txn-info{flex:1;min-width:0}
+.txn-desc{font-weight:700;font-size:14px;line-height:1.35;margin-bottom:4px}
+.txn-date{font-size:12px;opacity:.7;line-height:1.4}
+.txn-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;text-align:right;white-space:nowrap;font-size:13px}
+.txn-ic{flex-shrink:0}
+.auth-brand{color:#18a0fb!important;display:flex!important;align-items:center;justify-content:center;gap:8px;font-weight:800}
+.auth-brand svg,.auth-brand .icon{color:#18a0fb!important;stroke:#18a0fb!important;width:28px;height:28px}
+
+/* MYS-UPDATE-13 */
+body::after{content:"";position:fixed;inset:0;background:#ffffff;z-index:2147483646;pointer-events:none;animation:mysCover .35s ease .7s forwards}
+@keyframes mysCover{to{opacity:0;visibility:hidden}}
+#kb-loader{z-index:2147483645!important}
+.mys-brandrow{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:6px 12px!important;padding:14px!important;margin:0 0 10px!important;border:1px solid #dbe6f6!important;border-radius:12px!important;background:rgba(255,255,255,.03)!important;line-height:1.45!important}
+.mys-brandrow *{line-height:1.45}
+.mys-brandrow-in{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:4px 10px!important}
+
+/* MYS-UPDATE-14 */
+.hm-tab{background:#ffffff!important;color:#0b1b3a!important;border:1px solid #dbe6f6!important;padding:8px 14px!important;border-radius:999px!important;font-size:13px!important;white-space:nowrap!important;margin:0 8px 8px 0!important;line-height:1.3!important}
+.hm-tab.active,.hm-tab.on,.hm-tab.sel,.hm-tab.selected,.hm-tab[aria-pressed="true"]{background:#0b7cf5!important;border-color:#0b7cf5!important;color:#fff!important}
+.hm-tab:first-child{margin-left:0!important}
+[class*="hm-"][class*="tabs"],[class*="hm-"][class*="filter"]{display:flex!important;flex-wrap:wrap!important;padding:12px 14px!important}
+
+/* MYS-UPDATE-15 */
+.hm-tabs{display:flex!important;flex-wrap:wrap!important;gap:8px!important;padding:4px 14px 12px!important;margin:0!important}
+.hm-tabs .hm-tab{margin:0!important}
+.hm-card{display:block!important;margin:0 14px 16px!important;border:1px solid #dbe6f6!important;border-radius:14px!important;background:rgba(255,255,255,.03)!important;overflow:hidden}
+.hm-card .hm-row{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:12px!important;padding:14px!important;margin:0!important;border:0!important;border-radius:0!important;background:none!important}
+.hm-card .hm-row+.hm-row{border-top:1px solid #dbe6f6!important}
+.hm-row .hm-row-ico{flex:0 0 40px;width:40px;height:40px;border-radius:12px;background:rgba(24,160,251,.14);color:#18a0fb;display:flex!important;align-items:center;justify-content:center}
+.hm-row .hm-row-ico svg,.hm-row .hm-row-ico .icon{width:20px;height:20px}
+.hm-row .hm-row-main{flex:1 1 auto;min-width:0;display:block!important}
+.hm-row .hm-row-t{display:block!important;font-size:14px;font-weight:700;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-row .hm-row-s{display:block!important;font-size:12px;line-height:1.4;margin-top:3px;opacity:.7}
+.hm-row .hm-row-side{flex:0 0 auto;display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:6px!important;text-align:right}
+.hm-row .hm-row-amt{display:block!important;font-size:14px;font-weight:800;white-space:nowrap}
+.hm-row .hm-row-amt.up{color:#18a0fb}
+.hm-row .hm-chip{display:inline-block!important;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;line-height:1.3;text-transform:capitalize;background:rgba(24,160,251,.15);color:#5cc8ff}
+.hm-row .hm-chip.warn{background:rgba(245,158,11,.15);color:#fbbf24}
+.hm-row .hm-chip.bad{background:rgba(239,68,68,.15);color:#f87171}
+.hm-empty{padding:18px;text-align:center;opacity:.7;font-size:13px}
+
+/* MYS-UPDATE-21 */
+#page-login,#page-register,#page-welcome,.auth-card,.auth-wrap,.auth-box{
+  --gold:#18a0fb;--gold-light:#5cc8ff;--gold-dark:#0b7cf5;--gold2:#5cc8ff;
+  --accent:#18a0fb;--primary:#18a0fb;--brand:#18a0fb;--blue:#18a0fb;--blue-light:rgba(24,160,251,.14);
+  --bg:#000;--card:#0b0b0b;--border:#1d2b22;--text:#eeeef5;--t1:#eeeef5;--t2:#9aa3a0;
+}
+#page-login,#page-register{background:#ffffff!important;color:#0b1b3a!important}
+#page-login .auth-card,#page-register .auth-card,#page-login .auth-box,#page-register .auth-box{background:#ffffff!important;border:1px solid #dbe6f6!important;box-shadow:0 0 30px rgba(24,160,251,.12)!important}
+#page-login h1,#page-login h2,#page-login h3,#page-login label,#page-register h1,#page-register h2,#page-register h3,#page-register label{color:#0b1b3a!important}
+#page-login input,#page-register input,#page-login select,#page-register select{background:#ffffff!important;color:#0b1b3a!important;border:1px solid #dbe6f6!important}
+#page-login input:focus,#page-register input:focus{border-color:#18a0fb!important;box-shadow:0 0 0 3px rgba(24,160,251,.18)!important;outline:0}
+#page-login button[type="submit"],#page-register button[type="submit"],#page-login .btn-primary,#page-register .btn-primary,#page-login .auth-btn,#page-register .auth-btn{background:linear-gradient(115deg,#0b7cf5,#18a0fb 60%,#5cc8ff)!important;color:#fff!important;border:0!important}
+#page-login a,#page-register a,.auth-switch a,.auth-brand{color:#18a0fb!important}
+#page-login .auth-brand,#page-register .auth-brand{color:#18a0fb!important}
+#page-login p,#page-register p,#page-login small,#page-register small{color:#5a6c8c}
+
+
+/* MYS-LOADER-FIX-CSS: loader shows only the round logo; any image inside it must fit the circle */
+#kb-loader .kb-crown,#kb-loader .kb-name,#kb-loader .kb-sub{display:none!important}
+#kb-loader .kb-logo img,.dbfl-crown-svg img{width:100%;height:100%;object-fit:cover;border-radius:50%;font-size:0;color:transparent}

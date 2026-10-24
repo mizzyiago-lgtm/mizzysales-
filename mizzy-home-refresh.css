@@ -1,0 +1,10 @@
+/* Mizzy Sales homepage refresh: preserves existing brand, routes and feature names. */
+.ks-home-chip-mark{display:inline-flex;align-items:center;justify-content:center;margin-left:5px;color:#9fc9f4;font-size:15px;text-shadow:0 0 18px rgba(24,160,251,.55)}
+.ks-home-marquee{position:relative;overflow:hidden;border-top:1px solid rgba(92,200,255,.14);border-bottom:1px solid rgba(92,200,255,.14);background:linear-gradient(90deg,rgba(10,51,93,.24),rgba(255,255,255,0.18),rgba(10,51,93,.24));padding:13px 0;color:var(--t1,#0b1b3a)}
+.ks-home-marquee-track{display:flex;align-items:center;gap:22px;width:max-content;white-space:nowrap;animation:ksHomeMarquee 36s linear infinite;font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+.ks-home-marquee-track span:first-child,.ks-home-marquee-track span:nth-of-type(9){color:#9fdcff}
+.ks-home-marquee-track b{color:#5cc8ff;font-size:15px}
+@keyframes ksHomeMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (hover:hover){.ks-home-marquee:hover .ks-home-marquee-track{animation-play-state:paused}}
+@media(max-width:640px){.ks-home-marquee{padding:11px 0}.ks-home-marquee-track{gap:15px;font-size:10px;animation-duration:29s}.hero-h1{max-width:100%;overflow-wrap:normal}.hero-p{line-height:1.75}.hero-stats{gap:10px}}
+@media(prefers-reduced-motion:reduce){.ks-home-marquee-track{animation:none;transform:none}.ks-home-marquee{overflow-x:auto}.ks-home-marquee-track{width:max-content}}
