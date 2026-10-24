@@ -1,0 +1,12 @@
+node_modules/
+.env
+*.log
+.DS_Store
+public/uploads/*
+public/receipts/*
+public/files/*
+!public/uploads/.gitkeep
+!public/receipts/.gitkeep
+!public/files/.gitkeep
+_upgrade_backup/
+.nova-fix-backup/

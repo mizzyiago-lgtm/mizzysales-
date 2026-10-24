@@ -1,0 +1,174 @@
+<!doctype html><html lang="en"><head>
+<link rel="icon" type="image/png" href="/favicon.png"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Active Number | Mizzy Sales</title><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/theme.css"><script src="/js/mizzy-ui.js?v=1"></script><link rel="stylesheet" href="/brand.css"><style>
+body{background:#ffffff;color:#0b1b3a;padding:18px}.wrap{max-width:560px;margin:24px auto}a.back{color:#9fb3c8;text-decoration:none;font-weight:700}
+.badge{display:inline-block;margin:14px 0 4px;padding:5px 12px;border-radius:999px;background:#dbe6f6;color:#7db8e0;font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+h1{margin:6px 0 14px;font-size:24px}
+.card{background:linear-gradient(145deg,#ffffff,#ffffff 60%,#ffffff);border:1px solid #dbe6f6;border-radius:20px;padding:22px;box-shadow:0 18px 44px #0005}
+.live{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:900;letter-spacing:.09em;margin-bottom:14px;color:#ff626c}
+.led{width:14px;height:14px;background:#ff4757;border-radius:50%;animation:blink 1s infinite;box-shadow:0 0 12px #ff4757aa}
+.live.ok{color:#358de9}.live.ok .led{background:#18c8ff;animation:none;box-shadow:0 0 16px #18c8ff}
+.live.off{color:#5a6c8c}.live.off .led{background:#f4f8ff;animation:none;box-shadow:none}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.85)}}
+.label{color:#5a6c8c;font-size:13px;margin-top:6px}
+.number{font-size:clamp(26px,7vw,36px);font-weight:900;overflow-wrap:anywhere;margin:6px 0 10px;letter-spacing:.02em}
+.timer{font-size:36px;font-weight:900;color:#ff626c;font-variant-numeric:tabular-nums;margin:10px 0}.timer.ok{color:#18c8ff}.timer.off{color:#5a6c8c}
+.rows{margin:14px 0;border-top:1px solid #dbe6f6}.row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #dbe6f6}.row span:first-child{color:#5a6c8c}.row b{text-align:right;overflow-wrap:anywhere}
+button{border:0;border-radius:12px;background:#68a9d5;color:#ffffff;font-weight:800;padding:13px 16px;font-size:15px;cursor:pointer;width:100%;margin-top:10px}
+button.copy{width:auto;padding:10px 16px;margin-top:4px}button.danger{background:#f4f8ff;color:#fff}button[disabled]{opacity:.6}
+.codebox{display:none;padding:16px;border:1px solid #18c8ff;border-radius:14px;margin:14px 0 4px;background:#18c8ff14}.codebox .code{font-size:clamp(28px,8vw,40px);font-weight:900;color:#18c8ff;letter-spacing:.12em;overflow-wrap:anywhere;margin:6px 0}
+.msg{margin-top:12px;color:#5a6c8c;font-size:14px;text-align:center}.err{color:#ff8a93}
+#pgLoad{position:fixed;inset:0;z-index:2147483000;background:#ffffff;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#0562d6;font-weight:800;font-size:15px}#pgLoad.off{display:none}.pg-dots{display:inline-flex;gap:8px}.pg-dots i{display:block;width:12px;height:12px;border-radius:50%;background:#18a0fb;animation:pgB 1.1s infinite ease-in-out both}.pg-dots i:nth-child(2){animation-delay:.16s}.pg-dots i:nth-child(3){animation-delay:.32s}@keyframes pgB{0%,80%,100%{transform:translateY(0);opacity:.35}40%{transform:translateY(-9px);opacity:1}}
+</style><link rel="stylesheet" href="/css/mizzy-select-sheet.css?v=1">  <link rel="stylesheet" href="/css/page-transitions.css?v=1">
+<link rel="stylesheet" href="/css/responsive-device-fit.css?v=1">
+<link rel="stylesheet" href="/css/mys-header-clean.css?v=20261022b">
+<script src="/js/mys-menu-guard.js?v=20261022b" defer></script>
+<link rel="stylesheet" href="/css/mys-ui-fixes.css?v=20261022c">
+<link rel="stylesheet" href="/css/mizzy-theme.css?v=1"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#ffffff"/>
+</head><body>
+<div id="pgLoad" role="status"><span class="pg-dots"><i></i><i></i><i></i></span><div>Loading your number</div></div>
+<main class="wrap">
+<a class="back" id="backLink" href="/buy-number">← Back to services</a><br>
+<span class="badge" id="badge">Buy Number</span>
+<h1>Active Number</h1>
+<div class="card" id="card">
+  <div class="live" id="live"><span class="led"></span><span id="liveText">WAITING FOR OTP</span></div>
+  <div class="label">Your number</div>
+  <div class="number" id="number">—</div>
+  <button class="copy" id="copyNumber" type="button">Copy number</button>
+  <div class="timer" id="timer">20:00</div>
+  <div class="rows">
+    <div class="row"><span>Service</span><b id="svc">—</b></div>
+    <div class="row"><span>Country</span><b id="cty">—</b></div>
+    <div class="row"><span>Price</span><b id="price">—</b></div>
+  </div>
+  <div class="codebox" id="codeBox"><div class="label">Your OTP code</div><div class="code" id="code"></div><button class="copy" id="copyCode" type="button">Copy code</button></div>
+  <button class="danger" id="cancelBtn" type="button">Cancel &amp; Refund</button>
+  <div class="msg" id="msg">Waiting for the SMS verification code…</div>
+</div>
+</main>
+<script>
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id)};
+var q=new URLSearchParams(location.search);
+var S=['1','2','3'].indexOf(q.get('s'))>-1?q.get('s'):'3';
+var ID=(q.get('id')||'').trim();
+var NAMES={'1':'Buy Number 1','2':'Buy Number 2','3':'Buy Number 3'};
+var BACK={'1':'/buy-number-1','2':'/buy-number-2','3':'/buy-number-3'};
+var RENT_MS=20*60*1000;
+var money=function(n){return '\u20a6'+Number(n||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2})};
+var token=function(){return localStorage.getItem('ksl_token')||localStorage.getItem('token')||''};
+$('badge').textContent=NAMES[S];$('backLink').href=BACK[S];
+document.title='Active Number \u2022 '+NAMES[S]+' | Mizzy Sales';
+
+function api(url,opt){opt=opt||{};
+  return fetch(url,{method:opt.method||'GET',body:opt.body,headers:{'Content-Type':'application/json',Authorization:'Bearer '+token()}}).then(function(r){
+    return r.json().catch(function(){return {}}).then(function(d){
+      if(r.status===401){location.href='/login?next='+encodeURIComponent(location.pathname+location.search);throw new Error('Please log in again.')}
+      if(!r.ok)throw new Error(d.error||d.message||'Request failed');
+      return d;});});}
+
+// Each server answers differently; both are turned into the same shape.
+function fromListing(d){
+  var st=String(d.status||'').toLowerCase();
+  return {number:d.phoneNumber||'',service:d.service||'',country:d.country||'',price:d.sellPrice,code:d.code||'',
+    state:(d.code||st==='delivered')?'received':st==='expired'?'expired':st==='cancelled'?'cancelled':'waiting',
+    expiresAt:d.expiresAt?new Date(d.expiresAt).getTime():(new Date(d.createdAt||Date.now()).getTime()+RENT_MS)};
+}
+function fromOtp(o){
+  o=o||{};var st=String(o.status||'').toLowerCase();
+  var received=!!o.sms||['received','success','completed'].indexOf(st)>-1;
+  return {number:o.number||'',service:o.service||'',country:o.country||o.countryCode||'',price:o.price,code:o.sms||'',
+    state:received?'received':(st==='cancelled'||st==='refunded')?'cancelled':(st==='expired'||st==='failed')?'expired':'waiting',
+    expiresAt:new Date(o.createdAt||Date.now()).getTime()+RENT_MS};
+}
+var ADAPTER={
+  '1':{get:function(){return api('/api/numbers/status/'+encodeURIComponent(ID)).then(fromListing)},cancel:function(){return api('/api/numbers/cancel/'+encodeURIComponent(ID),{method:'POST',body:'{}'})}},
+  '3':{get:function(){return api('/api/numbers/status/'+encodeURIComponent(ID)).then(fromListing)},cancel:function(){return api('/api/numbers/cancel/'+encodeURIComponent(ID),{method:'POST',body:'{}'})}},
+  '2':{get:function(){return api('/api/numbers/n2/sms/'+encodeURIComponent(ID)).then(function(d){return fromOtp(d.order)})},cancel:function(){return api('/api/numbers/n2/cancel/'+encodeURIComponent(ID),{method:'POST',body:'{}'})}}
+}[S];
+
+var cur=null,pollT=null,tickT=null,finished=false;
+
+function setLive(cls,text){$('live').className='live '+cls;$('liveText').textContent=text}
+function render(s){
+  cur=s;
+  $('number').textContent=s.number||'Waiting for provider\u2026';
+  $('copyNumber').disabled=!s.number;
+  $('svc').textContent=s.service||'\u2014';$('cty').textContent=s.country||'\u2014';
+  $('price').textContent=s.price!=null?money(s.price):'\u2014';
+  if(s.state==='received'){
+    // Code detected: light turns green and Cancel & Refund disappears immediately.
+    setLive('ok','OTP RECEIVED');$('timer').className='timer ok';$('timer').textContent='\u2713 RECEIVED';
+    $('code').textContent=s.code;$('codeBox').style.display='block';
+    $('cancelBtn').style.display='none';
+    $('msg').textContent='Your OTP has arrived. This purchase is now final.';
+    stop();
+  }else if(s.state==='cancelled'){
+    setLive('off','CANCELLED');$('timer').className='timer off';$('timer').textContent='--:--';
+    $('cancelBtn').style.display='none';$('msg').textContent='This number was cancelled and your wallet was refunded.';stop();
+  }else if(s.state==='expired'){
+    setLive('off','EXPIRED');$('timer').className='timer off';$('timer').textContent='00:00';
+    $('cancelBtn').style.display='none';$('msg').textContent='No code arrived in time. Check your wallet for the refund.';stop();
+  }else{
+    setLive('','WAITING FOR OTP');$('timer').className='timer';$('codeBox').style.display='none';
+    $('cancelBtn').style.display='block';$('msg').textContent='Waiting for the SMS verification code\u2026';
+    startTick();
+  }
+}
+function stop(){finished=true;clearInterval(pollT);clearInterval(tickT)}
+function startTick(){
+  clearInterval(tickT);
+  var tick=function(){if(!cur||cur.state!=='waiting')return;var left=Math.max(0,Math.ceil((cur.expiresAt-Date.now())/1000));
+    $('timer').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0')};
+  tick();tickT=setInterval(tick,1000);
+}
+function poll(){
+  if(finished)return Promise.resolve();
+  return ADAPTER.get().then(render).catch(function(e){
+    if(!cur){$('msg').textContent=e.message;$('msg').className='msg err'}
+  });
+}
+function copy(text,btn,label){
+  var done=function(){var o=label;btn.textContent='Copied \u2713';setTimeout(function(){btn.textContent=o},1500)};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(String(text||'')).then(done,function(){fallback()});}else fallback();
+  function fallback(){var t=document.createElement('textarea');t.value=String(text||'');document.body.appendChild(t);t.select();try{document.execCommand('copy');done()}catch(e){}t.remove()}
+}
+$('copyNumber').onclick=function(){copy(cur&&cur.number,$('copyNumber'),'Copy number')};
+$('copyCode').onclick=function(){copy(cur&&cur.code,$('copyCode'),'Copy code')};
+$('cancelBtn').onclick=function(){
+  if(!cur||cur.state!=='waiting')return;
+  var go=function(){
+    var b=$('cancelBtn');b.disabled=true;b.textContent='Cancelling\u2026';
+    ADAPTER.cancel().then(function(){return poll()}).then(function(){
+      if(cur&&cur.state==='waiting'){cur.state='cancelled';render(cur)}
+    }).catch(function(e){
+      // The code may have arrived at the same moment; re-check before showing an error.
+      return poll().then(function(){if(!cur||cur.state==='waiting'){$('msg').textContent=e.message;$('msg').className='msg err'}});
+    }).then(function(){b.disabled=false;b.textContent='Cancel & Refund'});
+  };
+  if(window.MizzyUI&&MizzyUI.confirm){MizzyUI.confirm('Cancel this number and refund your wallet? This cannot be undone.',{title:'Cancel number',okText:'Cancel & refund'}).then(function(ok){if(ok)go()})}
+  else if(confirm('Cancel this number and refund your wallet?'))go();
+};
+
+if(!token()){location.href='/login?next='+encodeURIComponent(location.pathname+location.search)}
+else if(!ID){$('pgLoad').className='off';$('card').style.display='none';
+  var m=document.createElement('p');m.className='msg err';m.innerHTML='No number selected. <a class="back" href="'+BACK[S]+'">Go to '+NAMES[S]+'</a>';document.querySelector('.wrap').appendChild(m)}
+else{
+  poll().then(function(){$('pgLoad').className='off'});
+  pollT=setInterval(poll,4000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)poll()});
+}
+})();
+</script>
+<script src="/js/mizzy-select-sheet.js?v=1" defer></script>
+<script src="/js/app-shell.js?v=3" defer></script>
+<script src="/js/section-tabs.js?v=1" defer></script>
+<script src="/js/page-transitions.js?v=1" defer></script>
+</body></html>
