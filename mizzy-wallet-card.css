@@ -1,0 +1,51 @@
+/* Mizzy Sales — dashboard wallet card (card + action dock layout) */
+.kw-wallet{margin:14px 16px 0;position:relative}
+.kw-card{position:relative;overflow:hidden;border-radius:22px;padding:18px 20px 16px;color:#fff;
+  background:linear-gradient(135deg,#0562d6 0%,#0b7cf5 52%,#18a0fb 100%);
+  box-shadow:0 12px 30px rgba(11,124,245,.34),inset 0 1px 0 rgba(255,255,255,.28);
+  aspect-ratio:1.72/1;min-height:178px;display:flex;flex-direction:column;justify-content:space-between}
+.kw-card::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    repeating-linear-gradient(115deg,rgba(255,255,255,.07) 0 2px,transparent 2px 14px),
+    radial-gradient(120% 90% at 100% 0%,rgba(255,255,255,.22),transparent 55%)}
+.kw-card::after{content:"";position:absolute;right:-46px;bottom:-62px;width:190px;height:190px;border-radius:50%;
+  border:26px solid #dbe6f6;pointer-events:none}
+.kw-top,.kw-mid,.kw-foot{position:relative;z-index:1}
+.kw-top{display:flex;align-items:center;justify-content:space-between}
+.kw-brand{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.95}
+.kw-brand svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kw-nfc{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;opacity:.9}
+.kw-mid{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.kw-chip{width:42px;height:32px;border-radius:7px;flex-shrink:0;
+  background:linear-gradient(135deg,#9dcaf9,#9fdcff 45%,#bbd8f7);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.14);position:relative;overflow:hidden}
+.kw-chip::before,.kw-chip::after{content:"";position:absolute;background:rgba(5,98,214,.45)}
+.kw-chip::before{left:0;right:0;top:50%;height:1px}
+.kw-chip::after{top:0;bottom:0;left:38%;width:1px;box-shadow:12px 0 0 rgba(5,98,214,.45)}
+.kw-amt-wrap{min-width:0;text-align:right;flex:1}
+.kw-label{font-size:11.5px;font-weight:700;opacity:.85;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
+.kw-amount{display:flex;align-items:baseline;justify-content:flex-end;gap:4px;font-size:34px;font-weight:900;letter-spacing:-.6px;line-height:1.05;white-space:nowrap}
+.kw-amount .kw-cur{font-size:20px;font-weight:700;opacity:.85}
+.kw-amount .bal-hidden{letter-spacing:4px;font-size:28px}
+.kw-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;font-weight:700}
+.kw-sub{opacity:.9;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kw-eye{background:rgba(255,255,255,.2);border:1px solid #dbe6f6;border-radius:999px;
+  padding:5px 12px;cursor:pointer;color:#0b1b3a;display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700}
+.kw-eye svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kw-dock{display:grid;grid-template-columns:1.15fr 1fr 1.25fr;gap:8px;margin-top:10px}
+.kw-dock a{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;
+  padding:11px 12px;border-radius:16px;font-size:12.5px;font-weight:800;color:var(--text,#15151f);
+  background:var(--white,#fff);border:1px solid var(--border,#e2e2ec);box-shadow:var(--shadow,0 1px 4px rgba(0,0,0,.08));
+  transition:transform .15s ease,box-shadow .15s ease;min-width:0}
+.kw-dock a:active{transform:scale(.97)}
+.kw-dock a svg{width:18px;height:18px;stroke:#0b7cf5;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kw-dock a b{font-size:11.5px;font-weight:800;color:#0b7cf5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.kw-dock a span{white-space:nowrap}
+.kw-dock .kw-primary{background:#0b7cf5;border-color:#0b7cf5;color:#fff;box-shadow:0 8px 18px rgba(11,124,245,.32)}
+.kw-dock .kw-primary .kw-plus{width:22px;height:22px;border-radius:50%;background:#fff;color:#0b7cf5;
+  display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;line-height:1}
+html[data-theme="dark"] .kw-dock a:not(.kw-primary){background:#ffffff;border-color:#dbe6f6;color:#ecf4fd}
+@media (max-width:360px){
+  .kw-amount{font-size:28px}.kw-amount .kw-cur{font-size:17px}
+  .kw-dock a{padding:10px 9px;font-size:11.5px}
+}

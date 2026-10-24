@@ -1,0 +1,15 @@
+/* Mizzy Sales - header fix: no desktop nav pills inside the app, Back bar sits under the header */
+html body .navbar .nav-center,
+html body #navCenter,
+html body.app-shell .nav-center { display: none !important; }
+
+/* Back bar now sits under the header instead of above it */
+html body #kslBackBar {
+  position: relative !important;
+  top: auto !important;
+  z-index: 1 !important;
+  padding: 10px 14px 0 !important;
+  background: transparent !important;
+  border-bottom: 0 !important;
+}
+html body #kslBackBar button { padding: 7px 14px !important; font-size: 13px !important; }

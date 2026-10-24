@@ -1,0 +1,116 @@
+/* ═══ MIZZY SALES — white + blue theme (loaded last on every page) ═══════════
+   Brand blue comes from the logo: cyan #18c8ff → #0b7cf5 → deep #0562d6.      */
+html,html[data-theme],html[data-theme="light"],html[data-theme="dark"],:root{
+  --kb-control:#ffffff !important; --kb-surface:#ffffff !important; --kb-glass:rgba(255,255,255,.95) !important; --kb-ink:#0b1b3a !important;
+  --bg:#ffffff !important; --bg2:#f4f8ff !important; --bg3:#eef4fd !important; --bg4:#e3edfb !important;
+  --card:#ffffff !important; --card2:#f4f8ff !important;
+  --border:#dbe6f6 !important; --border2:#c5d6ee !important;
+  --t1:#0b1b3a !important; --t2:#4a5d7e !important; --t3:#7b8cab !important;
+  --gold:#0b7cf5 !important; --gold2:#0562d6 !important; --gold3:#8fd3ff !important;
+  --blue:#0b7cf5 !important; --green:#0b7cf5 !important; --accent:#0b7cf5 !important; --primary:#0b7cf5 !important;
+  --sh:0 8px 28px rgba(11,60,140,.10) !important; --sh2:0 2px 12px rgba(11,60,140,.08) !important;
+  --text:#0b1b3a !important; --text2:#4a5d7e !important; --text3:#7b8cab !important;
+  --white:#ffffff !important; --blue-light:#eaf3ff !important;
+  --app-blue:#0b7cf5 !important; --app-blue2:#0562d6 !important; --app-blue-soft:#eaf3ff !important;
+  --mys-surface:#fff !important; --mys-surface-2:#f4f8ff !important; --mys-line:#dbe6f6 !important;
+  --mys-text:#0b1b3a !important; --mys-text-muted:#4a5d7e !important; --mys-accent:#0b7cf5 !important;
+  --glass-bg:rgba(255,255,255,.92) !important; --glass-bg-hover:#fff !important;
+  --glass-border:rgba(11,124,245,.18) !important; --glass-border-hover:rgba(11,124,245,.45) !important;
+  --glass-glow:0 6px 18px -12px rgba(11,124,245,.35) !important; --glass-glow-hover:0 10px 24px -10px rgba(11,124,245,.5) !important;
+  --pill-bg:rgba(255,255,255,.96) !important; --pill-border:rgba(11,124,245,.22) !important;
+  --pill-active-bg:rgba(11,124,245,.12) !important; --pill-active-fg:#0562d6 !important; --pill-idle-fg:#5a6c8c !important;
+  color-scheme:light !important;
+}
+html{background:#fff !important}
+body{background:#fff !important;background-color:#fff !important;background-image:none !important;color:#0b1b3a !important;--kb-ov:none !important}
+body::before,body::after{background-image:none !important}
+body::before{background:#fff !important}
+
+/* header */
+.navbar,.topbar,.app-header,.sidebar,header.nav,.dsh-topbar{background:rgba(255,255,255,.94) !important;border-color:#dbe6f6 !important;color:#0b1b3a !important;box-shadow:0 1px 0 #e3edfb}
+.brand-ksl,.brand-name,.site-brand{background:none !important;-webkit-text-fill-color:#0b1b3a !important;color:#0b1b3a !important}
+.brand-icon,.dbfl-crown-svg{border-color:#dbe6f6 !important;box-shadow:0 2px 10px rgba(11,124,245,.18) !important}
+
+/* surfaces */
+.card,.mys-card,.stat-card,.panel,.box,.glass,.section-card,.tool-card,.log-card,.prod-card,.modal-content,.settings-card,.wallet-card,
+.modal,.dsh-card,.dsh-section,.bst-card,.pc-card,.review-item,.detail-box,.api-key-box,.mys-gate-box,.wal-card,.wal-row{
+  background:#fff !important;color:#0b1b3a !important;border-color:#dbe6f6 !important;box-shadow:0 6px 22px rgba(11,60,140,.08) !important}
+.dsh-shell,.app-shell,.main,main,.page,.container{background:transparent !important}
+input,select,textarea,.bst-input{background:#fff !important;color:#0b1b3a !important;border-color:#c5d6ee !important}
+input::placeholder,textarea::placeholder{color:#8a9bb8 !important}
+input:focus,select:focus,textarea:focus{border-color:#0b7cf5 !important;box-shadow:0 0 0 3px rgba(11,124,245,.15) !important;outline:none}
+table,th,td{border-color:#e3edfb !important}
+th{background:#f4f8ff !important;color:#0b1b3a !important}
+td{color:#0b1b3a}
+h1,h2,h3,h4,h5,label,p,li,span,small,b,strong{border-color:#dbe6f6}
+a{color:#0562d6}
+
+/* buttons: logo gradient */
+.btn-primary,.btn-gold,.btn-nav-reg,.hero-cta,.buy-btn,.prod-select-btn,button.primary,.btn-blue{
+  background:linear-gradient(115deg,#0562d6,#0b7cf5 55%,#18a0fb) !important;color:#fff !important;border:1px solid #0b7cf5 !important;
+  box-shadow:0 8px 22px rgba(11,124,245,.28) !important}
+.btn-nav-login,.btn-secondary,.btn-outline,.btn-ghost{background:#fff !important;color:#0562d6 !important;border:1px solid #bcd3f3 !important}
+.nav-balance-btn,.ph-chip{background:#eaf3ff !important;color:#0562d6 !important;border-color:#cfe2fb !important}
+.dsh-balance-card,.dsh-promo,.wal-hero{color:#fff !important;background:linear-gradient(135deg,#0562d6 0%,#0b7cf5 50%,#18c8ff 100%) !important}
+.dsh-balance-card *,.dsh-promo *,.wal-hero *{color:#fff}
+.dsh-balance-card .dsh-add-btn,.dsh-balance-card button{color:#0562d6 !important;background:#fff !important}
+
+/* hero / landing text that was white over artwork */
+.hero-p,.welcome-hero p{text-shadow:none !important;color:#4a5d7e !important}
+.hero,.welcome-hero,.hero h1,.welcome-hero h1{color:#0b1b3a !important}
+
+/* bottom nav pill */
+.bottom-tabbar,.dsh-bottom-nav{background:rgba(255,255,255,.96) !important;border:1px solid #dbe6f6 !important;box-shadow:0 10px 30px rgba(11,60,140,.16) !important}
+
+/* chips / pills */
+.mkt-chip{background:#fff !important;color:#4a5d7e !important;border-color:#c5d6ee !important}
+.mkt-chip.active{background:#0b7cf5 !important;border-color:#0b7cf5 !important;color:#fff !important}
+.online-pill,.dsh-stat-dot,.pdot{color:#0b7cf5 !important}
+
+/* overlays keep readable */
+.mys-gate{background:rgba(11,27,58,.45) !important}
+::selection{background:#bfe0ff}
+
+/* no glow/shadow on headings (was for dark artwork) */
+h1,h2,h3,h4,.sec-title,p,.hero-p,.sub,.desc{text-shadow:none !important}
+/* admin passcode + generic dark inputs */
+#passInput,.fg input{background:#fff !important;color:#0b1b3a !important;border:1px solid #c5d6ee !important}
+/* "Back" pills etc keep readable on white */
+.wrap>a:first-child{color:#0562d6 !important;background:#eaf3ff !important}
+
+/* selector bottom-sheet + triggers (white/blue) */
+.ks-sheet-trigger{background:#fff !important;color:#0b1b3a !important;border:1px solid #c5d6ee !important;box-shadow:0 2px 10px rgba(11,60,140,.06) !important}
+.ks-sheet-subtitle{color:#5a6c8c !important}
+.ks-sheet{background:#fff !important;color:#0b1b3a !important;border-color:#dbe6f6 !important}
+.ks-sheet-overlay{background:rgba(11,27,58,.45) !important}
+.ks-sheet *{border-color:#e3edfb !important}
+.ks-sheet-grab{background:#c5d6ee !important}
+.ks-sheet input{background:#f4f8ff !important}
+.ks-sheet button,.ks-sheet [class*="option"],.ks-sheet [class*="item"]{color:#0b1b3a !important}
+.ks-sheet [class*="option"],.ks-sheet [class*="item"]{background:#fff !important}
+.ks-sheet [class*="option"]:hover,.ks-sheet [class*="item"]:hover,.ks-sheet [aria-selected="true"]{background:#eaf3ff !important}
+
+/* loader: Mizzy mark with blue spinner on white */
+#kb-loader{background:#fff !important}
+#kb-loader .kb-logo{width:76px !important;height:76px !important;box-shadow:0 6px 24px rgba(11,124,245,.25) !important}
+#kb-loader .kb-logo::after{border-color:rgba(11,124,245,.15) !important;border-top-color:#0b7cf5 !important}
+
+/* remaining dark controls → white/blue */
+input,textarea,select,.nh-input,.as-search,.bst-input-search{background:#fff !important;color:#0b1b3a !important;border-color:#c5d6ee !important}
+input[type="file"]{background:#f4f8ff !important}
+.dsh-nav-item,.bt-item,.hm-tab{background:#fff !important;color:#5a6c8c !important;border-color:#dbe6f6 !important}
+.dsh-nav-item.active,.dsh-nav-item.on,.bt-item.active,.bt-item.on,.hm-tab.active,.hm-tab.on,.hm-tab[aria-selected="true"]{background:#0b7cf5 !important;color:#fff !important}
+
+/* contrast fixes for text that used to sit on dark */
+.wrap li,.wrap b,.wrap i,.wrap .notice,.wrap .msg,.how-sum+*{color:#0b1b3a}
+.msg.err,p.msg.err,.err{color:#d92d3f !important}
+.tb-link,.tb-back,.tb-title,summary.how-sum,a.back,.back{color:#0562d6 !important}
+.badge{color:#0562d6 !important}
+.txn-seg-opt{color:#4a5d7e !important}
+.txn-seg-opt.active,.txn-seg-opt.on{color:#fff !important}
+.lock-role-tab.active{color:#fff !important}
+.txt-muted,.muted,.sub,small{color:#5a6c8c}
+html body button.txn-seg-opt{color:#4a5d7e !important}
+html body button.txn-seg-opt.active{color:#fff !important}
+html body a.tb-link,html body button.tb-back{color:#0562d6 !important}
+a[aria-current="page"]{color:#fff !important}

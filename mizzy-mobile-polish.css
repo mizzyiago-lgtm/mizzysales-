@@ -1,0 +1,40 @@
+/* Mizzy Sales: shared responsive polish across ALL pages and controls. */
+:root{--kb-cyan:#18a0fb;--kb-blue:#0b7cf5;--kb-pink:#18a0fb;--kb-radius:24px;--kb-edge:rgba(24,160,251,.18);--kb-surface:rgba(19,19,32,.94);--kb-control:rgba(14,14,24,.92)}
+*,*::before,*::after{box-sizing:border-box}
+html{width:100%;max-width:100%;min-height:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%;background:#ffffff;scroll-padding-bottom:100px}
+body{width:100%;max-width:100%;min-width:0;overflow-x:clip;color:#0b1b3a;background:transparent!important;margin:0;overscroll-behavior-x:none}
+/* Keep every common content surface consistent, not only Marketplace cards. */
+.card,.mys-card,.stat-card,.panel,.box,.glass,.section-card,.tool-card,.log-card,.prod-card,.modal-content,.settings-card,.wallet-card,.filter-panel,.market-filter,.marketplace-filter,.purchase-card,.order-card,.form-card,.content-card,.feature-card,.service-card,.history-card,.transaction-card,.profile-card,.chat-card,.support-card,.admin-card,.table-container,.settings-panel,.wallet-panel,.dashboard-panel{min-width:0;max-width:100%;border-radius:var(--kb-radius)!important;border:1px solid var(--kb-edge)!important;background:linear-gradient(145deg,#ffffff,#ffffff)!important;box-shadow:0 12px 32px rgba(0,0,0,.17),inset 0 1px rgba(255,255,255,.025)}
+/* Consistent polished form fields throughout the application. */
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea,.form-control,.search-input,.search-box,.filter-input,.form-select{width:auto;max-width:100%;min-width:0;min-height:46px;border-radius:16px!important;background:var(--kb-control)!important;border:1px solid rgba(24,160,251,.20)!important;color:#f2f7ff!important;padding:12px 15px}
+input::placeholder,textarea::placeholder{color:#5a6c8c!important;opacity:1}
+input:focus,select:focus,textarea:focus,.form-control:focus{outline:2px solid rgba(24,160,251,.22);outline-offset:1px;border-color:rgba(24,160,251,.72)!important}
+button,.btn,.tab,.chip,.category-pill,a.button,.filter-button{max-width:100%;border-radius:16px;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.btn-primary,.btn-gold,.btn-nav-reg,.hero-cta,.buy-btn,.prod-select-btn,button.primary,.sfab-toggle,.dsh-support-toggle,.btn-success{background:linear-gradient(120deg,#0b7cf5,#18a0fb)!important;border:1px solid rgba(103,169,238,.42)!important;box-shadow:0 8px 24px rgba(11,124,245,.20)!important}
+button:active,.btn:active{transform:scale(.985)}
+.navbar,.topbar,.app-header,.sidebar,.bottom-tabbar,.app-bottom-nav,.mobile-bottom-nav{backdrop-filter:blur(18px) saturate(1.2);background:#ffffff!important;border-color:rgba(24,160,251,.15)!important}
+.bottom-tabbar,.app-bottom-nav,.mobile-bottom-nav{border-radius:34px!important;border:1px solid rgba(24,160,251,.18)!important;box-shadow:0 12px 36px rgba(0,0,0,.28)!important}
+.sfab-toggle,.dsh-support-toggle{width:60px!important;height:60px!important;min-width:60px!important;min-height:60px!important;border-radius:50%!important;display:grid;place-items:center;padding:0!important;box-shadow:0 10px 28px rgba(11,124,245,.32)!important;z-index:1000}
+.sfab-toggle svg,.dsh-support-toggle svg{width:25px!important;height:25px!important}
+.sfab-menu,.sfab-panel,.dsh-support-fab,.support-fab-panel{max-width:calc(100vw - 24px);border-radius:22px!important;background:#ffffff!important;border:1px solid rgba(24,160,251,.22)!important;box-shadow:0 18px 48px rgba(0,0,0,.38)!important;backdrop-filter:blur(18px)}
+.page-hero{border-radius:0 0 30px 30px!important}.page-hero h1,h1,h2,h3{letter-spacing:-.025em;overflow-wrap:anywhere}
+img,video,canvas,svg{max-width:100%;height:auto}iframe{max-width:100%}pre,code{overflow-wrap:anywhere;white-space:pre-wrap}table{max-width:100%}.table-wrap,.table-responsive{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* Avoid fixed desktop-width layouts leaking beyond phones. */
+.container,.container-fluid,main,#app,#root,.page,.page-content,.content,.main-content,.dashboard-content,.app-content{min-width:0;max-width:100%}
+@media(max-width:700px){
+ html,body{width:100%;max-width:100%;overflow-x:clip}
+ body{font-size:15px}
+ main,#app,#root,.page,.page-content,.content,.main-content,.dashboard-content,.app-content{width:100%;max-width:100%;min-width:0}
+ .container{width:100%;max-width:100%;padding-left:14px;padding-right:14px}
+ .container-fluid{padding-left:12px;padding-right:12px}
+ .card,.mys-card,.stat-card,.panel,.box,.glass,.section-card,.tool-card,.log-card,.prod-card,.settings-card,.wallet-card,.filter-panel,.market-filter,.marketplace-filter,.form-card,.content-card,.feature-card,.service-card,.history-card,.transaction-card,.profile-card,.chat-card,.support-card,.admin-card{border-radius:22px!important}
+ .grid,.cards,.card-grid,.products-grid,.services-grid,.stats-grid{grid-template-columns:minmax(0,1fr)!important}
+ .row{margin-left:0;margin-right:0;max-width:100%}
+ [class*=col-]{min-width:0;max-width:100%}
+ input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea,.form-control,.search-input,.search-box,.filter-input,.form-select{min-width:0;font-size:16px;max-width:100%}
+ .bottom-tabbar,.app-bottom-nav,.mobile-bottom-nav{left:4%!important;right:4%!important;width:92%!important;max-width:92%!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important}
+ .sfab-toggle,.dsh-support-toggle{width:58px!important;height:58px!important;min-width:58px!important;min-height:58px!important}
+ body{padding-bottom:env(safe-area-inset-bottom,0px)}
+}
+@media(max-width:380px){.container{padding-left:10px;padding-right:10px}.card,.panel,.box,.section-card,.tool-card{padding-left:12px;padding-right:12px}.bottom-tabbar,.app-bottom-nav,.mobile-bottom-nav{left:3%!important;right:3%!important;width:94%!important;max-width:94%!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
