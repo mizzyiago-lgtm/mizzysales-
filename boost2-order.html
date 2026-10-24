@@ -1,0 +1,86 @@
+<!doctype html><html lang="en"><head>
+<link rel="icon" type="image/png" href="/favicon.png"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Place order | Mizzy Sales</title>
+<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/brand.css">
+<script src="/js/mizzy-ui.js?v=1"></script>
+<script>(function(){try{if(!localStorage.getItem('ksl_token')&&!localStorage.getItem('token'))location.replace('/login')}catch(e){}})();</script>
+<style>
+body{background:#ffffff;color:#0b1b3a;padding:18px}.wrap{max-width:900px;margin:20px auto}.muted{color:#5a6c8c}.back{color:#9fb4c8;text-decoration:none;font-weight:700}
+.panel{background:#ffffff;border:1px solid #dbe6f6;border-radius:16px;padding:16px;margin:14px 0}
+input{width:100%;padding:13px;border-radius:10px;background:#ffffff;color:#0b1b3a;border:1px solid #dbe6f6;margin:6px 0;box-sizing:border-box;font-size:16px}
+label{display:block;margin-top:10px;color:#5a6c8c;font-size:14px}
+.btn{border:0;border-radius:10px;background:#68a9d5;color:#ffffff;font-weight:800;padding:13px 16px;cursor:pointer;width:100%;font-size:16px;margin-top:12px}.btn:disabled{opacity:.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:#ffffff;border:1px solid #dbe6f6;border-radius:14px;padding:16px 10px;cursor:pointer;color:inherit;text-decoration:none;font-weight:800}
+.tile:hover{border-color:#68a9d5}.tile small{color:#5a6c8c;font-weight:600}
+.big{width:52px;height:52px;border-radius:14px;object-fit:contain;background:#fff;padding:5px}.ph{width:52px;height:52px;border-radius:14px;background:#dbe6f6;display:grid;place-items:center;font-size:24px;font-weight:900;color:#9fb4c8}
+.svc{display:flex;gap:12px;align-items:center;background:#ffffff;border:1px solid #dbe6f6;border-radius:14px;padding:12px;margin:8px 0;cursor:pointer;color:inherit;text-decoration:none}
+.svc:hover{border-color:#68a9d5}.svc .big,.svc .ph{width:42px;height:42px;flex:0 0 42px;font-size:19px;border-radius:11px;padding:4px}
+.svc b{display:block;line-height:1.3}.svc .m{font-size:12px;color:#5a6c8c}.svc .p{margin-left:auto;text-align:right;color:#7db8e0;font-weight:800;white-space:nowrap}
+.price{color:#7db8e0;font-weight:800;font-size:20px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ord{padding:10px 0;border-top:1px solid #dbe6f6;font-size:14px}.ord:first-child{border-top:0}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+</style>
+<link rel="stylesheet" href="/css/page-transitions.css?v=1"><link rel="stylesheet" href="/css/responsive-device-fit.css?v=1">
+<link rel="stylesheet" href="/css/mys-header-clean.css?v=20261022b">
+<script src="/js/mys-menu-guard.js?v=20261022b" defer></script>
+<link rel="stylesheet" href="/css/mys-ui-fixes.css?v=20261022c">
+<link rel="stylesheet" href="/css/mizzy-theme.css?v=1"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#ffffff"/>
+</head><body>
+<main class="wrap"><a class="back" href="/boost2" id="backLink">← Back to services</a>
+<div class="panel" id="card"><div class="muted">Loading…</div></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>'₦'+Number(n||0).toLocaleString('en-NG',{maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(url,opt={}){const t=localStorage.getItem('ksl_token')||localStorage.getItem('token')||'';const r=await fetch(url,{...opt,headers:{'Content-Type':'application/json',...(t?{Authorization:'Bearer '+t}:{}),...(opt.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||d.message||'Request failed');e.status=r.status;e.data=d;throw e}return d}
+function logoOf(s){return s.logo||(window.MizzyUI&&MizzyUI.logoFor(s.name||'',s.category||''))||''}
+function logoHtml(url,text,cls){return url?'<img class="'+(cls||'big')+'" src="'+esc(url)+'" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=ph>'+esc((text||'?').trim().charAt(0).toUpperCase())+'</div>\'">':'<div class="ph">'+esc((text||'?').trim().charAt(0).toUpperCase())+'</div>'}
+
+let s=null,busy=false;
+const id=Number(new URLSearchParams(location.search).get('id'));
+const unit=()=>Number(s.rateUnit)>0?Number(s.rateUnit):1000;
+function total(){const q=Number($('qty').value);return Number.isFinite(q)&&q>0?Math.round(s.price*q/unit()*100)/100:0}
+function check(){
+  const q=Number($('qty').value),link=$('link').value.trim();
+  const okQ=Number.isInteger(q)&&q>=s.min&&q<=s.max,okL=/^https?:\/\/\S+\.\S+/i.test(link);
+  $('total').textContent=money(total());
+  $('qerr').textContent=$('qty').value&&!okQ?'Quantity must be between '+s.min.toLocaleString()+' and '+s.max.toLocaleString()+'.':'';
+  $('go').disabled=busy||!(okQ&&okL);
+}
+function draw(){
+  $('card').innerHTML='<div style="display:flex;gap:12px;align-items:center">'+logoHtml(logoOf(s),s.name,'big')+'<div><h2 style="margin:0;font-size:18px">'+esc(s.name)+'</h2><span class="muted">'+esc(s.category||'')+'</span></div></div>'
+   +'<p class="muted" style="margin:12px 0 0">'+money(s.price*1000/unit())+' per 1,000 · Min '+s.min.toLocaleString()+' · Max '+s.max.toLocaleString()+'</p>'
+   +'<label for="link">Link</label><input id="link" type="url" inputmode="url" placeholder="https://…" autocomplete="off">'
+   +'<div class="row"><div><label for="qty">Quantity</label><input id="qty" type="number" min="'+s.min+'" max="'+s.max+'" value="'+s.min+'"><small id="qerr" style="color:#f87171"></small></div>'
+   +'<div><label>Total to pay</label><div class="price" id="total" style="padding:10px 0">'+money(0)+'</div></div></div>'
+   +'<button class="btn" id="go" disabled>Place order</button>';
+  $('link').addEventListener('input',check);$('qty').addEventListener('input',check);check();
+  $('go').onclick=async()=>{
+    if(busy)return;const q=Number($('qty').value),t=total();
+    const ok=await MizzyUI.confirm('Order '+q.toLocaleString()+' × '+s.name+'\nTotal: '+money(t)+'\nThis amount will be taken from your wallet.',{title:'Confirm your order',okText:'Pay '+money(t)});
+    if(!ok)return;busy=true;check();MizzyUI.loading(true,'Placing your order…');
+    try{
+      const d=await api('/api/boost2/orders',{method:'POST',body:JSON.stringify({serviceKey:s.serviceKey,quantity:q,link:$('link').value.trim()})});
+      MizzyUI.flash(d.pending?(d.message||'Your order is being verified.'):'Order placed successfully. Paid '+money(d.amountPaid||t)+'.',d.pending?'info':'success');
+      location.href='/boost2';
+    }catch(e){busy=false;MizzyUI.loading(false);MizzyUI.banner(e.message||'Order failed.','err');check()}
+  };
+}
+(async()=>{
+  try{await (window.MizzyUI&&MizzyUI.logos());try{s=JSON.parse(sessionStorage.getItem('b2svc')||'null')}catch(e){s=null}
+    if(!s||!s.serviceKey){location.replace('/boost2');return}
+    if(!s){$('card').innerHTML='<div class="muted">This service is no longer available.</div>';return}
+    s.price=Number(s.price)||0;draw()}
+  catch(e){$('card').innerHTML='<div class="muted">'+esc(e.message||'Could not load this service.')+'</div>'}
+})();
+</script>
+<script src="/js/app-shell.js?v=3" defer></script><script src="/js/section-tabs.js?v=1" defer></script>
+<script src="/js/page-transitions.js?v=1" defer></script><script src="/js/loader-failsafe.js?v=1" defer></script>
+</body></html>

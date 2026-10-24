@@ -1,0 +1,105 @@
+<!doctype html><html lang="en"><head>
+<link rel="icon" type="image/png" href="/favicon.png"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Boost 2 | Mizzy Sales</title>
+<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/brand.css">
+<script src="/js/mizzy-ui.js?v=1"></script>
+<script src="/js/boost-loader.js?v=1"></script>
+<script>(function(){try{if(!localStorage.getItem('ksl_token')&&!localStorage.getItem('token'))location.replace('/login')}catch(e){}})();</script>
+<style>
+body{background:#ffffff;color:#0b1b3a;padding:18px}.wrap{max-width:900px;margin:20px auto}.muted{color:#5a6c8c}.back{color:#9fb4c8;text-decoration:none;font-weight:700}
+.panel{background:#ffffff;border:1px solid #dbe6f6;border-radius:16px;padding:16px;margin:14px 0}
+input{width:100%;padding:13px;border-radius:10px;background:#ffffff;color:#0b1b3a;border:1px solid #dbe6f6;margin:6px 0;box-sizing:border-box;font-size:16px}
+label{display:block;margin-top:10px;color:#5a6c8c;font-size:14px}
+.btn{border:0;border-radius:10px;background:#68a9d5;color:#ffffff;font-weight:800;padding:13px 16px;cursor:pointer;width:100%;font-size:16px;margin-top:12px}.btn:disabled{opacity:.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:#ffffff;border:1px solid #dbe6f6;border-radius:14px;padding:16px 10px;cursor:pointer;color:inherit;text-decoration:none;font-weight:800}
+.tile:hover{border-color:#68a9d5}.tile small{color:#5a6c8c;font-weight:600}
+.ico{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:var(--c,#dbe6f6)}.ico img{width:28px;height:28px}
+.big{width:52px;height:52px;border-radius:14px;object-fit:contain;background:#fff;padding:5px}.ph{width:52px;height:52px;border-radius:14px;background:#dbe6f6;display:grid;place-items:center;font-size:24px;font-weight:900;color:#9fb4c8}
+.svc{display:flex;gap:12px;align-items:center;background:#ffffff;border:1px solid #dbe6f6;border-radius:14px;padding:12px;margin:8px 0;cursor:pointer;color:inherit;text-decoration:none}
+.svc:hover{border-color:#68a9d5}.svc .big,.svc .ph{width:42px;height:42px;flex:0 0 42px;font-size:19px;border-radius:11px;padding:4px}
+.svc b{display:block;line-height:1.3}.svc .m{font-size:12px;color:#5a6c8c}.svc .p{margin-left:auto;text-align:right;color:#7db8e0;font-weight:800;white-space:nowrap}
+.price{color:#7db8e0;font-weight:800;font-size:20px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ord{padding:10px 0;border-top:1px solid #dbe6f6;font-size:14px}.ord:first-child{border-top:0}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+</style>
+<link rel="stylesheet" href="/css/page-transitions.css?v=1"><link rel="stylesheet" href="/css/responsive-device-fit.css?v=1">
+<link rel="stylesheet" href="/css/mys-header-clean.css?v=20261022b">
+<script src="/js/mys-menu-guard.js?v=20261022b" defer></script>
+<link rel="stylesheet" href="/css/mys-ui-fixes.css?v=20261022c">
+<link rel="stylesheet" href="/css/mizzy-theme.css?v=1"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#ffffff"/>
+</head><body>
+<main class="wrap"><a class="back" href="/boost" id="backLink">← Back</a>
+<h1 id="ttl">Boost 2</h1><p class="muted" id="sub">Choose a category.</p>
+<input id="search" placeholder="Search…" autocomplete="off">
+<div id="view" class="panel muted" style="display:none"></div>
+<div class="panel" id="ordersBox" style="display:none"><h3 style="margin:0 0 6px">Recent orders</h3><div id="orders"></div></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>'₦'+Number(n||0).toLocaleString('en-NG',{maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(url,opt={}){const t=localStorage.getItem('ksl_token')||localStorage.getItem('token')||'';const r=await fetch(url,{...opt,headers:{'Content-Type':'application/json',...(t?{Authorization:'Bearer '+t}:{}),...(opt.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||d.message||'Request failed');e.status=r.status;e.data=d;throw e}return d}
+function logoOf(s){return s.logo||(window.MizzyUI&&MizzyUI.logoFor(s.name||'',s.category||''))||''}
+function logoHtml(url,text,cls){return url?'<img class="'+(cls||'big')+'" src="'+esc(url)+'" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=ph>'+esc((text||'?').trim().charAt(0).toUpperCase())+'</div>\'">':'<div class="ph">'+esc((text||'?').trim().charAt(0).toUpperCase())+'</div>'}
+
+let all=[],loaded=false;
+const PLATS=[['Instagram','instagram','#E4405F'],['TikTok','tiktok','#000000'],['YouTube','youtube','#FF0000'],['Facebook','facebook','#1877F2'],['Telegram','telegram','#26A5E4'],['Twitter','x','#000000'],['WhatsApp','whatsapp','#25d366'],['Snapchat','snapchat','#FFFC00'],['Spotify','spotify','#1569c1'],['Threads','threads','#000000'],['LinkedIn','linkedin','#0A66C2'],['Twitch','twitch','#9146FF'],['Discord','discord','#5865F2'],['Pinterest','pinterest','#BD081C'],['SoundCloud','soundcloud','#FF5500']];
+function matchPlat(s,n){const t=(String(s.platform||'')+' '+String(s.category||'')+' '+String(s.name||'')).toLowerCase(),k=n.toLowerCase();
+  if(k==='twitter')return /twitter|\bx\b|tweet/.test(t);
+  if(k==='other')return !PLATS.some(p=>matchPlat(s,p[0]));
+  return t.indexOf(k)!==-1}
+function platIcon(p){return p[1]?'<span class="ico" style="--c:'+p[2]+'"><img src="https://cdn.simpleicons.org/'+p[1]+'/ffffff" alt="" loading="lazy" onerror="this.remove()"></span>':'<span class="ico">✨</span>'}
+const TYPES=['Followers','Likes','Views','Comments','Subscribers','Members','Shares','Reactions','Live','Story','Saves','Plays','Votes','Reels'];
+function typeOf(s){const t=(String(s.category||'')+' '+String(s.name||'')).toLowerCase();for(const k of TYPES)if(t.indexOf(k.toLowerCase().replace(/s$/,''))!==-1)return k;return 'Other'}
+const per1000=s=>s.price*1000/(Number(s.rateUnit)>0?Number(s.rateUnit):1000);
+function route(){const h=decodeURIComponent((location.hash||'').replace(/^#/,''));const o={p:'',t:''};h.split('&').forEach(x=>{if(x.startsWith('p='))o.p=x.slice(2);else if(x.startsWith('t='))o.t=x.slice(2)});return o}
+const hashFor=(p,t)=>'#'+(p?'p='+encodeURIComponent(p):'')+(t?'&t='+encodeURIComponent(t):'');
+function render(){
+  const q=$('search').value.trim().toLowerCase(),r=route(),v=$('view');
+  if(!loaded)return;
+  v.style.display='';
+  if(!all.length){v.className='panel muted';v.textContent='No services are available right now. Please check back soon.';return}
+  v.className='';
+  if(!r.p){ /* step 1 — platform */
+    $('ttl').textContent='Boost 2';$('sub').textContent='Step 1 — Choose a category.';$('backLink').href='/boost';
+    const list=PLATS.concat([['Other','','#64748b']]).map(p=>({p,n:all.filter(s=>matchPlat(s,p[0])).length})).filter(x=>x.n>0&&(!q||x.p[0].toLowerCase().includes(q)));
+    v.innerHTML=list.length?'<div class="grid">'+list.map(x=>'<a class="tile" href="'+hashFor(x.p[0])+'">'+platIcon(x.p)+'<span>'+esc(x.p[0])+'</span><small>'+x.n.toLocaleString()+' service'+(x.n>1?'s':'')+'</small></a>').join('')+'</div>':'<div class="panel muted">No categories match your search.</div>';
+  }else if(!r.t){ /* step 2 — type (followers, views, likes…) */
+    const pool=all.filter(s=>matchPlat(s,r.p));
+    $('ttl').textContent=r.p;$('sub').textContent='Step 2 — What do you need?';$('backLink').href='#';
+    const counts={};pool.forEach(s=>{const t=typeOf(s);counts[t]=(counts[t]||0)+1});
+    let keys=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).filter(k=>!q||k.toLowerCase().includes(q));
+    const tiles=(!q||'all services'.includes(q)?['*']:[]).concat(keys);
+    v.innerHTML=tiles.length?'<div class="grid">'+tiles.map(k=>k==='*'?'<a class="tile" href="'+hashFor(r.p,'*')+'"><span class="ico">✨</span><span>All services</span><small>'+pool.length.toLocaleString()+' services</small></a>':'<a class="tile" href="'+hashFor(r.p,k)+'"><span class="ico">'+esc(k.charAt(0))+'</span><span>'+esc(k)+'</span><small>'+counts[k].toLocaleString()+' service'+(counts[k]>1?'s':'')+'</small></a>').join('')+'</div>':'<div class="panel muted">Nothing matches your search.</div>';
+  }else{ /* step 3 — services */
+    $('ttl').textContent=r.p+(r.t==='*'?'':' · '+r.t);$('sub').textContent='Step 3 — Choose a service.';$('backLink').href='#';
+    const rows=all.filter(s=>matchPlat(s,r.p)&&(r.t==='*'||typeOf(s)===r.t)&&(!q||(s.name||'').toLowerCase().includes(q))).sort((a,b)=>per1000(a)-per1000(b));
+    v.innerHTML=rows.length?rows.map(s=>'<a class="svc" href="/boost2/order" data-k="'+esc(s.serviceKey)+'" onclick="pickSvc(this)">'+logoHtml(logoOf(s),s.name,'big')+'<div><b>'+esc(s.name)+'</b><span class="m">Min '+Number(s.min||0).toLocaleString()+' · Max '+Number(s.max||0).toLocaleString()+'</span></div><div class="p">'+money(per1000(s))+'<div class="m">per 1,000</div></div></a>').join(''):'<div class="panel muted">No services here yet — go back and try another type.</div>';
+  }
+}
+/* full-screen dots stay up until the new screen is really on the page */
+function renderWithLoader(){
+  try{MysBoostLoader.show()}catch(e){}
+  setTimeout(()=>{try{render()}finally{requestAnimationFrame(()=>requestAnimationFrame(()=>{try{MysBoostLoader.hide()}catch(e){}}))}},220);
+}
+$('backLink').addEventListener('click',e=>{const r=route();if(r.t){e.preventDefault();location.hash=hashFor(r.p)}else if(r.p){e.preventDefault();location.hash=''}});
+$('search').addEventListener('input',render);
+window.addEventListener('hashchange',()=>{$('search').value='';window.scrollTo(0,0);renderWithLoader()});
+async function load(){
+  try{await (window.MizzyUI&&MizzyUI.logos());const d=await api('/api/boost2/services');all=(d.services||[]).map(s=>({...s,price:Number(s.price)||0}));window.__b2rows=all;loaded=true;render();if(d.enabled===false){$('view').style.display='';$('view').className='panel muted';$('view').textContent=d.message||'Not available yet.'}}
+  catch(e){loaded=true;$('view').style.display='';$('view').className='panel muted';$('view').textContent=e.message||'Could not load services.';try{MizzyUI.banner(e.message||'Could not load services.','err')}catch(_){}}
+  finally{requestAnimationFrame(()=>requestAnimationFrame(()=>{try{MysBoostLoader.hide()}catch(e){}}))}
+}
+function pickSvc(a){try{const k=a.getAttribute('data-k');const r=(window.__b2rows||[]).find(x=>x.serviceKey===k);if(r)sessionStorage.setItem('b2svc',JSON.stringify(r));}catch(e){}}
+async function loadOrders(){try{const rows=await api('/api/boost2/orders');if(!rows.length)return;$('ordersBox').style.display='block';$('orders').innerHTML=rows.map(o=>'<div class="ord"><b>'+esc(o.service)+'</b><br><span class="muted">'+Number(o.quantity).toLocaleString()+' · '+money(o.total)+' · '+esc(o.status)+' · '+new Date(o.createdAt).toLocaleString()+'</span></div>').join('')}catch(e){}}
+load();loadOrders();
+</script>
+<script src="/js/app-shell.js?v=3" defer></script><script src="/js/section-tabs.js?v=1" defer></script>
+<script src="/js/page-transitions.js?v=1" defer></script><script src="/js/loader-failsafe.js?v=1" defer></script>
+</body></html>
