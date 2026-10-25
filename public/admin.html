@@ -61,6 +61,12 @@ label{display:block;margin-bottom:5px;font-size:12px;color:var(--t2);font-weight
 @media(max-width:480px){.tb-name{font-size:13px}.tb-badge{margin-left:0;font-size:10px;padding:3px 8px}}
 .btn-sm{background:var(--bg4);border:1px solid var(--border2);color:var(--t2);padding:7px 14px;border-radius:var(--r8);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
 .btn-sm:hover{border-color:var(--red);color:var(--red)}
+.m4chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;-webkit-overflow-scrolling:touch}
+.m4chip{flex:0 0 auto;background:var(--bg4);border:1px solid var(--border2);color:var(--t1);padding:8px 14px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.m4chip span{color:var(--t3);margin-left:4px}
+.m4chip.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.m4chip.on span{color:#fff}
+.m4-bulk{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r12);padding:14px;margin-bottom:14px}
 /* LAYOUT */
 .layout{display:flex;min-height:calc(100vh - 58px)}
 /* SIDEBAR */
@@ -609,7 +615,7 @@ tr:hover td{background:rgba(255,255,255,.035)}
         </div>
         <div class="form-row">
           <div class="fg"><label>Marketplace 2 default markup (₦ added to provider cost)</label><input type="number" id="m2Markup" min="0" step="1" placeholder="300"/></div>
-          <div class="fg" style="flex:2"><label>&nbsp;</label><div class="info-box" style="margin:0">Applies to every product that has no custom price. Leave blank for the built-in default (₦300). Click Save below.</div></div>
+          <div class="fg" style="flex:2"><label>&nbsp;</label><div class="info-box" style="margin:0">Used for products with no custom price and no category rule. Leave blank for the built-in ₦300. For % markup or one price per category, use "Set prices for a whole category" in the products section below. Click Save below.</div></div>
         </div>
         <div class="form-row">
           <div class="fg"><label>Email me when supplier balance is below (₦)</label><input type="number" id="m2Low" min="0"/></div>
@@ -653,7 +659,7 @@ tr:hover td{background:rgba(255,255,255,.035)}
         </div>
         <div class="form-row">
           <div class="fg"><label>Marketplace 3 default markup (₦ added to provider cost)</label><input type="number" id="m3Markup" min="0" step="1" placeholder="300"/></div>
-          <div class="fg" style="flex:2"><label>&nbsp;</label><div class="info-box" style="margin:0">Applies to every product that has no custom price. Leave blank for the built-in default (₦300). Click Save below.</div></div>
+          <div class="fg" style="flex:2"><label>&nbsp;</label><div class="info-box" style="margin:0">Used for products with no custom price and no category rule. Leave blank for the built-in ₦300. For % markup or one price per category, use "Set prices for a whole category" in the products section below. Click Save below.</div></div>
         </div>
         <div class="form-row">
           <div class="fg"><label>Email me when supplier balance is below (₦)</label><input type="number" id="m3Low" min="0"/></div>
@@ -704,8 +710,8 @@ tr:hover td{background:rgba(255,255,255,.035)}
           <div class="fg" style="flex:2"><label>Maintenance message</label><input type="text" id="m4Msg"/></div>
         </div>
         <div class="form-row">
-          <div class="fg"><label>Marketplace 4 default markup (₦ added to provider cost)</label><input type="number" id="m4Markup" min="0" step="1" placeholder="300"/></div>
-          <div class="fg" style="flex:2"><label>&nbsp;</label><div class="info-box" style="margin:0">Applies to every product that has no custom price. Leave blank for the built-in default (₦300). Click Save below.</div></div>
+          <div class="fg"><label>Default markup ₦ (used when a category has no rule)</label><input type="number" id="m4Markup" min="0" step="1" placeholder="300"/></div>
+          <div class="fg" style="flex:2"><label>&nbsp;</label><div class="info-box" style="margin:0">Used for products with no custom price and no category rule. Leave blank for the built-in ₦300. For % markup or one price per category, use "Set prices for a whole category" in the products section below. Click Save below.</div></div>
         </div>
         <div class="form-row">
           <div class="fg"><label>Email me when supplier balance is below (₦)</label><input type="number" id="m4Low" min="0"/></div>
@@ -724,9 +730,23 @@ tr:hover td{background:rgba(255,255,255,.035)}
         <div class="info-box"><svg class="icon i-pin" aria-hidden="true"><use href="#i-pin"/></svg>
           Every product from the API shows here, including new ones. Synced products appear automatically using the default markup until you set a custom price. Disable a product to hide it.
           "API cost" is what the provider charges you; profit = your price − API cost.</div>
+        <div class="m4-bulk">
+          <div class="sec-title" style="font-size:13px;margin-bottom:8px">Set prices for a whole category</div>
+          <div class="form-row">
+            <div class="fg"><label>Category</label><select id="m4BulkGroup"></select></div>
+            <div class="fg"><label>How to price</label><select id="m4BulkMode" onchange="m4BulkHint()"><option value="percent">Add markup %</option><option value="fixed">Add markup ₦</option><option value="price">Set one price ₦</option></select></div>
+            <div class="fg"><label>Amount</label><input type="number" id="m4BulkVal" min="0" step="any" placeholder="e.g. 20" oninput="m4BulkHint()"/></div>
+          </div>
+          <div class="form-row">
+            <div class="fg"><button class="btn-gold" type="button" onclick="m4BulkApply()" style="width:100%">Apply to category</button></div>
+            <div class="fg"><button class="btn-sm" type="button" onclick="m4BulkReset()" style="width:100%;padding:11px">Reset to default</button></div>
+          </div>
+          <div class="info-box" id="m4BulkInfo" style="margin:0 0 12px"></div>
+        </div>
+        <div id="m4Chips" class="m4chips"></div>
         <div class="form-row">
-          <div class="fg"><input type="text" id="m4Search" placeholder="Search products…" oninput="m4Render()"/></div>
-          <div class="fg"><select id="m4Filter" onchange="m4Render()"><option value="">All products</option><option value="priced">Live (priced)</option><option value="unpriced">Not priced yet</option><option value="instock">In stock</option></select></div>
+          <div class="fg"><input type="text" id="m4Search" placeholder="Search products…" oninput="m4Debounce()"/></div>
+          <div class="fg"><select id="m4Filter" onchange="m4Debounce()"><option value="">All products</option><option value="priced">Live (priced)</option><option value="unpriced">Not priced yet</option><option value="instock">In stock</option></select></div>
           <div class="fg"><button class="btn-sm" type="button" onclick="m4LoadProducts(true)">Refresh from API</button></div>
         </div>
         <div id="m4Products" style="overflow-x:auto">Loading…</div>
@@ -7169,6 +7189,6 @@ async function refundOtpSuiteOrder(){const id=prompt('Paste the OTP Suite order 
   closeNow(); /* start with the menu closed */
 })();
 </script>
-<script src="/js/admin-mizzy.js?v=2"></script>
+<script src="/js/admin-mizzy.js?v=3"></script>
 </body>
 </html>
