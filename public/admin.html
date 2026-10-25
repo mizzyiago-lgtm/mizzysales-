@@ -608,6 +608,10 @@ tr:hover td{background:rgba(255,255,255,.035)}
           <div class="fg" style="flex:2"><label>Maintenance message</label><input type="text" id="m2Msg"/></div>
         </div>
         <div class="form-row">
+          <div class="fg"><label>Marketplace 2 default markup (₦ added to provider cost)</label><input type="number" id="m2Markup" min="0" step="1" placeholder="300"/></div>
+          <div class="fg" style="flex:2"><label>&nbsp;</label><div class="info-box" style="margin:0">Applies to every product that has no custom price. Leave blank for the built-in default (₦300). Click Save below.</div></div>
+        </div>
+        <div class="form-row">
           <div class="fg"><label>Email me when supplier balance is below (₦)</label><input type="number" id="m2Low" min="0"/></div>
           <div class="fg"><label>Alert email</label><input type="email" id="m2Email" placeholder="you@example.com"/></div>
           <div class="fg"><label>&nbsp;</label><button class="btn-primary" type="button" onclick="m2SaveConfig()" style="width:100%">Save</button></div>
@@ -646,6 +650,10 @@ tr:hover td{background:rgba(255,255,255,.035)}
         </div>
         <div class="form-row">
           <div class="fg" style="flex:2"><label>Maintenance message</label><input type="text" id="m3Msg"/></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Marketplace 3 default markup (₦ added to provider cost)</label><input type="number" id="m3Markup" min="0" step="1" placeholder="300"/></div>
+          <div class="fg" style="flex:2"><label>&nbsp;</label><div class="info-box" style="margin:0">Applies to every product that has no custom price. Leave blank for the built-in default (₦300). Click Save below.</div></div>
         </div>
         <div class="form-row">
           <div class="fg"><label>Email me when supplier balance is below (₦)</label><input type="number" id="m3Low" min="0"/></div>
@@ -694,6 +702,10 @@ tr:hover td{background:rgba(255,255,255,.035)}
         </div>
         <div class="form-row">
           <div class="fg" style="flex:2"><label>Maintenance message</label><input type="text" id="m4Msg"/></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Marketplace 4 default markup (₦ added to provider cost)</label><input type="number" id="m4Markup" min="0" step="1" placeholder="300"/></div>
+          <div class="fg" style="flex:2"><label>&nbsp;</label><div class="info-box" style="margin:0">Applies to every product that has no custom price. Leave blank for the built-in default (₦300). Click Save below.</div></div>
         </div>
         <div class="form-row">
           <div class="fg"><label>Email me when supplier balance is below (₦)</label><input type="number" id="m4Low" min="0"/></div>
@@ -1113,6 +1125,9 @@ tr:hover td{background:rgba(255,255,255,.035)}
 <div id="tab-boost2adm" class="tab-panel">
   <div class="sec-title">Boost 2 services</div>
   <div style="margin:10px 0"><button class="btn-primary" type="button" onclick="mysB2Sync()">Sync from provider</button> <button class="btn-primary" type="button" onclick="mysB2Load()">Refresh list</button></div>
+  <div class="sec-title" style="margin-top:6px">Default markup (all Boost 2 services)</div>
+  <p style="opacity:.8;margin:6px 0 10px">Added to the provider rate (per 1,000 units) for every service whose own Markup is 0 and that is not on a Specific price. Leave 0 to keep the old behaviour.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px"><input id="mysB2DefMarkup" type="number" min="0" step="0.01" placeholder="e.g. 300" style="padding:8px;border-radius:8px;max-width:160px"><button class="btn-primary" type="button" onclick="mysB2SaveDefault()">Save default markup</button></div>
   <div id="mysB2Msg" style="margin:6px 0"></div>
   <input id="mysB2Q" placeholder="Search services..." oninput="mysB2Render()" style="padding:8px;border-radius:8px;width:100%;max-width:360px;margin-bottom:8px">
   <div id="mysB2List" style="overflow:auto">Loading...</div>
@@ -1270,8 +1285,13 @@ tr:hover td{background:rgba(255,255,255,.035)}
   };
 
   var b2=[];
+  window.mysB2SaveDefault=async function(){
+    try{var v=Number(document.getElementById('mysB2DefMarkup').value||0);if(!Number.isFinite(v)||v<0)throw new Error('Enter a markup of 0 or more.');
+      await aFetch('/api/admin/boost2/config','PUT',{defaultMarkup:v});alert('Boost 2 default markup saved.');mysB2Load();}catch(e){alert(e.message);}
+  };
   window.mysB2Load=async function(){
     var el=document.getElementById('mysB2List');
+    try{var cfg=await aFetch('/api/admin/boost2/config');document.getElementById('mysB2DefMarkup').value=cfg.defaultMarkup||0;}catch(e){}
     try{var d=await aFetch('/api/admin/boost2/services');b2=Array.isArray(d)?d:(d&&(d.services||d.list))||[];mysB2Render();}
     catch(e){el.textContent='Error: '+e.message;}
     mysB2ReviewLoad();
@@ -6892,6 +6912,7 @@ async function m2LoadConfig(){
     document.getElementById('m2Msg').value=m2Cfg.maintenanceMessage||'';
     document.getElementById('m2Low').value=m2Cfg.lowBalanceNgn||0;
     document.getElementById('m2Email').value=m2Cfg.alertEmail||'';
+    document.getElementById('m2Markup').value=(m2Cfg.defaultMarkupNgn===null||m2Cfg.defaultMarkupNgn===undefined)?'':m2Cfg.defaultMarkupNgn;
     document.getElementById('m2BaseUrl').value=m2Cfg.baseUrl||'https://rakibsocials.com/api/v1';
   } catch(e){ document.getElementById('m2Balance').textContent='Could not load Marketplace settings: '+e.message; }
 }
@@ -6899,7 +6920,7 @@ async function m2Toggle(k){
   try { await aFetch('/api/admin/market2/config','PUT',{[k]: !m2Cfg[k]}); m2Cfg[k]=!m2Cfg[k]; m2Btns(); } catch(e){ alert(e.message); }
 }
 async function m2SaveConfig(){
-  try { const body={ maintenanceMessage: document.getElementById('m2Msg').value, lowBalanceNgn: Number(document.getElementById('m2Low').value||0), alertEmail: document.getElementById('m2Email').value, baseUrl:document.getElementById('m2BaseUrl').value }; const key=document.getElementById('m2ApiKey').value.trim(); if(key)body.apiKey=key; await aFetch('/api/admin/market2/config','PUT',body); document.getElementById('m2ApiKey').value=''; alert('Marketplace 2 settings saved.'); await m2LoadConfig(); } catch(e){ alert(e.message); }
+  try { const body={ maintenanceMessage: document.getElementById('m2Msg').value, lowBalanceNgn: Number(document.getElementById('m2Low').value||0), alertEmail: document.getElementById('m2Email').value, defaultMarkupNgn: document.getElementById('m2Markup').value.trim()===''?null:Number(document.getElementById('m2Markup').value), baseUrl:document.getElementById('m2BaseUrl').value }; const key=document.getElementById('m2ApiKey').value.trim(); if(key)body.apiKey=key; await aFetch('/api/admin/market2/config','PUT',body); document.getElementById('m2ApiKey').value=''; alert('Marketplace 2 settings saved.'); await m2LoadConfig(); } catch(e){ alert(e.message); }
 }
 async function m2LoadBalance(){
   const el=document.getElementById('m2Balance');
@@ -6955,6 +6976,7 @@ async function m3LoadConfig(){
     document.getElementById('m3Msg').value=m3Cfg.maintenanceMessage||'';
     document.getElementById('m3Low').value=m3Cfg.lowBalanceNgn||0;
     document.getElementById('m3Email').value=m3Cfg.alertEmail||'';
+    document.getElementById('m3Markup').value=(m3Cfg.defaultMarkupNgn===null||m3Cfg.defaultMarkupNgn===undefined)?'':m3Cfg.defaultMarkupNgn;
     document.getElementById('m3BaseUrl').value=m3Cfg.baseUrl||'https://api.sujandepartment.com/reseller/v1';
   } catch(e){ document.getElementById('m3Balance').textContent='Could not load Marketplace 3 settings: '+e.message; }
 }
@@ -6962,7 +6984,7 @@ async function m3Toggle(){
   try { await aFetch('/api/admin/market3/config','PUT',{market3Enabled: !m3Cfg.market3Enabled}); m3Cfg.market3Enabled=!m3Cfg.market3Enabled; m3Btn(); } catch(e){ alert(e.message); }
 }
 async function m3SaveConfig(){
-  try { const body={ maintenanceMessage: document.getElementById('m3Msg').value, lowBalanceNgn: Number(document.getElementById('m3Low').value||0), alertEmail: document.getElementById('m3Email').value, baseUrl:document.getElementById('m3BaseUrl').value }; const key=document.getElementById('m3ApiKey').value.trim(); if(key)body.apiKey=key; await aFetch('/api/admin/market3/config','PUT',body); document.getElementById('m3ApiKey').value=''; alert('Marketplace 3 settings saved.'); await m3LoadConfig(); } catch(e){ alert(e.message); }
+  try { const body={ maintenanceMessage: document.getElementById('m3Msg').value, lowBalanceNgn: Number(document.getElementById('m3Low').value||0), alertEmail: document.getElementById('m3Email').value, defaultMarkupNgn: document.getElementById('m3Markup').value.trim()===''?null:Number(document.getElementById('m3Markup').value), baseUrl:document.getElementById('m3BaseUrl').value }; const key=document.getElementById('m3ApiKey').value.trim(); if(key)body.apiKey=key; await aFetch('/api/admin/market3/config','PUT',body); document.getElementById('m3ApiKey').value=''; alert('Marketplace 3 settings saved.'); await m3LoadConfig(); } catch(e){ alert(e.message); }
 }
 async function m3LoadBalance(){
   const el=document.getElementById('m3Balance');
