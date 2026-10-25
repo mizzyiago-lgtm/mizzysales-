@@ -1,0 +1,162 @@
+/* Mizzy Sales — menu above the Back bar + normal-size close (X) buttons */
+
+/* 1. Hamburger menu + dim backdrop always cover the Back bar (z-index 9990) */
+.mys-menu-backdrop { z-index: 10005 !important; }
+.mys-drawer { z-index: 10010 !important; }
+
+/* 2. Close buttons: compact round box, normal-size X */
+.modal-x,
+.mys-drawer-close,
+.ks-sheet-close,
+.gmt-close,
+.drawer-close,
+.adm-drawer-close,
+.kp-x,
+.gw-win-close {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+.modal-x svg, .modal-x .icon,
+.mys-drawer-close svg, .ks-sheet-close svg, .gmt-close svg,
+.drawer-close svg, .adm-drawer-close svg, .kp-x svg, .gw-win-close svg {
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 auto;
+}
+/* bare X buttons (no box) */
+.rs-x, .kui-x { font-size: 18px !important; line-height: 1 !important; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   READABILITY FIX — customer panel + admin panel
+   (pale text on white, invisible Cancel & Refund, faded disabled buttons,
+   invisible typed text in inputs). Selectors start with "html body" so they
+   beat the inline <style> blocks inside each page.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* 0. Always render as a light page (stops phone "force dark" turning typed text white) */
+html{color-scheme:light only!important}
+
+/* 1. TYPED TEXT — customer + admin inputs, textareas, selects */
+html body input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
+html body textarea,
+html body select,
+html body [contenteditable="true"]{
+  color:#0b1b3a!important;
+  -webkit-text-fill-color:#0b1b3a!important;
+  caret-color:#0562d6!important;
+  background-color:#ffffff!important;
+  opacity:1!important;
+}
+html body input::placeholder,
+html body textarea::placeholder{color:#6b7d9c!important;-webkit-text-fill-color:#6b7d9c!important;opacity:1!important}
+html body select option,
+html body select optgroup{color:#0b1b3a!important;background:#ffffff!important}
+html body input:-webkit-autofill,
+html body textarea:-webkit-autofill,
+html body select:-webkit-autofill{
+  -webkit-text-fill-color:#0b1b3a!important;
+  -webkit-box-shadow:0 0 0 1000px #ffffff inset!important;
+  box-shadow:0 0 0 1000px #ffffff inset!important;
+}
+html body input:disabled,
+html body textarea:disabled,
+html body select:disabled{
+  color:#4a5d7e!important;-webkit-text-fill-color:#4a5d7e!important;
+  background-color:#eef4fd!important;opacity:1!important;
+}
+
+/* 2. QUICK-PICK CHIPS (WhatsApp, Telegram, Google, Pick recommended...) */
+html body .quick-chips button,
+html body .quick-chips .chip,
+html body button.chip,
+html body .chip-btn{
+  color:#0562d6!important;
+  -webkit-text-fill-color:#0562d6!important;
+  background:#eaf3ff!important;
+  border:1px solid #8fb8ea!important;
+  font-weight:800!important;
+  opacity:1!important;
+}
+html body .quick-chips button:active,
+html body button.chip:active,
+html body .chip-btn:active{background:#d6e8ff!important}
+html body .chip.on,html body .chip.active{background:#0b7cf5!important;color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;border-color:#0b7cf5!important}
+
+/* 3. Small labels that were too pale */
+html body .step-label{color:#0562d6!important}
+html body .stock-chip,html body .an-count-chip{color:#0562d6!important;opacity:1!important}
+html body .srv-sub{opacity:1!important;color:#4a5d7e!important}
+
+/* 4. DISABLED buttons — readable instead of washed out */
+html body .btn[disabled],html body .btn:disabled,
+html body .wrap .btn[disabled],
+html body button[disabled],html body button:disabled{
+  background:#c9dcf5!important;
+  background-image:none!important;
+  color:#1f3a66!important;
+  -webkit-text-fill-color:#1f3a66!important;
+  border:1px solid #9cb9e3!important;
+  opacity:1!important;
+  box-shadow:none!important;
+  cursor:not-allowed;
+}
+
+/* 5. CANCEL & REFUND / danger buttons — always visible (red, white text) */
+html body button.danger,
+html body .danger,
+html body #cancelBtn,
+html body #numCancelBtn,
+html body .btn.btn-danger,
+html body .btn-danger{
+  background:#d92d3f!important;
+  background-image:none!important;
+  color:#ffffff!important;
+  -webkit-text-fill-color:#ffffff!important;
+  border:1px solid #d92d3f!important;
+  font-weight:800!important;
+  opacity:1!important;
+  box-shadow:none!important;
+}
+html body button.danger[disabled],html body #cancelBtn[disabled],
+html body #numCancelBtn[disabled],html body .btn-danger[disabled]{
+  background:#f7c9ce!important;color:#8f1c2a!important;-webkit-text-fill-color:#8f1c2a!important;
+  border:1px solid #e79aa3!important;
+}
+
+/* 6. OTP code, timer, price and error text (were pale cyan / pale red on white) */
+html body .codebox .code{color:#0562d6!important}
+html body .timer.ok{color:#0b7cf5!important}
+html body .price{color:#0562d6!important}
+html body .err,html body .msg.err,html body p.err{color:#d92d3f!important}
+
+/* 7. Extra safety: chip labels + admin form fields (higher specificity, no opacity) */
+html body .quick-chips button *,
+html body button.chip *,
+html body .chip-btn *{opacity:1!important}
+html body .quick-chips .app-ico-name,
+html body button.chip .app-ico-name{color:#0562d6!important;-webkit-text-fill-color:#0562d6!important}
+html body .fg input,
+html body .fg textarea,
+html body .fg select,
+html body .form-row input,
+html body .form-row textarea,
+html body .form-row select,
+html body .modal input,
+html body .modal textarea,
+html body .modal select{
+  color:#0b1b3a!important;
+  -webkit-text-fill-color:#0b1b3a!important;
+  background-color:#ffffff!important;
+  opacity:1!important;
+}
+html body .fg input::placeholder,
+html body .fg textarea::placeholder{color:#6b7d9c!important;-webkit-text-fill-color:#6b7d9c!important;opacity:1!important}
