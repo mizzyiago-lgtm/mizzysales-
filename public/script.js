@@ -42,26 +42,64 @@ function pageForPath(path) {
 // Links" tab) and applies them to every anchor tagged data-link="group/channel/contact" across
 // the whole site, plus WA_NUMBER used by JS-rendered content (chat/support prompts etc.). Runs
 // once per page load — these rarely change, so no need to re-fetch on every navigation.
+const TG_PLANE_SVG = '<svg class="icon tg-contact-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M21.9 4.3 18.6 19.6c-.2 1-.9 1.3-1.7.8l-4.7-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.4-4.8 8.7-7.9c.4-.3-.1-.5-.6-.2L6.6 13 2 11.6c-1-.3-1-1 .2-1.5L20.3 3.1c.8-.3 1.6.2 1.6 1.2z"/></svg>';
+// Contact modes: the admin can switch WhatsApp and Telegram contact on/off independently
+// (Admin -> Site Links). Both default to ON until the admin changes them.
+let WA_ON = true;
+let TG_ON = true;
+// URL a customer should use to reach support right now: WhatsApp if enabled, otherwise Telegram.
+function supportUrl() {
+  if (WA_ON && WA_NUMBER) return `https://wa.me/${WA_NUMBER}`;
+  if (TG_ON && TG_LINK && TG_LINK !== '#') return TG_LINK;
+  return '#';
+}
+function supportLabel() { return (WA_ON || !TG_ON) ? 'WhatsApp' : 'Telegram'; }
+// Turns a WhatsApp-styled anchor into a Telegram one (link, wording and icon).
+function convertAnchorToTelegram(a) {
+  a.href = TG_LINK;
+  a.title = (a.title || '').replace(/WhatsApp/g, 'Telegram');
+  if (a.getAttribute('aria-label')) a.setAttribute('aria-label', a.getAttribute('aria-label').replace(/WhatsApp/g, 'Telegram'));
+  const walker = document.createTreeWalker(a, NodeFilter.SHOW_TEXT);
+  let n; while ((n = walker.nextNode())) { if (/WhatsApp/.test(n.nodeValue)) n.nodeValue = n.nodeValue.replace(/WhatsApp/g, 'Telegram'); }
+  const svg = a.querySelector('svg');
+  if (svg && !svg.classList.contains('tg-contact-icon')) svg.outerHTML = TG_PLANE_SVG;
+  a.classList.add('is-telegram-contact');
+}
 async function applySiteLinks() {
   try {
     const links = await req('/api/public/site-links', 'GET', null, false, false, true);
+    WA_ON = links.whatsappEnabled !== false;
+    TG_ON = links.telegramEnabled !== false;
     if (links.whatsappNumber) WA_NUMBER = links.whatsappNumber;
     const adminPhone = links.adminPhone || WA_NUMBER;
-    if (links.telegramCommunityLink || links.whatsappGroupLink) document.querySelectorAll('a[data-link="group"]').forEach(a => a.href = links.telegramCommunityLink || links.whatsappGroupLink);
-    if (links.telegramChannelLink || links.whatsappChannelLink) document.querySelectorAll('a[data-link="channel"]').forEach(a => a.href = links.telegramChannelLink || links.whatsappChannelLink);
-    document.querySelectorAll('a[data-link="contact"]').forEach(a => { a.href = WA_NUMBER ? `https://wa.me/${WA_NUMBER}` : '#'; });
-    document.querySelectorAll('a[data-link="adminphone"]').forEach(a => { a.href = adminPhone ? `https://wa.me/${adminPhone}` : '#'; });
-    const textLink = document.getElementById('termsWaTextLink');
-    if (textLink) { textLink.href = WA_NUMBER ? `https://wa.me/${WA_NUMBER}` : '#'; textLink.textContent = WA_NUMBER ? `wa.me/${WA_NUMBER}` : 'WhatsApp support'; }
-    document.querySelectorAll('.ksl-admin-phone-text').forEach(el => el.textContent = adminPhone ? `+${adminPhone}` : '');
-    document.querySelectorAll('.ksl-wa-number-text').forEach(el => el.textContent = WA_NUMBER ? `+${WA_NUMBER}` : '');
     // Telegram support is set by the admin in Site Links; no third-party default is hardcoded.
-    TG_LINK = links.telegramLink || (links.telegramUsername ? `https://t.me/${links.telegramUsername}` : '#');
-    TG_USERNAME = (links.telegramUsername || (TG_LINK.startsWith('https://t.me/') ? TG_LINK.split('/').pop() : '') || '').replace(/^@/, '');
+    TG_USERNAME = (links.telegramUsername || (links.telegramLink && links.telegramLink.startsWith('https://t.me/') ? links.telegramLink.split('/').pop() : '') || '').replace(/^@/, '');
+    TG_LINK = links.telegramLink || (TG_USERNAME ? `https://t.me/${TG_USERNAME}` : '#');
+    const tgUsable = TG_ON && TG_LINK && TG_LINK !== '#';
+    const waUsable = WA_ON && !!WA_NUMBER;
+    const hide = a => { a.style.display = 'none'; a.setAttribute('hidden', ''); };
+    const community = (tgUsable ? links.telegramCommunityLink : '') || (WA_ON ? links.whatsappGroupLink : '');
+    const channel = (tgUsable ? links.telegramChannelLink : '') || (WA_ON ? links.whatsappChannelLink : '');
+    document.querySelectorAll('a[data-link="group"]').forEach(a => { if (community && community !== '#') a.href = community; else if (!WA_ON) hide(a); });
+    document.querySelectorAll('a[data-link="channel"]').forEach(a => { if (channel && channel !== '#') a.href = channel; else if (!WA_ON) hide(a); });
+    // "Contact" anchors: WhatsApp when on; Telegram when WhatsApp is off; hidden if both are off.
+    document.querySelectorAll('a[data-link="contact"], a[data-link="adminphone"]').forEach(a => {
+      const num = a.dataset.link === 'adminphone' ? adminPhone : WA_NUMBER;
+      if (WA_ON) { a.href = num ? `https://wa.me/${num}` : '#'; }
+      else if (tgUsable) { convertAnchorToTelegram(a); }
+      else { hide(a); }
+    });
+    // Support page: the WhatsApp button became the Telegram one, so drop the extra Telegram button.
+    if (!WA_ON) document.querySelectorAll('a.supp-tg').forEach(hide);
+    const textLink = document.getElementById('termsWaTextLink');
+    if (textLink && WA_ON) { textLink.href = WA_NUMBER ? `https://wa.me/${WA_NUMBER}` : '#'; textLink.textContent = WA_NUMBER ? `wa.me/${WA_NUMBER}` : 'WhatsApp support'; }
+    document.querySelectorAll('.ksl-admin-phone-text').forEach(el => { if (WA_ON) el.textContent = adminPhone ? `+${adminPhone}` : ''; else el.style.display = 'none'; });
+    document.querySelectorAll('.ksl-wa-number-text').forEach(el => { if (WA_ON) el.textContent = WA_NUMBER ? `+${WA_NUMBER}` : ''; else el.style.display = 'none'; });
     WA_CHAT_LINK = links.whatsappChatLink || (WA_NUMBER ? `https://wa.me/${WA_NUMBER}` : '#');
     SUPPORT_HOURS = links.supportHours || SUPPORT_HOURS;
-    document.querySelectorAll('a[data-link="telegram"]').forEach(a => { a.href = TG_LINK; });
-    document.querySelectorAll('.ksl-telegram-text').forEach(el => el.textContent = `@${TG_USERNAME}`);
+    // Telegram anchors: shown only when Telegram contact is ON.
+    document.querySelectorAll('a[data-link="telegram"]').forEach(a => { if (tgUsable) { a.href = TG_LINK; } else { hide(a); } });
+    document.querySelectorAll('.ksl-telegram-text').forEach(el => { if (tgUsable) el.textContent = `@${TG_USERNAME}`; else el.style.display = 'none'; });
     document.querySelectorAll('.ksl-support-hours').forEach(el => el.textContent = SUPPORT_HOURS);
   } catch (e) { /* No contact link is assumed until the admin configures Site Links. */ }
 }
@@ -1751,7 +1789,7 @@ function renderCard(item) {
   // a small WhatsApp button so the customer can ask admin to restock instead of just bouncing.
   const restockMsg = encodeURIComponent(`Hi! "${item.title}" is showing Sold Out — can you restock it?`);
   const restockBtn = soldOut
-    ? `<a href="https://wa.me/${WA_NUMBER}?text=${restockMsg}" target="_blank" class="prod-restock-btn" onclick="event.stopPropagation()"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Contact Admin to Restock</a>
+    ? `<a href="${supportUrl()}${WA_ON ? '?text=' + restockMsg : ''}" target="_blank" class="prod-restock-btn" onclick="event.stopPropagation()"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Contact Admin to Restock</a>
        <button type="button" class="prod-notify-btn" onclick="event.stopPropagation();notifyRestock('${item._id}',this)"><svg class="icon i-bell" aria-hidden="true"><use href="#i-bell"/></svg> Notify Me</button>`
     : '';
   return `<div class="prod-card-wrap">
@@ -1835,7 +1873,7 @@ async function openModal(id) {
     } else if (soldOut) {
       const restockMsg = encodeURIComponent(`Hi! "${item.title}" is showing Sold Out — can you restock it?`);
       actionHtml=`<button class="m-buy-btn" disabled style="opacity:.5;cursor:not-allowed"><svg class="icon i-x-circle" aria-hidden="true"><use href="#i-x-circle"/></svg> Sold Out</button>
-        <a href="https://wa.me/${WA_NUMBER}?text=${restockMsg}" target="_blank" class="prod-restock-btn" style="margin-top:10px"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Contact Admin to Restock</a>
+        <a href="${supportUrl()}${WA_ON ? '?text=' + restockMsg : ''}" target="_blank" class="prod-restock-btn" style="margin-top:10px"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Contact Admin to Restock</a>
         <button type="button" class="prod-notify-btn" style="margin-top:8px;width:100%" onclick="notifyRestock('${id}',this)"><svg class="icon i-bell" aria-hidden="true"><use href="#i-bell"/></svg> Notify Me When Back in Stock</button>`;
     } else {
       actionHtml=`<button class="m-buy-btn" id="mbuyBtn" onclick="buyItem('${id}')">
@@ -1984,7 +2022,7 @@ function renderFolderModal(item, body) {
          </div>
          <button class="m-buy-btn btn-full" id="subBuyBtnBottom" onclick="buySelectedSubAccounts()" disabled style="opacity:.5"><svg class="icon i-cart" aria-hidden="true"><use href="#i-cart"/></svg> Select accounts to buy</button>`
       : `<button class="m-buy-btn btn-full" disabled style="opacity:.5"><svg class="icon i-x-circle" aria-hidden="true"><use href="#i-x-circle"/></svg> All Sold Out</button>
-         <a href="https://wa.me/${WA_NUMBER}?text=${restockMsg}" target="_blank" class="prod-restock-btn" style="margin-top:10px"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Contact Admin to Restock</a>
+         <a href="${supportUrl()}${WA_ON ? '?text=' + restockMsg : ''}" target="_blank" class="prod-restock-btn" style="margin-top:10px"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Contact Admin to Restock</a>
          <button type="button" class="prod-notify-btn" style="margin-top:8px;width:100%" onclick="notifyRestock('${item._id}',this)"><svg class="icon i-bell" aria-hidden="true"><use href="#i-bell"/></svg> Notify Me When Back in Stock</button>`;
   body.innerHTML = `<div class="m-body">
     <div class="m-avatar-title-row">
@@ -2119,7 +2157,7 @@ async function buyItem(id) {
       ${detailBlock}
       ${receiptRow}
       <button class="btn-primary btn-full" onclick="closeModal();showPage('purchases')" style="margin-top:12px"><svg class="icon i-package" aria-hidden="true"><use href="#i-package"/></svg> View All Purchases</button>
-      <a href="https://wa.me/${WA_NUMBER}" target="_blank" class="wa-support-link"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Need help? WhatsApp us</a>
+      <a href="${supportUrl()}" target="_blank" class="wa-support-link"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Need help? ${supportLabel()} us</a>
     </div></div>`;
  showToast('Purchase successful! ','ok');
   } catch(e) {
@@ -2201,7 +2239,7 @@ function buildPurchaseCard(p,idx) {
     ${detailContent}
     <div class="pc-actions">
       ${copyHistoryBtn}
-      <a href="https://wa.me/${WA_NUMBER}" target="_blank" class="pc-wa-btn"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Support</a>
+      <a href="${supportUrl()}" target="_blank" class="pc-wa-btn"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Support</a>
     </div>
     ${reviewSection}
   </div>`;
@@ -2228,7 +2266,7 @@ Date: ${date.replace(' ','')}
 Details:
 ${details}
 ═══════════════════════════
-Support: wa.me/${WA_NUMBER}`;
+Support: ${supportUrl().replace(/^https:\/\//,'')}`;
  copyRaw(text,btn,' Copy Full Receipt');
 }
 function setStar(idx,val) {
@@ -3530,7 +3568,7 @@ function showDepositResultCard(state) {
         <button class="btn-secondary" onclick="manualCheckPending()" style="margin-bottom:8px"><svg class="icon i-refresh" aria-hidden="true"><use href="#i-refresh"/></svg> Check Now</button>
       ` : ''}
       ${state==='success' ? `<button class="btn-primary" onclick="showPage('market')"><svg class="icon i-cart" aria-hidden="true"><use href="#i-cart"/></svg> Shop Marketplace</button>` : ''}
-      ${state==='failed'  ? `<a href="https://wa.me/${WA_NUMBER}" target="_blank" class="btn-secondary" style="display:inline-block;text-decoration:none"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Contact Support</a>` : ''}
+      ${state==='failed'  ? `<a href="${supportUrl()}" target="_blank" class="btn-secondary" style="display:inline-block;text-decoration:none"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Contact Support</a>` : ''}
     </div>`;
 }
 let _pendingPoller = null;

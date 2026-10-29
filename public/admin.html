@@ -2063,6 +2063,11 @@ tr:hover td{background:rgba(255,255,255,.035)}
         <div style="background:var(--card2,#ffffff);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px">
           <div style="font-weight:700;font-size:.95rem;margin-bottom:4px;color:var(--accent)"><svg class="icon i-message-circle" aria-hidden="true"><use href="#i-message-circle"/></svg> Telegram &amp; WhatsApp contact (support dock)</div>
           <div style="font-size:.82rem;color:var(--t2);margin-bottom:12px">These power the floating Telegram + WhatsApp buttons shown on every page and every “Contact admin” link. Change them any time — no redeploy needed.</div>
+          <div style="display:flex;gap:22px;flex-wrap:wrap;margin-bottom:14px;padding:12px 14px;border:1px solid var(--border);border-radius:10px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><input type="checkbox" id="slTelegramEnabled" checked style="width:18px;height:18px"/> Show Telegram contact to customers</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><input type="checkbox" id="slWhatsappEnabled" checked style="width:18px;height:18px"/> Show WhatsApp contact to customers</label>
+            <div style="font-size:.78rem;color:var(--t2);flex-basis:100%">Turn WhatsApp off and leave Telegram on — customers then see only Telegram. Click “Save Contact Links” to apply.</div>
+          </div>
           <div class="form-row" style="margin-bottom:10px">
             <div class="fg"><label>Telegram username</label><input type="text" id="slTelegramUser" placeholder="your Telegram username" oninput="mysSyncTelegramLink()"/></div>
             <div class="fg"><label>Telegram link (auto-filled — edit only for a custom link)</label><input type="url" id="slTelegramLink" placeholder="#" oninput="mysTelegramLinkDirty=true"/></div>
@@ -5780,6 +5785,8 @@ async function loadContactLinksAdmin() {
     mysTelegramLinkDirty = false; // freshly loaded from the server — back in sync
     set('slWaChatLink', links.whatsappChatLink || '');
     set('slSupportHours', links.supportHours || '');
+    const tgOn = document.getElementById('slTelegramEnabled'); if (tgOn) tgOn.checked = links.telegramEnabled !== false;
+    const waOn = document.getElementById('slWhatsappEnabled'); if (waOn) waOn.checked = links.whatsappEnabled !== false;
     const prev = document.getElementById('slTgPreviewBtn');
     if (prev) prev.href = links.telegramLink || ('https://t.me/' + (links.telegramUsername || ''));
   } catch (e) {}
@@ -5793,10 +5800,12 @@ async function saveContactLinks() {
   const telegramChannelLink = document.getElementById('slTelegramChannelLink').value.trim();
   const telegramCommunityLink = document.getElementById('slTelegramCommunityLink').value.trim();
   for (const [label, link] of [['Telegram channel', telegramChannelLink], ['Telegram community', telegramCommunityLink]]) if (link && !link.startsWith('https://')) return setFb(fb, label + ' link must start with https://', 'err');
-  if (!telegramUsername && !telegramLink) return setFb(fb, 'Enter a Telegram username or link', 'err');
+  const telegramEnabled = document.getElementById('slTelegramEnabled').checked;
+  const whatsappEnabled = document.getElementById('slWhatsappEnabled').checked;
+  if (telegramEnabled && !telegramUsername && !telegramLink) return setFb(fb, 'Enter a Telegram username or link (or switch Telegram off)', 'err');
   if (telegramUsername && !telegramLink) telegramLink = 'https://t.me/' + telegramUsername;
   try {
-    await aFetch('/api/admin/site-links', 'POST', { telegramUsername, telegramLink, telegramChannelLink, telegramCommunityLink, whatsappChatLink, supportHours });
+    await aFetch('/api/admin/site-links', 'POST', { telegramUsername, telegramLink, telegramChannelLink, telegramCommunityLink, whatsappChatLink, supportHours, telegramEnabled, whatsappEnabled });
     mysTelegramLinkDirty = false;
     setFb(fb, 'Saved — live across the site immediately', 'ok');
     const prev = document.getElementById('slTgPreviewBtn'); if (prev) prev.href = telegramLink;

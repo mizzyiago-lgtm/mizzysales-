@@ -414,6 +414,9 @@
       <a class="dsh-contact-item" id="dshContactAdmin" href="#" target="_blank" rel="noopener">
         <div class="dsh-contact-icon svc-emerald"><svg><use href="#i-message-circle"/></svg></div> WhatsApp Support
       </a>
+      <a class="dsh-contact-item" id="dshContactTelegram" href="#" target="_blank" rel="noopener" style="display:none">
+        <div class="dsh-contact-icon svc-blue"><svg><use href="#i-send"/></svg></div> Telegram Support
+      </a>
       <a class="dsh-contact-item" id="dshContactChannel" href="#" target="_blank" rel="noopener">
         <div class="dsh-contact-icon svc-blue"><svg><use href="#i-bell"/></svg></div> Channel
       </a>
@@ -439,6 +442,7 @@
   <div class="dsh-support-menu">
     <a href="/support">🎧 Support</a>
     <a id="dshFabAdmin" href="#" target="_blank" rel="noopener">💬 Admin contact</a>
+    <a id="dshFabTelegram" href="#" target="_blank" rel="noopener" style="display:none">✈️ Telegram support</a>
     <a id="dshFabChannel" href="#" target="_blank" rel="noopener">📣 Channel</a>
     <a id="dshFabGroup" href="#" target="_blank" rel="noopener">👥 Community</a>
   </div>
@@ -667,12 +671,27 @@
       const fabAdmin=document.getElementById('dshFabAdmin');
       const fabChannel=document.getElementById('dshFabChannel');
       const fabGroup=document.getElementById('dshFabGroup');
-      if(admin) admin.href = links.whatsappChatLink || ('https://wa.me/'+(links.adminPhone||links.whatsappNumber||''));
-      if(channel && links.whatsappChannelLink) channel.href = links.whatsappChannelLink;
-      if(group && links.whatsappGroupLink) group.href = links.whatsappGroupLink;
-      if(fabAdmin) fabAdmin.href = links.whatsappChatLink || ('https://wa.me/'+(links.adminPhone||links.whatsappNumber||''));
-      if(fabChannel && links.whatsappChannelLink) fabChannel.href = links.whatsappChannelLink;
-      if(fabGroup && links.whatsappGroupLink) fabGroup.href = links.whatsappGroupLink;
+      const waOn = links.whatsappEnabled !== false;
+      const tgUser = String(links.telegramUsername||'').replace(/^@/,'');
+      const tgHref = links.telegramLink || (tgUser ? 'https://t.me/'+tgUser : '');
+      const tgOn = links.telegramEnabled !== false && !!tgHref && tgHref !== '#';
+      const waHref = links.whatsappChatLink || ('https://wa.me/'+(links.adminPhone||links.whatsappNumber||''));
+      const tg=document.getElementById('dshContactTelegram');
+      const fabTg=document.getElementById('dshFabTelegram');
+      const setLink=(el,href,show)=>{ if(!el) return; if(show){ el.href=href; el.style.display=''; } else { el.style.display='none'; } };
+      // WhatsApp contact: only when the admin has WhatsApp turned on
+      setLink(admin, waHref, waOn);
+      setLink(fabAdmin, waHref, waOn);
+      // Telegram contact: only when the admin has Telegram turned on
+      setLink(tg, tgHref, tgOn);
+      setLink(fabTg, tgHref, tgOn);
+      // Channel / community: prefer Telegram links when Telegram is on, WhatsApp ones only when WhatsApp is on
+      const chLink = (tgOn && links.telegramChannelLink) || (waOn ? links.whatsappChannelLink : '');
+      const grLink = (tgOn && links.telegramCommunityLink) || (waOn ? links.whatsappGroupLink : '');
+      setLink(channel, chLink, !!chLink && chLink !== '#');
+      setLink(fabChannel, chLink, !!chLink && chLink !== '#');
+      setLink(group, grLink, !!grLink && grLink !== '#');
+      setLink(fabGroup, grLink, !!grLink && grLink !== '#');
     }catch{}
   }
 
