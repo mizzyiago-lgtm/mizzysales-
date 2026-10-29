@@ -706,6 +706,9 @@ const siteLinksSchema = new mongoose.Schema({
   telegramChannelLink: { type: String, default: '' },
   telegramCommunityLink: { type: String, default: '' },
  whatsappChatLink: { type: String, default: '' },
+ // Contact modes — admin can switch each method on/off (Admin → Site Links). Both ON by default.
+ whatsappEnabled: { type: Boolean, default: true },
+ telegramEnabled: { type: Boolean, default: true },
  supportHours: { type: String, default: '' },
  logoUrl: { type: String, default: '' },
  updatedAt: { type: Date, default: Date.now }
@@ -8240,7 +8243,7 @@ app.get('/api/public/site-links', async (req, res) => {
  const links = await getSiteLinks();
  const tgUser = String(links.telegramUsername || '').replace(/^@/, '');
    const tgLink = links.telegramLink || ('https://t.me/' + tgUser);
-   res.json({ whatsappNumber: links.whatsappNumber, adminPhone: links.adminPhone || links.whatsappNumber, whatsappGroupLink: links.whatsappGroupLink, whatsappChannelLink: links.whatsappChannelLink, telegramUsername: tgUser, telegramLink: tgLink, telegramChannelLink: links.telegramChannelLink || '', telegramCommunityLink: links.telegramCommunityLink || '', whatsappChatLink: links.whatsappChatLink || ('https://wa.me/' + links.whatsappNumber), supportHours: links.supportHours || '', logoUrl: links.logoUrl || '' });
+   res.json({ whatsappNumber: links.whatsappNumber, adminPhone: links.adminPhone || links.whatsappNumber, whatsappGroupLink: links.whatsappGroupLink, whatsappChannelLink: links.whatsappChannelLink, telegramUsername: tgUser, telegramLink: tgLink, telegramChannelLink: links.telegramChannelLink || '', telegramCommunityLink: links.telegramCommunityLink || '', whatsappChatLink: links.whatsappChatLink || ('https://wa.me/' + links.whatsappNumber), whatsappEnabled: links.whatsappEnabled !== false, telegramEnabled: links.telegramEnabled !== false, supportHours: links.supportHours || '', logoUrl: links.logoUrl || '' });
  } catch (e) { res.status(500).json({ error: 'Failed to load site links' }); }
 });
 app.get('/api/admin/site-links', anyAdminAuth, async (req, res) => {
@@ -8248,7 +8251,7 @@ app.get('/api/admin/site-links', anyAdminAuth, async (req, res) => {
 });
 app.post('/api/admin/site-links', anyAdminAuth, async (req, res) => {
  try {
- const { whatsappNumber, adminPhone, whatsappGroupLink, whatsappChannelLink , telegramUsername, telegramLink, telegramChannelLink, telegramCommunityLink, whatsappChatLink, supportHours } = req.body;
+ const { whatsappNumber, adminPhone, whatsappGroupLink, whatsappChannelLink , telegramUsername, telegramLink, telegramChannelLink, telegramCommunityLink, whatsappChatLink, supportHours, whatsappEnabled, telegramEnabled } = req.body;
  const update = { updatedAt: new Date() };
  if (whatsappNumber !== undefined) {
  const cleaned = String(whatsappNumber).replace(/[^\d]/g, '');
@@ -8293,10 +8296,12 @@ app.post('/api/admin/site-links', anyAdminAuth, async (req, res) => {
    if (link && !/^https:\/\//.test(link)) return res.status(400).json({ error: 'WhatsApp link must start with https://' });
    update.whatsappChatLink = link;
   }
+  if (whatsappEnabled !== undefined) update.whatsappEnabled = (whatsappEnabled === true || whatsappEnabled === 'true');
+  if (telegramEnabled !== undefined) update.telegramEnabled = (telegramEnabled === true || telegramEnabled === 'true');
   if (supportHours !== undefined) update.supportHours = String(supportHours).trim().slice(0, 120);
  const doc = await SiteLinks.findByIdAndUpdate('main', { $set: update }, { upsert: true, new: true });
  console.log(`[admin] site-links updated:`, JSON.stringify(update));
- res.json({ ok: true, whatsappNumber: doc.whatsappNumber, adminPhone: doc.adminPhone || doc.whatsappNumber, whatsappGroupLink: doc.whatsappGroupLink, whatsappChannelLink: doc.whatsappChannelLink, telegramUsername: doc.telegramUsername, telegramLink: doc.telegramLink, telegramChannelLink: doc.telegramChannelLink || '', telegramCommunityLink: doc.telegramCommunityLink || '', whatsappChatLink: doc.whatsappChatLink, supportHours: doc.supportHours });
+ res.json({ ok: true, whatsappNumber: doc.whatsappNumber, adminPhone: doc.adminPhone || doc.whatsappNumber, whatsappGroupLink: doc.whatsappGroupLink, whatsappChannelLink: doc.whatsappChannelLink, telegramUsername: doc.telegramUsername, telegramLink: doc.telegramLink, telegramChannelLink: doc.telegramChannelLink || '', telegramCommunityLink: doc.telegramCommunityLink || '', whatsappChatLink: doc.whatsappChatLink, whatsappEnabled: doc.whatsappEnabled !== false, telegramEnabled: doc.telegramEnabled !== false, supportHours: doc.supportHours });
  } catch (e) { res.status(500).json({ error: 'Failed to update site links: ' + e.message }); }
 });
 const brandLogoUpload = multer({
