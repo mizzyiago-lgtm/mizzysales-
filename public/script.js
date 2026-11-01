@@ -987,9 +987,10 @@ function timeBasedTheme() {
   return (hour >= 19 || hour < 7) ? 'dark' : 'light'; // 7pm–7am = dark, 7am–7pm = light
 }
 function getThemePref() {
-  return 'light'; // Mizzy Sales uses one white + blue look
+  try { const t = localStorage.getItem('ksl_theme'); if (t === 'light' || t === 'dark') return t; } catch (e) {}
+  return 'dark'; // default: navy + blue; users can switch to light
 }
-function getEffectiveTheme(pref) { return 'light'; }
+function getEffectiveTheme(pref) { return pref === 'light' ? 'light' : 'dark'; }
 function applyTheme(pref) {
   const effective = getEffectiveTheme(pref);
   document.documentElement.setAttribute('data-theme', effective);
@@ -1006,7 +1007,6 @@ function applyTheme(pref) {
     : '<svg class="icon i-zap" aria-hidden="true"><use href="#i-zap"/></svg>'; // sun stand-in — reuses existing icon set
 }
 function toggleThemeSimple() {
-  return; // theme toggle disabled — single dark look
   const next = getThemePref() === 'light' ? 'dark' : 'light';
   localStorage.setItem('ksl_theme', next); // an explicit manual choice from here on — time-based auto-switching stops applying
   applyTheme(next);

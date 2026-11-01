@@ -17,7 +17,7 @@
       // Theme: follow the same saved preference / day-night clock as the rest of
       // the site — this page used to hard-force light mode, ignoring dark mode.
       try{
-        var pref = 'light';
+        var pref = 'dark'; try { var _t = localStorage.getItem('ksl_theme'); if (_t === 'light' || _t === 'dark') pref = _t; } catch(e) {}
         var effective = (pref === 'light' || pref === 'dark') ? pref : (function(){ var h = new Date().getHours(); return (h >= 19 || h < 7) ? 'dark' : 'light'; })();
         document.documentElement.setAttribute('data-theme', effective);
       }catch(e){}

@@ -19,14 +19,14 @@
     // Apply theme before first paint to avoid a flash of the wrong theme
     (function(){
       try {
-        var pref = 'light';
+        var pref = 'dark'; try { var _t = localStorage.getItem('ksl_theme'); if (_t === 'light' || _t === 'dark') pref = _t; } catch(e) {}
         var effective = (pref === 'light' || pref === 'dark') ? pref : (function(){ var h = new Date().getHours(); return (h >= 19 || h < 7) ? 'dark' : 'light'; })();
         document.documentElement.setAttribute('data-theme', effective);
         // Follow the device / country clock: with no manual override, re-evaluate the
         // theme on a timer and whenever the tab is shown again (covers timezone changes).
         var auto = function(){
           try {
-            var p = 'light';
+            var p = 'dark'; try { var _t2 = localStorage.getItem('ksl_theme'); if (_t2 === 'light' || _t2 === 'dark') p = _t2; } catch(e) {}
             if (p === 'light' || p === 'dark') return;
             var h = new Date().getHours();
             document.documentElement.setAttribute('data-theme', (h >= 19 || h < 7) ? 'dark' : 'light');
