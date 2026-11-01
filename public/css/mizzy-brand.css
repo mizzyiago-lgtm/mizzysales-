@@ -71,7 +71,7 @@ html[data-theme="light"] .brand-ksl,html[data-theme="light"] .brand-name,html[da
 }
 
 /* Mizzy Sales is dark-only: hide the light/dark toggles */
-#themeBtn,#mThemeToggle,#dshThemeBtn,.theme-toggle-wrap{display:none!important}
+/* theme toggle buttons are visible again */
 
 /* Phones: keep logo + name + Login + Get Started on one row (no cut-off) */
 @media(max-width:480px){
