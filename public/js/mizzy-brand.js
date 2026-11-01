@@ -282,9 +282,9 @@ try{if(localStorage.getItem('ksl_token'))document.documentElement.classList.add(
     p.style.setProperty('gap','8px','important');p.style.setProperty('padding','12px 14px','important');
     p.querySelectorAll('button,a').forEach(function(b){
       var on=/active|selected|on/i.test(b.className||'');
-      b.style.setProperty('background',on?'#0b7cf5':'#ffffff','important');
-      b.style.setProperty('color',on?'#fff':'#0b1b3a','important');
-      b.style.setProperty('border','1px solid '+(on?'#0b7cf5':'#c5d6ee'),'important');
+      b.style.setProperty('background',on?'var(--ms-accent)':'var(--ms-card)','important');
+      b.style.setProperty('color',on?'var(--ms-on-accent)':'var(--ms-t1)','important');
+      b.style.setProperty('border','1px solid '+(on?'var(--ms-accent)':'var(--ms-border2)'),'important');
       b.style.setProperty('padding','8px 14px','important');
       b.style.setProperty('border-radius','999px','important');
       b.style.setProperty('font-size','13px','important');
@@ -293,7 +293,7 @@ try{if(localStorage.getItem('ksl_token'))document.documentElement.classList.add(
   }
   function overlay(t){
     var o=document.createElement('div');
-    o.style.cssText='position:fixed;inset:0;z-index:100000;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#0b1b3a;font:600 15px system-ui';
+    o.style.cssText='position:fixed;inset:0;z-index:100000;background:var(--ms-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:var(--ms-t1);font:600 15px system-ui';
     o.innerHTML='<div style="width:54px;height:54px;border-radius:50%;border:3px solid rgba(24,160,251,.25);border-top-color:#18a0fb;animation:kshsp 1s linear infinite"></div><div>'+t+'</div><style>@keyframes kshsp{to{transform:rotate(360deg)}}</style>';
     document.body.appendChild(o);
   }

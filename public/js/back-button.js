@@ -9,7 +9,7 @@
     var st = document.createElement('style');
     st.textContent = '#kslBackBar{position:sticky;top:0;z-index:9990;display:flex;align-items:center;padding:8px 12px;background:var(--card,#fff);border-bottom:1px solid var(--border,#dbe6f6)}' +
       '#kslBackBar button{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #0b7cf5;background:transparent;color:#0b7cf5;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer}' +
-      '[data-theme="dark"] #kslBackBar{background:#ffffff}';
+      '[data-theme="dark"] #kslBackBar{background:var(--card)}';
     document.head.appendChild(st);
     var bar = document.createElement('div');
     bar.id = 'kslBackBar';
